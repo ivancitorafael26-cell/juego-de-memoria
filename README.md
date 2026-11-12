@@ -1,1 +1,1 @@
-# juego-de-memoria
+# juego de memorizar cubos
