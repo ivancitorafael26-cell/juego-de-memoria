@@ -208,7 +208,6 @@
 <div id="vidasContainer">❤️❤️❤️</div>
 
 <div class="controles">
-  <!-- Selector de Modos -->
   <select id="modoJuego" onchange="cambiarModo()">
     <option value="clasico" selected>🕹️ Modo: Clásico</option>
     <option value="inverso">🔄 Modo: Espejo (Inverso)</option>
@@ -218,7 +217,6 @@
     <option value="libre">🎹 Modo: Melodía Libre</option>
   </select>
 
-  <!-- Selector de Dificultad -->
   <select id="dificultad" onchange="armarTablero()">
     <option value="facil">🟢 Dificultad: Fácil (4 bloques)</option>
     <option value="normal" selected>🟡 Dificultad: Normal (6 bloques)</option>
@@ -226,7 +224,6 @@
     <option value="extremo">🔴 Dificultad: Extremo (15 bloques - 3x5)</option>
   </select>
 
-  <!-- Selector de Sonido -->
   <select id="tipoSonido" onchange="probarSonido()">
     <option value="melodia" selected>🎶 Sonido: Melodía</option>
     <option value="piano">🎹 Sonido: Piano</option>
@@ -240,7 +237,6 @@
     <option value="maullido">🐱 Sonido: Maullido</option>
   </select>
 
-  <!-- Selector de Temas de Bloques (Ultra Saturados y Vibrantes) -->
   <select id="temaColor" onchange="aplicarTema()">
     <option value="bosque" selected>🌿 Tema: Bosque Mágico</option>
     <option value="pastel">🌸 Tema: Rosa Pastel</option>
@@ -254,7 +250,15 @@
 
 <div class="tablero-container" id="tableroContainer">
   <div class="barra-tiempo" id="barraTiempo"></div>
-  <div class="tablero" id="tablero"></div>
+  <div class="tablero" id="tablero">
+    <!-- Bloques de respaldo iniciales para que nunca cargue vacío -->
+    <div class="bloque" style="background:#00ff66; width:105px; height:105px;"></div>
+    <div class="bloque" style="background:#10b981; width:105px; height:105px;"></div>
+    <div class="bloque" style="background:#00e676; width:105px; height:105px;"></div>
+    <div class="bloque" style="background:#00c853; width:105px; height:105px;"></div>
+    <div class="bloque" style="background:#76ff03; width:105px; height:105px;"></div>
+    <div class="bloque" style="background:#69f0ae; width:105px; height:105px;"></div>
+  </div>
 </div>
 
 <div class="acciones">
@@ -347,7 +351,7 @@ function armarTablero() {
     d.id = 'b' + i;
     d.style.background = paleta[i % paleta.length];
     d.style.width = tamFinal + 'px'; 
-    d.style.height = (cfg.cant === 15 ? Math.floor(tamFinal * 0.75) : tamFinal) + 'px';
+    d.style.height = tamFinal + 'px';
     
     d.addEventListener('touchstart', (e) => {
       e.preventDefault();
@@ -586,4 +590,122 @@ function usarRepetir() {
   usr = [];
   vibrar([50, 50, 50]);
   const btnRep = document.getElementById('btnRepetir');
-  btnRep.innerText = '🔁
+  btnRep.innerText = '🔁 Repetir (Usado)';
+  btnRep.disabled = true;
+  reproducirSecuencia();
+}
+
+function iniciar() {
+  armarTablero(); 
+  seq = []; usr = []; lvl = 0; vidas = 3; comodinDisponible = true;
+  if (modoActual === 'supervivencia') {
+    document.getElementById('vidasContainer').innerText = '❤️❤️❤️';
+  }
+  document.getElementById('dificultad').disabled = true;
+  document.getElementById('modoJuego').disabled = true;
+  document.getElementById('btn').style.display = 'none';
+  const btnRep = document.getElementById('btnRepetir');
+  btnRep.style.display = (modoActual === 'contrarreloj' || modoActual === 'supervivencia') ? 'none' : 'block';
+  btnRep.innerText = '🔁 Repetir (1)';
+  btnRep.disabled = true;
+  sigNivel();
+}
+
+function sigNivel() {
+  lvl++; usr = [];
+  seq.push(Math.floor(Math.random() * cfg.cant));
+  reproducirSecuencia();
+}
+
+function tocar(i) {
+  if (modoActual === 'libre') {
+    vibrar(25);
+    luz(i);
+    return;
+  }
+
+  if (lock) return;
+  vibrar(35);
+  luz(i); usr.push(i);
+
+  let idxActual = usr.length - 1;
+  let acerto = true;
+
+  if (modoActual === 'inverso') {
+    let indiceEsperado = seq.length - 1 - idxActual;
+    if (usr[idxActual] !== seq[indiceEsperado]) {
+      acerto = false;
+    }
+  } else {
+    if (usr[idxActual] !== seq[idxActual]) {
+      acerto = false;
+    }
+  }
+
+  if (!acerto) {
+    if (modoActual === 'supervivencia') {
+      vidas--;
+      let corazones = '❤️'.repeat(vidas) + '🖤'.repeat(3 - vidas);
+      document.getElementById('vidasContainer').innerText = corazones;
+      sonido(-1, 400);
+      vibrar(200);
+
+      if (vidas > 0) {
+        lock = true;
+        clearInterval(temporizadorTurno);
+        usr = [];
+        document.getElementById('estado').innerText = `¡Falló! Vidas restantes: ${vidas}. Repitiendo...`;
+        setTimeout(reproducirSecuencia, 1200);
+        return;
+      }
+    }
+    perderPartida();
+    return;
+  }
+
+  if (usr.length === seq.length) {
+    lock = true;
+    clearInterval(temporizadorTurno);
+    document.getElementById('tableroContainer').classList.remove('panico');
+    document.getElementById('barraTiempo').style.width = '100%';
+    document.getElementById('btnRepetir').disabled = true;
+    document.getElementById('estado').innerText = '¡Excelente!';
+    
+    if (modoActual === 'caos') {
+      setTimeout(barajarTableroCaos, 500);
+    } else {
+      setTimeout(sigNivel, 700);
+    }
+  }
+}
+
+function barajarTableroCaos() {
+  const paleta = temas[document.getElementById('temaColor').value];
+  const bloques = document.querySelectorAll('.bloque');
+  bloques.forEach(b => {
+    const colorAleatorio = paleta[Math.floor(Math.random() * paleta.length)];
+    b.style.background = colorAleatorio;
+  });
+  setTimeout(sigNivel, 400);
+}
+
+function perderPartida(mensajeCustom) {
+  lock = true;
+  clearInterval(temporizadorTurno);
+  document.getElementById('tableroContainer').classList.remove('panico');
+  sonido(-1, 600); vibrar(300);
+  const pts = modoActual === 'supervivencia' ? lvl : lvl - 1;
+  document.getElementById('estado').innerText = mensajeCustom || `¡Juego Terminado! Nivel alcanzado: ${Math.max(0, pts)}`;
+  document.getElementById('dificultad').disabled = false;
+  document.getElementById('modoJuego').disabled = false;
+  document.getElementById('btnRepetir').style.display = 'none';
+  document.getElementById('barraTiempo').style.width = '100%';
+  const btn = document.getElementById('btn');
+  btn.innerText = 'Volver a intentar';
+  btn.style.display = 'block';
+}
+
+window.addEventListener('resize', () => { if (esMovil) armarTablero(); });
+</script>
+</body>
+</html>
