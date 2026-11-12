@@ -7,7 +7,7 @@
 <style>
   :root {
     --bg-main: #0f1115;
-    --panel-bg: rgba(22, 27, 34, 0.75);
+    --panel-bg: rgba(22, 27, 34, 0.9);
     --border-color: rgba(255, 255, 255, 0.1);
     --text-main: #f0f3f6;
     --text-muted: #8b949e;
@@ -16,7 +16,7 @@
 
   body.modo-claro {
     --bg-main: #f0f3f6;
-    --panel-bg: rgba(255, 255, 255, 0.85);
+    --panel-bg: rgba(255, 255, 255, 0.9);
     --border-color: rgba(0, 0, 0, 0.1);
     --text-main: #0f1115;
     --text-muted: #57606a;
@@ -29,13 +29,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding: 70px 15px 20px 15px;
     box-sizing: border-box;
     user-select: none;
-    transition: background 0.3s ease, color 0.3s ease;
   }
 
   .top-bar {
@@ -47,20 +46,16 @@
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    pointer-events: none;
   }
-  .top-bar > * { pointer-events: auto; }
 
   .record-badge {
     background: var(--panel-bg);
-    backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
     padding: 8px 14px;
     border-radius: 20px;
     font-size: 13px;
     font-weight: 700;
     color: var(--accent);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   }
 
   .grupo-botones-top { display: flex; gap: 8px; }
@@ -72,22 +67,18 @@
     border: 1px solid var(--border-color);
     border-radius: 20px;
     background: var(--panel-bg);
-    backdrop-filter: blur(12px);
     color: var(--text-main);
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    transition: 0.2s;
   }
-  .btn-vista:hover { background: rgba(128,128,128,0.15); }
 
-  h1 { margin: 10px 0 5px; font-size: 28px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
-  #estado { font-size: 15px; margin-bottom: 5px; color: var(--text-muted); height: 24px; text-align: center; font-weight: 500; }
+  h1 { margin: 5px 0; font-size: 24px; font-weight: 800; text-align: center; }
+  #estado { font-size: 14px; margin-bottom: 8px; color: var(--text-muted); height: 20px; text-align: center; font-weight: 500; }
   
   #vidasContainer {
-    font-size: 18px;
-    height: 28px;
+    font-size: 16px;
+    height: 24px;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     display: none;
     letter-spacing: 4px;
   }
@@ -97,66 +88,43 @@
     gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 18px;
+    margin-bottom: 15px;
     max-width: 680px;
   }
 
   select {
-    padding: 9px 12px;
+    padding: 8px 12px;
     font-size: 13px;
     font-weight: 500;
     border-radius: 10px;
     border: 1px solid var(--border-color);
     background: var(--panel-bg);
-    backdrop-filter: blur(12px);
     color: var(--text-main);
     cursor: pointer;
     outline: none;
-    transition: 0.2s;
   }
-  select:hover { border-color: rgba(128,128,128,0.3); }
 
   .tablero-container {
     position: relative;
     background: var(--panel-bg);
-    backdrop-filter: blur(16px);
-    padding: 20px;
-    border-radius: 24px;
+    padding: 15px;
+    border-radius: 20px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    transition: 0.3s;
-    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .tablero-container.panico {
-    animation: latidoPanico 0.4s infinite alternate;
-    border-color: #ef4444 !important;
-  }
-  @keyframes latidoPanico {
-    from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
-    to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9); }
-  }
-
-  .barra-tiempo {
-    position: absolute;
-    top: 0; left: 0; height: 4px; background: var(--accent);
-    border-radius: 24px 24px 0 0; width: 100%;
-    transition: width 0.05s linear, background-color 0.2s;
-    display: none;
-    z-index: 10;
+    margin-bottom: 15px;
   }
 
   .tablero { 
     display: grid; 
-    grid-gap: 12px; 
+    grid-gap: 10px; 
     justify-content: center;
   }
 
   .bloque {
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
     opacity: 0.4;
     transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.15s ease;
@@ -166,16 +134,15 @@
   .iluminado {
     opacity: 1 !important;
     transform: scale(1.04);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
   }
 
   .acciones {
     display: flex;
     gap: 10px;
-    margin-top: 20px;
     justify-content: center;
     width: 100%;
-    max-width: 380px;
+    max-width: 350px;
   }
 
   .acciones button {
@@ -185,11 +152,147 @@
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    transition: 0.2s;
   }
-  #btn { background: var(--text-main); color: var(--bg-main); flex: 1; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
-  #btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  #btn { background: var(--text-main); color: var(--bg-main); flex: 1; }
   #btnRepetir { background: #eab308; color: #0f1115; display: none; }
   #btnRepetir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
-  .btn-grabacion { background: #ef4444; color: #fff; display:
+  .btn-grabacion { background: #ef4444; color: #fff; display: none; }
+  .btn-grabacion.grabando { background: #dc2626; }
+  .btn-reproducir { background: #10b981; color: #fff; display: none; }
+  .btn-reproducir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="record-badge" id="recordBadge">🏆 Récord: 0</div>
+  <div class="grupo-botones-top">
+    <button class="btn-vista" onclick="alternarTemaClaroDark()" id="btnTemaClaro">☀️ Claro</button>
+    <button class="btn-vista" id="btnVista" onclick="alternarVista()">💻 Escritorio</button>
+  </div>
+</div>
+
+<h1>Memoria de Bloques</h1>
+<div id="estado">Selecciona opciones y presiona Jugar</div>
+<div id="vidasContainer">❤️❤️❤️</div>
+
+<div class="controles">
+  <select id="modoJuego" onchange="cambiarModo()">
+    <option value="clasico" selected>🕹️ Clásico</option>
+    <option value="inverso">🔄 Espejo</option>
+    <option value="contrarreloj">⏱️ Contrarreloj</option>
+    <option value="caos">⚡ Caos</option>
+    <option value="supervivencia">🛡️ Supervivencia</option>
+    <option value="libre">🎹 Melodía Libre</option>
+  </select>
+
+  <select id="dificultad" onchange="cambiarDificultad()">
+    <option value="facil">🟢 Fácil (4)</option>
+    <option value="normal" selected>🟡 Normal (6)</option>
+    <option value="dificil">🟠 Difícil (9)</option>
+    <option value="extremo">🔴 Extremo (15)</option>
+  </select>
+
+  <select id="tipoSonido" onchange="probarSonido()">
+    <option value="melodia" selected>🎶 Melodía</option>
+    <option value="piano">🎹 Piano</option>
+    <option value="laser">🚀 Láser</option>
+  </select>
+
+  <select id="temaColor" onchange="aplicarTema()">
+    <option value="bosque" selected>🌿 Bosque</option>
+    <option value="pastel">🌸 Pastel</option>
+    <option value="galaxia">🌌 Galaxia</option>
+    <option value="neon">⚡ Neón</option>
+  </select>
+</div>
+
+<div class="tablero-container" id="tableroContainer">
+  <div class="tablero" id="tablero"></div>
+</div>
+
+<div class="acciones">
+  <button id="btn" onclick="iniciar()">Jugar</button>
+  <button id="btnRepetir" onclick="usarRepetir()">🔁 Repetir</button>
+  <button id="btnGrabar" class="btn-grabacion" onclick="toggleGrabacion()">🔴 Grabar</button>
+  <button id="btnReproducerMelodia" class="btn-reproducir" onclick="reproducirMelodiaGrabada()" disabled>▶️ Escuchar</button>
+</div>
+
+<script>
+const temas = {
+  bosque:      ['#00ff66', '#10b981', '#00e676', '#00c853', '#76ff03', '#69f0ae', '#00bfa5', '#aeea00'],
+  pastel:      ['#ff4081', '#ff80ab', '#e040fb', '#d500f9', '#7c4dff', '#ff1744', '#aa00ff', '#ff6d00'],
+  galaxia:     ['#00b0ff', '#2979ff', '#651fff', '#f50057', '#00e5ff', '#3d5afe', '#e040fb', '#0091ea'],
+  neon:        ['#d500f9', '#f50057', '#00e5ff', '#00e676', '#ffea00', '#651fff', '#1de9b6', '#ff6d00']
+};
+
+const notas = [261.6, 293.6, 329.6, 349.2, 392.0, 440.0, 493.8, 523.2, 587.3, 659.2, 698.4, 783.9, 830.6, 880.0, 932.3];
+const niveles = {
+  facil:   { cant: 4,  col: 2, tam: 110, vel: 700 },
+  normal:  { cant: 6,  col: 3, tam: 95,  vel: 580 },
+  dificil: { cant: 9,  col: 3, tam: 80,  vel: 450 },
+  extremo: { cant: 15, col: 5, tam: 55,  vel: 320 }
+};
+
+let cfg = niveles.normal, seq = [], usr = [], lvl = 0, lock = true, ctx = null;
+let esMovil = false, comodinDisponible = true, modoActual = 'clasico';
+let esClaro = localStorage.getItem('simon_modo_claro') === 'true';
+let vidas = 3, estaGrabando = false, melodiaGrabada = [], tiempoInicioGrabacion = 0;
+
+// Ejecutar inmediatamente al cargar el script para que no falle nunca
+if (esClaro) document.body.classList.add('modo-claro');
+actualizarVistaRecord();
+aplicarTema();
+armarTablero();
+
+function obtenerClaveRecord() {
+  const difSel = document.getElementById('dificultad');
+  return 'simon_record_' + (difSel ? difSel.value : 'normal');
+}
+
+function obtenerRecordActual() {
+  return parseInt(localStorage.getItem(obtenerClaveRecord()) || '0', 10);
+}
+
+function actualizarVistaRecord() {
+  const badge = document.getElementById('recordBadge');
+  if(badge) badge.innerText = `🏆 Récord: ${obtenerRecordActual()}`;
+}
+
+function cambiarDificultad() {
+  actualizarVistaRecord();
+  armarTablero();
+}
+
+function comprobarRecord(puntuacion) {
+  if (puntuacion > obtenerRecordActual()) {
+    localStorage.setItem(obtenerClaveRecord(), puntuacion);
+    actualizarVistaRecord();
+  }
+}
+
+function alternarTemaClaroDark() {
+  esClaro = !esClaro;
+  document.body.classList.toggle('modo-claro', esClaro);
+  localStorage.setItem('simon_modo_claro', esClaro);
+  const btnT = document.getElementById('btnTemaClaro');
+  if(btnT) btnT.innerText = esClaro ? '🌙 Oscuro' : '☀️ Claro';
+}
+
+function vibrar(patron) {
+  if (navigator.vibrate) { try { navigator.vibrate(patron); } catch (e) {} }
+}
+
+function aplicarTema() {
+  const temaSel = document.getElementById('temaColor');
+  const paleta = temas[temaSel ? temaSel.value : 'bosque'] || temas.bosque;
+  if(paleta && paleta[0]) document.documentElement.style.setProperty('--accent', paleta[0]);
+  armarTablero();
+}
+
+function alternarVista() {
+  esMovil = !esMovil;
+  const btn = document.getElementById('btnVista');
+  if(btn) btn.innerText = esMovil
+  
