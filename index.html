@@ -189,57 +189,5 @@
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    transition: 0.2s;
-  }
-  #btn { background: var(--text-main); color: var(--bg-main); flex: 1; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
-  #btn:hover { opacity: 0.9; transform: translateY(-1px); }
-  #btnRepetir { background: #eab308; color: #0f1115; display: none; }
-  #btnRepetir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
-
-  .btn-grabacion { background: #ef4444; color: #fff; display: none; }
-  .btn-grabacion.grabando { background: #dc2626; animation: pulseRec 1s infinite alternate; }
-  @keyframes pulseRec { from { opacity: 1; } to { opacity: 0.6; } }
-  .btn-reproducir { background: #10b981; color: #fff; display: none; }
-  .btn-reproducir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
-</style>
-</head>
-<body>
-
-<div class="top-bar">
-  <div class="record-badge" id="recordBadge">🏆 Récord: 0</div>
-  <div class="grupo-botones-top">
-    <button class="btn-vista" onclick="alternarTemaClaroDark()" id="btnTemaClaro">☀️ Claro</button>
-    <button class="btn-vista" id="btnVista" onclick="alternarVista()">💻 Escritorio</button>
-  </div>
-</div>
-
-<h1>Memoria de Bloques</h1>
-<div id="estado">Selecciona opciones y presiona Jugar</div>
-<div id="vidasContainer">❤️❤️❤️</div>
-
-<div class="controles">
-  <select id="modoJuego" onchange="cambiarModo()">
-    <option value="clasico" selected>🕹️ Modo: Clásico</option>
-    <option value="inverso">🔄 Modo: Espejo (Inverso)</option>
-    <option value="contrarreloj">⏱️ Modo: Contrarreloj</option>
-    <option value="caos">⚡ Modo: Caos (Aleatorio)</option>
-    <option value="supervivencia">🛡️ Modo: Supervivencia (3 Vidas)</option>
-    <option value="libre">🎹 Modo: Melodía Libre & Grabadora</option>
-  </select>
-
-  <select id="dificultad" onchange="cambiarDificultad()">
-    <option value="facil">🟢 Dificultad: Fácil (4 bloques)</option>
-    <option value="normal" selected>🟡 Dificultad: Normal (6 bloques)</option>
-    <option value="dificil">🟠 Dificultad: Difícil (9 bloques)</option>
-    <option value="extremo">🔴 Dificultad: Extremo (15 bloques - 3x5)</option>
-  </select>
-
-  <select id="tipoSonido" onchange="probarSonido()">
-    <option value="melodia" selected>🎶 Sonido: Melodía</option>
-    <option value="piano">🎹 Sonido: Piano</option>
-    <option value="campana">🔔 Sonido: Campana</option>
-    <option value="laser">🚀 Sonido: Láser</option>
-    <option value="gota">💧 Sonido: Gota de Agua</option>
-    <option value="violin">🎻 Sonido: Violín</option>
-    <option value="guitarra">
-      
+    transition:
+  
