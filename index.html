@@ -12,7 +12,6 @@
     --text-main: #f0f3f6;
     --text-muted: #8b949e;
     --accent: #3b82f6;
-    --accent-hover: #2563eb;
   }
 
   body.modo-claro {
@@ -50,15 +49,9 @@
     z-index: 100;
     pointer-events: none;
   }
+  .top-bar > * { pointer-events: auto; }
 
-  .top-bar > * {
-    pointer-events: auto;
-  }
-
-  .grupo-botones-top {
-    display: flex;
-    gap: 8px;
-  }
+  .grupo-botones-top { display: flex; gap: 8px; }
 
   .btn-vista {
     padding: 8px 14px;
@@ -74,7 +67,6 @@
     transition: 0.2s;
   }
   .btn-vista:hover { background: rgba(128,128,128,0.15); }
-  .btn-vista:active { transform: scale(0.95); }
 
   h1 { margin: 10px 0 5px; font-size: 28px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
   #estado { font-size: 15px; margin-bottom: 5px; color: var(--text-muted); height: 24px; text-align: center; font-weight: 500; }
@@ -249,7 +241,15 @@
 
 <div class="tablero-container" id="tableroContainer">
   <div class="barra-tiempo" id="barraTiempo"></div>
-  <div class="tablero" id="tablero"></div>
+  <div class="tablero" id="tablero">
+    <!-- Bloques estáticos de respaldo por seguridad -->
+    <div class="bloque" style="background:#00ff66;"></div>
+    <div class="bloque" style="background:#10b981;"></div>
+    <div class="bloque" style="background:#00e676;"></div>
+    <div class="bloque" style="background:#00c853;"></div>
+    <div class="bloque" style="background:#76ff03;"></div>
+    <div class="bloque" style="background:#69f0ae;"></div>
+  </div>
 </div>
 
 <div class="acciones">
@@ -281,24 +281,29 @@ let esMovil = false, comodinDisponible = true;
 let modoActual = 'clasico';
 let esClaro = localStorage.getItem('simon_modo_claro') === 'true';
 let vidas = 3;
-
 let temporizadorTurno = null;
 let tiempoRestante = 100;
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (esClaro) {
-    document.body.classList.add('modo-claro');
-    document.getElementById('btnTemaClaro').innerText = '🌙 Oscuro';
+  try {
+    if (esClaro) {
+      document.body.classList.add('modo-claro');
+      const btnT = document.getElementById('btnTemaClaro');
+      if(btnT) btnT.innerText = '🌙 Oscuro';
+    }
+    aplicarTema();
+    armarTablero();
+  } catch(e) {
+    console.error("Error al iniciar:", e);
   }
-  aplicarTema();
-  armarTablero();
 });
 
 function alternarTemaClaroDark() {
   esClaro = !esClaro;
   document.body.classList.toggle('modo-claro', esClaro);
   localStorage.setItem('simon_modo_claro', esClaro);
-  document.getElementById('btnTemaClaro').innerText = esClaro ? '🌙 Oscuro' : '☀️ Claro';
+  const btnT = document.getElementById('btnTemaClaro');
+  if(btnT) btnT.innerText = esClaro ? '🌙 Oscuro' : '☀️ Claro';
 }
 
 function vibrar(patron) {
@@ -306,8 +311,9 @@ function vibrar(patron) {
 }
 
 function aplicarTema() {
-  const temaKey = document.getElementById('temaColor').value;
-  const paleta = temas[temaKey];
+  const temaSel = document.getElementById('temaColor');
+  const temaKey = temaSel ? temaSel.value : 'bosque';
+  const paleta = temas[temaKey] || temas.bosque;
   if(paleta && paleta[0]) {
     document.documentElement.style.setProperty('--accent', paleta[0]);
   }
@@ -317,14 +323,18 @@ function aplicarTema() {
 function alternarVista() {
   esMovil = !esMovil;
   const btn = document.getElementById('btnVista');
-  btn.innerText = esMovil ? '💻 Escritorio' : '📱 Móvil';
+  if(btn) btn.innerText = esMovil ? '💻 Escritorio' : '📱 Móvil';
   armarTablero();
 }
 
 function armarTablero() {
-  cfg = niveles[document.getElementById('dificultad').value];
-  const paleta = temas[document.getElementById('temaColor').value] || temas.bosque;
+  const difSel = document.getElementById('dificultad');
+  cfg = niveles[difSel ? difSel.value : 'normal'] || niveles.normal;
+  const temaSel = document.getElementById('temaColor');
+  const paleta = temas[temaSel ? temaSel.value : 'bosque'] || temas.bosque;
   const tab = document.getElementById('tablero');
+  if (!tab) return;
+  
   tab.innerHTML = '';
   let tamFinal = cfg.tam;
   if (esMovil) {
@@ -352,23 +362,277 @@ function armarTablero() {
 }
 
 function cambiarModo() {
-  modoActual = document.getElementById('modoJuego').value;
+  const modoSel = document.getElementById('modoJuego');
+  modoActual = modoSel ? modoSel.value : 'clasico';
   const barra = document.getElementById('barraTiempo');
   const btnJugar = document.getElementById('btn');
   const estado = document.getElementById('estado');
   const vidasContainer = document.getElementById('vidasContainer');
   
-  barra.style.display = (modoActual === 'contrarreloj') ? 'block' : 'none';
-  vidasContainer.style.display = (modoActual === 'supervivencia') ? 'block' : 'none';
-  document.getElementById('tableroContainer').classList.remove('panico');
+  if(barra) barra.style.display = (modoActual === 'contrarreloj') ? 'block' : 'none';
+  if(vidasContainer) vidasContainer.style.display = (modoActual === 'supervivencia') ? 'block' : 'none';
+  
+  const tabC = document.getElementById('tableroContainer');
+  if(tabC) tabC.classList.remove('panico');
 
   if (modoActual === 'libre') {
     lock = false;
-    btnJugar.style.display = 'none';
-    document.getElementById('btnRepetir').style.display = 'none';
-    estado.innerText = '🎹 Modo Libre: Toca los bloques cuando quieras';
+    if(btnJugar) btnJugar.style.display = 'none';
+    const btnRep = document.getElementById('btnRepetir');
+    if(btnRep) btnRep.style.display = 'none';
+    if(estado) estado.innerText = '🎹 Modo Libre: Toca los bloques cuando quieras';
     document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.8');
   } else {
     lock = true;
-    btnJugar.style.display = 'block';
-    estado.innerText =
+    if(btnJugar) btnJugar.style.display = 'block';
+    if(estado) estado.innerText = 'Selecciona opciones y presiona Jugar';
+    document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.4');
+  }
+}
+
+function sonido(i, ms) {
+  try {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime, dur = ms / 1000;
+    const tipoSel = document.getElementById('tipoSonido');
+    const tipo = tipoSel ? tipoSel.value : 'melodia';
+    const f = i === -1 ? 90 : notas[i % notas.length];
+
+    if (i === -1) {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(130, now); o.frequency.linearRampToValueAtTime(60, now + dur);
+      g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
+      return;
+    }
+
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = tipo === 'piano' ? 'sine' : (tipo === 'laser' ? 'sawtooth' : 'triangle');
+    o.frequency.setValueAtTime(f, now);
+    g.gain.setValueAtTime(0.8, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
+  } catch (e) {}
+}
+
+function probarSonido() { sonido(2, 350); }
+
+function luz(i) {
+  const el = document.getElementById('b' + i);
+  if (!el) return;
+  const ms = Math.min(280, cfg.vel * 0.65);
+  el.classList.add('iluminado'); 
+  sonido(i, ms);
+  setTimeout(() => el.classList.remove('iluminado'), ms);
+}
+
+function reproducirSecuencia() {
+  lock = true;
+  clearInterval(temporizadorTurno);
+  const barra = document.getElementById('barraTiempo');
+  if(barra) barra.style.width = '100%';
+  const btnRep = document.getElementById('btnRepetir');
+  if(btnRep) btnRep.disabled = true;
+  const tabC = document.getElementById('tableroContainer');
+  if(tabC) tabC.classList.remove('panico');
+  const estado = document.getElementById('estado');
+  if(estado) estado.innerText = `Nivel ${lvl} — Observa...`;
+  
+  seq.forEach((id, idx) => {
+    setTimeout(() => {
+      luz(id);
+      if (idx === seq.length - 1) {
+        setTimeout(() => {
+          lock = false;
+          let textoModo = modoActual === 'inverso' ? ' ¡Tu turno (Espejo)! ' : ' ¡Tu turno! ';
+          if(estado) estado.innerText = `Nivel ${lvl} —${textoModo}`;
+          if (comodinDisponible && modoActual !== 'contrarreloj' && btnRep) {
+            btnRep.disabled = false;
+          }
+          if (modoActual === 'contrarreloj') {
+            iniciarTemporizador();
+          }
+        }, cfg.vel * 0.7);
+      }
+    }, (idx + 1) * cfg.vel);
+  });
+}
+
+function iniciarTemporizador() {
+  clearInterval(temporizadorTurno);
+  tiempoRestante = 100;
+  const barra = document.getElementById('barraTiempo');
+  const contenedorTablero = document.getElementById('tableroContainer');
+  const tiempoTotalMs = Math.max(3000, 7000 - (lvl * 250));
+  const intervaloMs = 40;
+  const decremento = (intervaloMs / tiempoTotalMs) * 100;
+
+  temporizadorTurno = setInterval(() => {
+    if (lock) {
+      clearInterval(temporizadorTurno);
+      if(contenedorTablero) contenedorTablero.classList.remove('panico');
+      return;
+    }
+    tiempoRestante -= decremento;
+    if(barra) barra.style.width = Math.max(0, tiempoRestante) + '%';
+
+    if (tiempoRestante <= 25) {
+      if(contenedorTablero) contenedorTablero.classList.add('panico');
+      if(barra) barra.style.backgroundColor = '#ef4444';
+    } else {
+      if(contenedorTablero) contenedorTablero.classList.remove('panico');
+      if(barra) barra.style.backgroundColor = 'var(--accent)';
+    }
+
+    if (tiempoRestante <= 0) {
+      clearInterval(temporizadorTurno);
+      if(contenedorTablero) contenedorTablero.classList.remove('panico');
+      perderPartida("¡Se acabó el tiempo!");
+    }
+  }, intervaloMs);
+}
+
+function usarRepetir() {
+  if (lock || !comodinDisponible || modoActual === 'contrarreloj') return;
+  comodinDisponible = false;
+  usr = [];
+  vibrar([50, 50, 50]);
+  const btnRep = document.getElementById('btnRepetir');
+  if(btnRep) {
+    btnRep.innerText = '🔁 Repetir (Usado)';
+    btnRep.disabled = true;
+  }
+  reproducirSecuencia();
+}
+
+function iniciar() {
+  armarTablero(); 
+  seq = []; usr = []; lvl = 0; vidas = 3; comodinDisponible = true;
+  const vidasContainer = document.getElementById('vidasContainer');
+  if (modoActual === 'supervivencia' && vidasContainer) {
+    vidasContainer.innerText = '❤️❤️❤️';
+  }
+  const difSel = document.getElementById('dificultad');
+  const modSel = document.getElementById('modoJuego');
+  if(difSel) difSel.disabled = true;
+  if(modSel) modSel.disabled = true;
+  
+  const btn = document.getElementById('btn');
+  if(btn) btn.style.display = 'none';
+  
+  const btnRep = document.getElementById('btnRepetir');
+  if(btnRep) {
+    btnRep.style.display = (modoActual === 'contrarreloj' || modoActual === 'supervivencia') ? 'none' : 'block';
+    btnRep.innerText = '🔁 Repetir (1)';
+    btnRep.disabled = true;
+  }
+  sigNivel();
+}
+
+function sigNivel() {
+  lvl++; usr = [];
+  seq.push(Math.floor(Math.random() * cfg.cant));
+  reproducirSecuencia();
+}
+
+function tocar(i) {
+  if (modoActual === 'libre') {
+    vibrar(25);
+    luz(i);
+    return;
+  }
+
+  if (lock) return;
+  vibrar(35);
+  luz(i); usr.push(i);
+
+  let idxActual = usr.length - 1;
+  let acerto = true;
+
+  if (modoActual === 'inverso') {
+    let indiceEsperado = seq.length - 1 - idxActual;
+    if (usr[idxActual] !== seq[indiceEsperado]) acerto = false;
+  } else {
+    if (usr[idxActual] !== seq[idxActual]) acerto = false;
+  }
+
+  if (!acerto) {
+    if (modoActual === 'supervivencia') {
+      vidas--;
+      const vidasContainer = document.getElementById('vidasContainer');
+      if(vidasContainer) vidasContainer.innerText = '❤️'.repeat(vidas) + '🖤'.repeat(3 - vidas);
+      sonido(-1, 400);
+      vibrar(200);
+
+      if (vidas > 0) {
+        lock = true;
+        clearInterval(temporizadorTurno);
+        usr = [];
+        const estado = document.getElementById('estado');
+        if(estado) estado.innerText = `¡Falló! Vidas restantes: ${vidas}. Repitiendo...`;
+        setTimeout(reproducirSecuencia, 1200);
+        return;
+      }
+    }
+    perderPartida();
+    return;
+  }
+
+  if (usr.length === seq.length) {
+    lock = true;
+    clearInterval(temporizadorTurno);
+    const tabC = document.getElementById('tableroContainer');
+    if(tabC) tabC.classList.remove('panico');
+    const barra = document.getElementById('barraTiempo');
+    if(barra) barra.style.width = '100%';
+    const btnRep = document.getElementById('btnRepetir');
+    if(btnRep) btnRep.disabled = true;
+    const estado = document.getElementById('estado');
+    if(estado) estado.innerText = '¡Excelente!';
+    
+    if (modoActual === 'caos') {
+      setTimeout(barajarTableroCaos, 500);
+    } else {
+      setTimeout(sigNivel, 700);
+    }
+  }
+}
+
+function barajarTableroCaos() {
+  const temaSel = document.getElementById('temaColor');
+  const paleta = temas[temaSel ? temaSel.value : 'bosque'];
+  document.querySelectorAll('.bloque').forEach(b => {
+    b.style.background = paleta[Math.floor(Math.random() * paleta.length)];
+  });
+  setTimeout(sigNivel, 400);
+}
+
+function perderPartida(mensajeCustom) {
+  lock = true;
+  clearInterval(temporizadorTurno);
+  const tabC = document.getElementById('tableroContainer');
+  if(tabC) tabC.classList.remove('panico');
+  sonido(-1, 600); vibrar(300);
+  const pts = modoActual === 'supervivencia' ? lvl : lvl - 1;
+  const estado = document.getElementById('estado');
+  if(estado) estado.innerText = mensajeCustom || `¡Juego Terminado! Nivel alcanzado: ${Math.max(0, pts)}`;
+  
+  const difSel = document.getElementById('dificultad');
+  const modSel = document.getElementById('modoJuego');
+  if(difSel) difSel.disabled = false;
+  if(modSel) modSel.disabled = false;
+  
+  const btnRep = document.getElementById('btnRepetir');
+  if(btnRep) btnRep.style.display = 'none';
+  const barra = document.getElementById('barraTiempo');
+  if(barra) barra.style.width = '100%';
+  
+  const btn = document.getElementById('btn');
+  if(btn) {
+    btn.innerText = 'Volver a intentar';
+    btn.style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
