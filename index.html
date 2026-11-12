@@ -15,7 +15,6 @@
     --accent-hover: #2563eb;
   }
 
-  /* Variables para el Modo Claro */
   body.modo-claro {
     --bg-main: #f0f3f6;
     --panel-bg: rgba(255, 255, 255, 0.85);
@@ -80,7 +79,6 @@
   h1 { margin: 10px 0 5px; font-size: 28px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
   #estado { font-size: 15px; margin-bottom: 5px; color: var(--text-muted); height: 24px; text-align: center; font-weight: 500; }
   
-  /* Contenedor de Vidas (Corazones) */
   #vidasContainer {
     font-size: 18px;
     height: 28px;
@@ -124,9 +122,13 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     transition: 0.3s;
     overflow: hidden;
+    min-width: 320px;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Animación de Pánico cuando queda poco tiempo */
   .tablero-container.panico {
     animation: latidoPanico 0.4s infinite alternate;
     border-color: #ef4444 !important;
@@ -189,9 +191,6 @@
   #btn:hover { opacity: 0.9; transform: translateY(-1px); }
   #btnRepetir { background: #eab308; color: #0f1115; display: none; }
   #btnRepetir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
-
-  body.modo-movil h1 { font-size: 22px; }
-  body.modo-movil .tablero-container { padding: 12px; border-radius: 18px; }
 </style>
 </head>
 <body>
@@ -199,7 +198,7 @@
 <div class="top-bar">
   <div class="grupo-botones-top">
     <button class="btn-vista" onclick="alternarTemaClaroDark()" id="btnTemaClaro">☀️ Claro</button>
-    <button class="btn-vista" id="btnVista" onclick="alternarVista()">📱 Móvil</button>
+    <button class="btn-vista" id="btnVista" onclick="alternarVista()">💻 Escritorio</button>
   </div>
 </div>
 
@@ -250,15 +249,7 @@
 
 <div class="tablero-container" id="tableroContainer">
   <div class="barra-tiempo" id="barraTiempo"></div>
-  <div class="tablero" id="tablero">
-    <!-- Bloques de respaldo iniciales para que nunca cargue vacío -->
-    <div class="bloque" style="background:#00ff66; width:105px; height:105px;"></div>
-    <div class="bloque" style="background:#10b981; width:105px; height:105px;"></div>
-    <div class="bloque" style="background:#00e676; width:105px; height:105px;"></div>
-    <div class="bloque" style="background:#00c853; width:105px; height:105px;"></div>
-    <div class="bloque" style="background:#76ff03; width:105px; height:105px;"></div>
-    <div class="bloque" style="background:#69f0ae; width:105px; height:105px;"></div>
-  </div>
+  <div class="tablero" id="tablero"></div>
 </div>
 
 <div class="acciones">
@@ -286,7 +277,7 @@ const niveles = {
 };
 
 let cfg = niveles.normal, seq = [], usr = [], lvl = 0, lock = true, ctx = null;
-let esMovil = window.innerWidth <= 600, comodinDisponible = true;
+let esMovil = false, comodinDisponible = true;
 let modoActual = 'clasico';
 let esClaro = localStorage.getItem('simon_modo_claro') === 'true';
 let vidas = 3;
@@ -300,7 +291,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnTemaClaro').innerText = '🌙 Oscuro';
   }
   aplicarTema();
-  aplicarVista();
   armarTablero();
 });
 
@@ -324,14 +314,12 @@ function aplicarTema() {
   armarTablero();
 }
 
-function aplicarVista() {
+function alternarVista() {
+  esMovil = !esMovil;
   const btn = document.getElementById('btnVista');
-  document.body.classList.toggle('modo-movil', esMovil);
   btn.innerText = esMovil ? '💻 Escritorio' : '📱 Móvil';
   armarTablero();
 }
-
-function alternarVista() { esMovil = !esMovil; aplicarVista(); }
 
 function armarTablero() {
   cfg = niveles[document.getElementById('dificultad').value];
@@ -383,329 +371,4 @@ function cambiarModo() {
   } else {
     lock = true;
     btnJugar.style.display = 'block';
-    estado.innerText = 'Selecciona opciones y presiona Jugar';
-    document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.4');
-  }
-}
-
-function sonido(i, ms) {
-  try {
-    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
-    const now = ctx.currentTime, dur = ms / 1000;
-    const tipo = document.getElementById('tipoSonido').value;
-    const f = i === -1 ? 90 : notas[i % notas.length];
-
-    if (i === -1) {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sawtooth'; o.frequency.setValueAtTime(130, now); o.frequency.linearRampToValueAtTime(60, now + dur);
-      g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-      return;
-    }
-
-    if (tipo === 'melodia') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'triangle';
-      o.frequency.setValueAtTime(f, now);
-      o.frequency.exponentialRampToValueAtTime(f * 1.5, now + dur);
-      g.gain.setValueAtTime(0.8, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-
-    } else if (tipo === 'piano') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine'; o.frequency.setValueAtTime(f, now);
-      g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-
-    } else if (tipo === 'campana') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine'; o.frequency.setValueAtTime(f * 2, now);
-      g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur + 0.1);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur + 0.1);
-
-    } else if (tipo === 'laser') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sawtooth'; o.frequency.setValueAtTime(f * 3, now); o.frequency.exponentialRampToValueAtTime(f * 0.2, now + dur);
-      g.gain.setValueAtTime(0.8, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-
-    } else if (tipo === 'gota') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f * 2.5, now);
-      o.frequency.exponentialRampToValueAtTime(f * 3.8, now + dur * 0.25);
-      o.frequency.exponentialRampToValueAtTime(f * 2.2, now + dur);
-      g.gain.setValueAtTime(0.9, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(now); o.stop(now + dur);
-
-    } else if (tipo === 'violin') {
-      const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
-      o1.type = 'sawtooth'; o2.type = 'triangle';
-      o1.frequency.setValueAtTime(f, now);
-      o2.frequency.setValueAtTime(f, now);
-      o1.frequency.linearRampToValueAtTime(f * 1.015, now + dur * 0.6);
-      g.gain.setValueAtTime(0.001, now);
-      g.gain.linearRampToValueAtTime(0.5, now + dur * 0.25);
-      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o1.connect(g); o2.connect(g); g.connect(ctx.destination);
-      o1.start(now); o2.start(now); o1.stop(now + dur); o2.stop(now + dur);
-
-    } else if (tipo === 'guitarra') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(f, now);
-      g.gain.setValueAtTime(0.8, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + dur * 0.75);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(now); o.stop(now + dur);
-
-    } else if (tipo === 'explosion') {
-      const bufferSize = ctx.sampleRate * 0.5;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let j = 0; j < bufferSize; j++) {
-        data[j] = Math.random() * 2 - 1;
-      }
-      const ruido = ctx.createBufferSource();
-      ruido.buffer = buffer;
-      
-      const filtro = ctx.createBiquadFilter();
-      filtro.type = 'lowpass';
-      filtro.frequency.setValueAtTime(400, now);
-      filtro.frequency.linearRampToValueAtTime(40, now + dur);
-
-      const g = ctx.createGain();
-      g.gain.setValueAtTime(1.0, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-
-      ruido.connect(filtro); filtro.connect(g); g.connect(ctx.destination);
-      ruido.start(now); ruido.stop(now + dur);
-
-    } else if (tipo === 'timbre') {
-      const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain();
-      o1.type = 'sine'; o2.type = 'sine';
-      o1.frequency.setValueAtTime(f * 3.2, now);
-      o2.frequency.setValueAtTime(f * 5.1, now);
-      g.gain.setValueAtTime(0.8, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + dur * 1.3);
-      o1.connect(g); o2.connect(g); g.connect(ctx.destination);
-      o1.start(now); o2.start(now); o1.stop(now + dur * 1.3); o2.stop(now + dur * 1.3);
-
-    } else if (tipo === 'maullido') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f * 1.1, now);
-      o.frequency.linearRampToValueAtTime(f * 2.1, now + dur * 0.35);
-      o.frequency.linearRampToValueAtTime(f * 1.4, now + dur);
-      g.gain.setValueAtTime(0.001, now);
-      g.gain.linearRampToValueAtTime(0.8, now + dur * 0.25);
-      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(now); o.stop(now + dur);
-    }
-  } catch (e) {}
-}
-
-function probarSonido() { 
-  sonido(2, 350); 
-}
-
-function luz(i) {
-  const el = document.getElementById('b' + i);
-  if (!el) return;
-  const ms = Math.min(280, cfg.vel * 0.65);
-  el.classList.add('iluminado'); 
-  sonido(i, ms);
-  setTimeout(() => el.classList.remove('iluminado'), ms);
-}
-
-function reproducirSecuencia() {
-  lock = true;
-  clearInterval(temporizadorTurno);
-  document.getElementById('barraTiempo').style.width = '100%';
-  document.getElementById('btnRepetir').disabled = true;
-  document.getElementById('tableroContainer').classList.remove('panico');
-  document.getElementById('estado').innerText = `Nivel ${lvl} — Observa...`;
-  
-  seq.forEach((id, idx) => {
-    setTimeout(() => {
-      luz(id);
-      if (idx === seq.length - 1) {
-        setTimeout(() => {
-          lock = false;
-          let textoModo = modoActual === 'inverso' ? ' ¡Tu turno (Espejo)! ' : ' ¡Tu turno! ';
-          document.getElementById('estado').innerText = `Nivel ${lvl} —${textoModo}`;
-          if (comodinDisponible && modoActual !== 'contrarreloj') {
-            document.getElementById('btnRepetir').disabled = false;
-          }
-          if (modoActual === 'contrarreloj') {
-            iniciarTemporizador();
-          }
-        }, cfg.vel * 0.7);
-      }
-    }, (idx + 1) * cfg.vel);
-  });
-}
-
-function iniciarTemporizador() {
-  clearInterval(temporizadorTurno);
-  tiempoRestante = 100;
-  const barra = document.getElementById('barraTiempo');
-  const contenedorTablero = document.getElementById('tableroContainer');
-  const tiempoTotalMs = Math.max(3000, 7000 - (lvl * 250));
-  const intervaloMs = 40;
-  const decremento = (intervaloMs / tiempoTotalMs) * 100;
-
-  temporizadorTurno = setInterval(() => {
-    if (lock) {
-      clearInterval(temporizadorTurno);
-      contenedorTablero.classList.remove('panico');
-      return;
-    }
-    tiempoRestante -= decremento;
-    barra.style.width = Math.max(0, tiempoRestante) + '%';
-
-    if (tiempoRestante <= 25) {
-      contenedorTablero.classList.add('panico');
-      barra.style.backgroundColor = '#ef4444';
-    } else {
-      contenedorTablero.classList.remove('panico');
-      barra.style.backgroundColor = 'var(--accent)';
-    }
-
-    if (tiempoRestante <= 0) {
-      clearInterval(temporizadorTurno);
-      contenedorTablero.classList.remove('panico');
-      perderPartida("¡Se acabó el tiempo!");
-    }
-  }, intervaloMs);
-}
-
-function usarRepetir() {
-  if (lock || !comodinDisponible || modoActual === 'contrarreloj') return;
-  comodinDisponible = false;
-  usr = [];
-  vibrar([50, 50, 50]);
-  const btnRep = document.getElementById('btnRepetir');
-  btnRep.innerText = '🔁 Repetir (Usado)';
-  btnRep.disabled = true;
-  reproducirSecuencia();
-}
-
-function iniciar() {
-  armarTablero(); 
-  seq = []; usr = []; lvl = 0; vidas = 3; comodinDisponible = true;
-  if (modoActual === 'supervivencia') {
-    document.getElementById('vidasContainer').innerText = '❤️❤️❤️';
-  }
-  document.getElementById('dificultad').disabled = true;
-  document.getElementById('modoJuego').disabled = true;
-  document.getElementById('btn').style.display = 'none';
-  const btnRep = document.getElementById('btnRepetir');
-  btnRep.style.display = (modoActual === 'contrarreloj' || modoActual === 'supervivencia') ? 'none' : 'block';
-  btnRep.innerText = '🔁 Repetir (1)';
-  btnRep.disabled = true;
-  sigNivel();
-}
-
-function sigNivel() {
-  lvl++; usr = [];
-  seq.push(Math.floor(Math.random() * cfg.cant));
-  reproducirSecuencia();
-}
-
-function tocar(i) {
-  if (modoActual === 'libre') {
-    vibrar(25);
-    luz(i);
-    return;
-  }
-
-  if (lock) return;
-  vibrar(35);
-  luz(i); usr.push(i);
-
-  let idxActual = usr.length - 1;
-  let acerto = true;
-
-  if (modoActual === 'inverso') {
-    let indiceEsperado = seq.length - 1 - idxActual;
-    if (usr[idxActual] !== seq[indiceEsperado]) {
-      acerto = false;
-    }
-  } else {
-    if (usr[idxActual] !== seq[idxActual]) {
-      acerto = false;
-    }
-  }
-
-  if (!acerto) {
-    if (modoActual === 'supervivencia') {
-      vidas--;
-      let corazones = '❤️'.repeat(vidas) + '🖤'.repeat(3 - vidas);
-      document.getElementById('vidasContainer').innerText = corazones;
-      sonido(-1, 400);
-      vibrar(200);
-
-      if (vidas > 0) {
-        lock = true;
-        clearInterval(temporizadorTurno);
-        usr = [];
-        document.getElementById('estado').innerText = `¡Falló! Vidas restantes: ${vidas}. Repitiendo...`;
-        setTimeout(reproducirSecuencia, 1200);
-        return;
-      }
-    }
-    perderPartida();
-    return;
-  }
-
-  if (usr.length === seq.length) {
-    lock = true;
-    clearInterval(temporizadorTurno);
-    document.getElementById('tableroContainer').classList.remove('panico');
-    document.getElementById('barraTiempo').style.width = '100%';
-    document.getElementById('btnRepetir').disabled = true;
-    document.getElementById('estado').innerText = '¡Excelente!';
-    
-    if (modoActual === 'caos') {
-      setTimeout(barajarTableroCaos, 500);
-    } else {
-      setTimeout(sigNivel, 700);
-    }
-  }
-}
-
-function barajarTableroCaos() {
-  const paleta = temas[document.getElementById('temaColor').value];
-  const bloques = document.querySelectorAll('.bloque');
-  bloques.forEach(b => {
-    const colorAleatorio = paleta[Math.floor(Math.random() * paleta.length)];
-    b.style.background = colorAleatorio;
-  });
-  setTimeout(sigNivel, 400);
-}
-
-function perderPartida(mensajeCustom) {
-  lock = true;
-  clearInterval(temporizadorTurno);
-  document.getElementById('tableroContainer').classList.remove('panico');
-  sonido(-1, 600); vibrar(300);
-  const pts = modoActual === 'supervivencia' ? lvl : lvl - 1;
-  document.getElementById('estado').innerText = mensajeCustom || `¡Juego Terminado! Nivel alcanzado: ${Math.max(0, pts)}`;
-  document.getElementById('dificultad').disabled = false;
-  document.getElementById('modoJuego').disabled = false;
-  document.getElementById('btnRepetir').style.display = 'none';
-  document.getElementById('barraTiempo').style.width = '100%';
-  const btn = document.getElementById('btn');
-  btn.innerText = 'Volver a intentar';
-  btn.style.display = 'block';
-}
-
-window.addEventListener('resize', () => { if (esMovil) armarTablero(); });
-</script>
-</body>
-</html>
+    estado.innerText =
