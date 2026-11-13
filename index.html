@@ -616,16 +616,16 @@
             <div class="barra-progreso-tiempo" id="barra-progreso-tiempo"></div>
         </div>
 
-        <!-- Panel de Grabadora con Código Numérico de 7 Dígitos -->
+        <!-- Panel de Grabadora con Código de Melodía Completo (Soporta 17 o más notas) -->
         <div class="panel-grabadora" id="panel-grabadora">
             <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
                 <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
                 <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Reproducir</button>
-                <button class="btn-grabadora" id="btn-generar-codigo" type="button" onclick="generarCodigoMelodia()" style="background-color: #3742fa; color: white;">🔗 Copiar PIN (7 dígitos)</button>
+                <button class="btn-grabadora" id="btn-generar-codigo" type="button" onclick="generarCodigoMelodia()" style="background-color: #3742fa; color: white;">🔗 Copiar Código</button>
             </div>
             <div style="display: flex; gap: 6px; align-items: center; justify-content: center; margin-top: 4px;">
-                <input type="text" id="input-codigo-melodia" placeholder="Ej: 0481923" maxlength="7" style="padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(128,128,128,0.4); background: rgba(0,0,0,0.2); color: white; font-size: 0.8rem; width: 140px; outline: none; text-align: center; letter-spacing: 2px;">
-                <button class="btn-grabadora" id="btn-cargar-codigo" type="button" onclick="cargarMelodiaPorCodigo()" style="background-color: #ffa502; color: white;">📥 Cargar PIN</button>
+                <input type="text" id="input-codigo-melodia" placeholder="Pega el código aquí..." style="padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(128,128,128,0.4); background: rgba(0,0,0,0.2); color: white; font-size: 0.8rem; width: 170px; outline: none; text-align: center;">
+                <button class="btn-grabadora" id="btn-cargar-codigo" type="button" onclick="cargarMelodiaPorCodigo()" style="background-color: #ffa502; color: white;">📥 Cargar</button>
             </div>
         </div>
 
@@ -832,84 +832,67 @@
             canvasAtmos.height = window.innerHeight;
         });
 
-        // Generar PIN numérico de 7 dígitos basado en las notas grabadas
+        // Generar código compacto que soporta cualquier cantidad de notas (17, 30, etc.)
         function generarCodigoMelodia() {
             if (notasGrabadas.length === 0) {
                 alert("¡Primero graba una melodía en el Modo Libre tocando los bloques!");
                 return;
             }
             try {
-                // Tomamos hasta 5 notas de la grabación (rellenando con 0 si son menos)
-                let notas = notasGrabadas.map(n => n.id);
-                while (notas.length < 5) {
-                    notas.push(0);
-                }
-                notas = notas.slice(0, 5);
+                // Convertir cada ID de nota a un carácter (0-9 y A-O para 0-24)
+                let codigo = notasGrabadas.map(n => {
+                    let id = n.id;
+                    return id < 10 ? id.toString() : String.fromCharCode(55 + id);
+                }).join('');
 
-                // Comprimir en un número único usando base-25
-                let num = notas[0] + 
-                          (notas[1] * 25) + 
-                          (notas[2] * 625) + 
-                          (notas[3] * 15625) + 
-                          (notas[4] * 390625);
-
-                // Convertir a texto de exactamente 7 dígitos rellenando con ceros a la izquierda
-                let codigoNum = String(num).padStart(7, '0');
-
-                navigator.clipboard.writeText(codigoNum).then(() => {
+                navigator.clipboard.writeText(codigo).then(() => {
                     const mensaje = document.getElementById('mensaje');
-                    if (mensaje) mensaje.textContent = `📋 ¡PIN numérico copiado: ${codigoNum}!`;
-                    alert(`¡Tu PIN numérico de 7 dígitos es: ${codigoNum}\nYa está copiado para compartirlo con tus amigos!`);
+                    if (mensaje) mensaje.textContent = `📋 ¡Código de ${notasGrabadas.length} notas copiado!`;
+                    alert(`¡Código generado (${notasGrabadas.length} notas) y copiado con éxito! Compártelo con tus amigos.`);
                 }).catch(err => {
-                    prompt("Copia este PIN de 7 dígitos para tu melodía:", codigoNum);
+                    prompt("Copia este código para compartir tu melodía:", codigo);
                 });
             } catch (e) {
-                alert("Error al generar el PIN numérico.");
+                alert("Error al generar el código.");
             }
         }
 
-        // Cargar melodía a partir del PIN numérico de 7 dígitos
+        // Cargar melodía completa desde el código compartido
         function cargarMelodiaPorCodigo() {
             const input = document.getElementById('input-codigo-melodia');
             if (!input || !input.value.trim()) {
-                alert("Por favor, ingresa el PIN numérico de 7 dígitos en la casilla.");
+                alert("Por favor, pega el código de melodía en la casilla.");
                 return;
             }
             try {
-                let codigoNum = input.value.trim().replace(/\D/g, ''); // Limpiar para que sean solo números
-                if (codigoNum.length !== 7) {
-                    alert("El PIN debe contener exactamente 7 dígitos numéricos.");
-                    return;
+                let codigo = input.value.trim().toUpperCase();
+                let nuevasNotas = [];
+                let intervaloTiempo = 350; // Ritmo uniforme perfecto para reproducir
+
+                for (let i = 0; i < codigo.length; i++) {
+                    let char = codigo[i];
+                    let id = -1;
+                    if (char >= '0' && char <= '9') {
+                        id = parseInt(char, 10);
+                    } else if (char >= 'A' && char <= 'O') {
+                        id = char.charCodeAt(0) - 55;
+                    }
+
+                    if (id >= 0 && id <= 24) {
+                        nuevasNotas.push({ id: id, tiempo: i * intervaloTiempo });
+                    }
                 }
 
-                let num = parseInt(codigoNum, 10);
-                if (isNaN(num) || num > 9765624) {
-                    alert("El PIN numérico ingresado no es válido.");
-                    return;
+                if (nuevasNotas.length > 0) {
+                    notasGrabadas = [...nuevasNotas];
+                    const mensaje = document.getElementById('mensaje');
+                    if (mensaje) mensaje.textContent = `✅ ¡Melodía cargada (${notasGrabadas.length} notas)! Dale a Reproducir.`;
+                    reproducirGrabacion();
+                } else {
+                    alert("El código ingresado no contiene notas válidas.");
                 }
-
-                // Descomprimir el número en 5 notas
-                let temp = num;
-                let n0 = temp % 25; temp = Math.floor(temp / 25);
-                let n1 = temp % 25; temp = Math.floor(temp / 25);
-                let n2 = temp % 25; temp = Math.floor(temp / 25);
-                let n3 = temp % 25; temp = Math.floor(temp / 25);
-                let n4 = temp % 25;
-
-                // Asignar tiempos secuenciales uniformes para la reproducción
-                notasGrabadas = [
-                    { id: n0, tiempo: 0 },
-                    { id: n1, tiempo: 400 },
-                    { id: n2, tiempo: 800 },
-                    { id: n3, tiempo: 1200 },
-                    { id: n4, tiempo: 1600 }
-                ];
-
-                const mensaje = document.getElementById('mensaje');
-                if (mensaje) mensaje.textContent = `✅ ¡PIN cargado (${notasGrabadas.length} notas)! Dale a Reproducir.`;
-                reproducirGrabacion();
             } catch (e) {
-                alert("El PIN ingresado no es válido.");
+                alert("El código ingresado no es válido o está dañado.");
             }
         }
 
@@ -1001,7 +984,7 @@
 
         let estadisticas = (() => {
             try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v12'));
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v13'));
                 if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
                 for (let m in estadisticasBase) {
                     if (!guardado[m]) guardado[m] = estadisticasBase[m];
@@ -1019,7 +1002,7 @@
 
         function guardarStats() {
             try {
-                localStorage.setItem('memoria_stats_v12', JSON.stringify(estadisticas));
+                localStorage.setItem('memoria_stats_v13', JSON.stringify(estadisticas));
             } catch (e) {}
         }
 
@@ -1209,7 +1192,7 @@
 
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v12');
+                localStorage.removeItem('memoria_stats_v13');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
                 abrirEstadisticas();
