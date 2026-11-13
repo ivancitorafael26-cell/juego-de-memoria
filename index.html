@@ -3,171 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infla el Globo Pro</title>
+    <title>Secuencia Hacker Pro</title>
     <style>
         body {
-            background-color: #111;
-            color: #fff;
+            background-color: #0b0c10;
+            color: #66fcf1;
             text-align: center;
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            overflow: hidden;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
+            overflow: hidden;
         }
-        h1 { color: #ff0077; font-size: 24px; margin-bottom: 5px; }
-        #puntuacion { font-size: 18px; color: #00ffcc; margin-bottom: 20px; }
+        h1 { color: #66fcf1; font-size: 22px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102,252,241,0.5); }
+        #estado { font-size: 15px; margin-bottom: 20px; color: #45a29e; height: 20px; }
         
-        #zona-juego {
-            width: 300px;
-            height: 320px;
-            display: flex;
-            align-items: center;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 90px);
+            grid-gap: 12px;
             justify-content: center;
-            position: relative;
+            margin-bottom: 25px;
         }
-
-        #globo {
-            width: 50px;
-            height: 65px;
-            background-color: #ff3366;
-            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-            position: relative;
-            transition: transform 0.05s ease;
-            box-shadow: inset -8px -8px 0px rgba(0,0,0,0.15);
-        }
-
-        /* Hilito del globo */
-        #globo::after {
-            content: "";
-            position: absolute;
-            bottom: -12px;
-            left: 22px;
-            width: 2px;
-            height: 15px;
-            background-color: #888;
-        }
-
-        #btn-inflar {
-            background-color: #00ffcc;
-            color: #111;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
+        
+        .nodo {
+            width: 90px;
+            height: 90px;
+            background-color: #1f2833;
+            border: 3px solid #45a29e;
             border-radius: 12px;
             cursor: pointer;
-            user-select: none;
-            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.4);
-            transition: transform 0.1s;
+            transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
         }
-        #btn-inflar:active { transform: scale(0.95); }
+        .nodo:active { transform: scale(0.93); }
 
-        #mensaje {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #ffcc00;
-            height: 20px;
+        /* Colores activos de los nodos */
+        .activo-0 { background-color: #ff0055 !important; border-color: #ff88aa !important; box-shadow: 0 0 20px #ff0055; }
+        .activo-1 { background-color: #00ffcc !important; border-color: #88ffbb !important; box-shadow: 0 0 20px #00ffcc; }
+        .activo-2 { background-color: #ffcc00 !important; border-color: #ffee88 !important; box-shadow: 0 0 20px #ffcc00; }
+        .activo-3 { background-color: #9900ff !important; border-color: #cc88ff !important; box-shadow: 0 0 20px #9900ff; }
+
+        #btn {
+            background-color: #66fcf1;
+            color: #0b0c10;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(102,252,241,0.4);
+            transition: background 0.2s;
         }
+        #btn:hover { background-color: #45a29e; color: #fff; }
     </style>
 </head>
 <body>
 
-    <h1>🎈 INFLA EL GLOBO 💥</h1>
-    <div id="puntuacion">Puntos: 0 | Récord: 0</div>
+    <h1>💻 SECUENCIA HACKER 🔐</h1>
+    <div id="estado">¡Dale al botón para hackear el sistema!</div>
 
-    <div id="zona-juego">
-        <div id="globo"></div>
+    <div class="grid" id="tablero">
+        <div class="nodo" data-index="0"></div>
+        <div class="nodo" data-index="1"></div>
+        <div class="nodo" data-index="2"></div>
+        <div class="nodo" data-index="3"></div>
+        <div class="nodo" data-index="4"></div>
+        <div class="nodo" data-index="5"></div>
+        <div class="nodo" data-index="6"></div>
+        <div class="nodo" data-index="7"></div>
+        <div class="nodo" data-index="8"></div>
     </div>
 
-    <button id="btn-inflar">¡MANTÉN PARA INFLAR!</button>
-    <div id="mensaje">Mantén presionado y suelta antes de que explote</div>
+    <button id="btn" onclick="iniciarJuego()">Iniciar Hackeo</button>
 
     <script>
-        const globo = document.getElementById("globo");
-        const btn = document.getElementById("btn-inflar");
-        const txtPuntuacion = document.getElementById("puntuacion");
-        const mensaje = document.getElementById("mensaje");
+        const nodos = document.querySelectorAll(".nodo");
+        const estado = document.getElementById("estado");
+        let secuencia = [];
+        let jugadorSecuencia = [];
+        let nivel = 0;
+        let jugando = false;
+        let coloresClase = ["activo-0", "activo-1", "activo-2", "activo-3"];
 
-        let escala = 1;
-        let puntos = 0;
-        let record = 0;
-        let inflando = false;
-        let explotado = false;
-        let limiteExplosion = 2.4 + Math.random() * 0.6; // Límite aleatorio pa' que sea divertido
-
-        function empezarInflar(e) {
-            e.preventDefault();
-            if (explotado) return;
-            inflando = true;
-            mensaje.innerText = "¡Inflando... suelta a tiempo!";
+        function iniciarJuego() {
+            secuencia = [];
+            nivel = 0;
+            siguienteNivel();
         }
 
-        function detenerInflar(e) {
-            e.preventDefault();
-            if (!inflando || explotado) return;
-            inflando = false;
-
-            if (escala >= limiteExplosion) {
-                // ¡Pum! Exploto por pasarse
-                explotado = true;
-                globo.style.backgroundColor = "#444";
-                globo.style.transform = "scale(0)";
-                mensaje.innerText = "💥 ¡BOOM! Te pasaste de rosca.";
-                puntos = 0;
-                setTimeout(reiniciar, 1500);
-            } else {
-                // ¡Bien hecho! Suma puntos según qué tan grande lo dejó
-                let ganado = Math.floor(escala * 10);
-                puntos += ganado;
-                if (puntos > record) record = puntos;
-                mensaje.innerText = `🎉 ¡Perfecto! +${ganado} pts`;
-                actualizarScore();
-                setTimeout(reiniciar, 1200);
-            }
+        function siguienteNivel() {
+            jugadorSecuencia = [];
+            nivel++;
+            estado.innerText = `Nivel ${nivel}: Descifrando código...`;
+            
+            // Añadir un nuevo nodo aleatorio al patrón
+            secuencia.push(Math.floor(Math.random() * 9));
+            
+            mostrarSecuencia();
         }
 
-        function reiniciar() {
-            explotado = false;
-            escala = 1;
-            limiteExplosion = 2.0 + Math.random() * 1.0; // Nuevo límite aleatorio
-            globo.style.backgroundColor = "#ff3366";
-            globo.style.transform = `scale(${escala})`;
-            mensaje.innerText = "Mantén presionado y suelta antes de que explote";
-        }
-
-        function actualizarScore() {
-            txtPuntuacion.innerText = `Puntos: ${puntos} | Récord: ${record}`;
-        }
-
-        // Eventos tanto para PC (mouse) como para Celular (touch)
-        btn.addEventListener("mousedown", empezarInflar);
-        btn.addEventListener("mouseup", detenerInflar);
-        
-        btn.addEventListener("touchstart", empezarInflar);
-        btn.addEventListener("touchend", detenerInflar);
-
-        // Bucle de crecimiento mientras se mantenga presionado
-        setInterval(() => {
-            if (inflando && !explotado) {
-                escala += 0.025;
-                globo.style.transform = `scale(${escala})`;
-
-                // Si se pasa del límite explota al instante
-                if (escala >= limiteExplosion) {
-                    inflando = false;
-                    explotado = true;
-                    globo.style.backgroundColor = "#444";
-                    globo.style.transform = "scale(0)";
-                    mensaje.innerText = "💥 ¡BOOM! Explotó muy rápido.";
-                    puntos = 0;
-                    setTimeout(reiniciar, 1500);
+        function mostrarSecuencia() {
+            let i = 0;
+            let velocidadMuestra = Math.max(300, 600 - (nivel * 25)); // Se pone más rápido cada nivel
+            
+            let intervalo = setInterval(() => {
+                if (i > 0) {
+                    let prevIdx = secuencia[i - 1];
+                    nodos[prevIdx].className = "nodo";
                 }
-            }
-        }, 30);
+                if (i < secuencia.length) {
+                    let actualIdx = secuencia[i];
+                    let randomColor = coloresClase[Math.floor(Math.random() * coloresClase.length)];
+                    nodos[actualIdx].classList.add(randomColor);
+                    i++;
+                } else {
+                    clearInterval(intervalo);
+                    setTimeout(() => {
+                        nodos[secuencia[secuencia.length - 1]].className = "nodo";
+                        estado.innerText = `⚡ ¡Tu turno! Repite el patrón`;
+                        jugando = true;
+                    }, 400);
+                }
+            }, velocidadMuestra);
+        }
+
+        nodos.forEach((nodo, index) => {
+            nodo.addEventListener("click", () => {
+                if (!jugando) return;
+
+                jugadorSecuencia.push(index);
+                
+                // Efecto visual al tocar
+                let colorToque = coloresClase[index % coloresClase.length];
+                nodo.classList.add(colorToque);
+                setTimeout(() => nodo.className = "nodo", 180);
+
+                // Comprobar paso actual
+                const pasoActual = jugadorSecuencia.length - 1;
+                if (jugadorSecuencia[pasoActual] !== secuencia[pasoActual]) {
+                    jugando = false;
+                    estado.innerText = `❌ ¡ALERTA! Fallaste en el nivel ${nivel}`;
+                    return;
+                }
+
+                // Si completó la secuencia de este nivel
+                if (jugadorSecuencia.length === secuencia.length) {
+                    jugando = false;
+                    estado.innerText = `🔓 ¡Sistema hackeado! Subiendo nivel...`;
+                    setTimeout(siguienteNivel, 1000);
+                }
+            });
+        });
     </script>
 </body>
 </html>
