@@ -239,7 +239,7 @@
   </div>
   <div class="grupo-botones-top">
     <button class="btn-vista" onclick="alternarTemaClaroDark()" id="btnTemaClaro">☀️ Claro</button>
-    <button class="btn-vista" id="btnVista" onclick="alternarVista()">📱 Móvil</button>
+    <button class="btn-vista" onclick="alternarVista()" id="btnVista">📱 Móvil</button>
   </div>
 </div>
 
@@ -444,6 +444,7 @@ function armarTablero() {
   cfg = niveles[document.getElementById('dificultad').value] || niveles.normal;
   const paleta = temas[document.getElementById('temaColor').value] || temas.bosque;
   const tab = document.getElementById('tablero');
+  if (!tab) return;
   
   let tam = esMovil ? Math.floor(cfg.tam * 0.85) : cfg.tam;
   tab.innerHTML = '';
@@ -471,6 +472,7 @@ function armarTablero() {
 function cambiarModo() {
   modoActual = document.getElementById('modoJuego').value;
   actualizarVistaRecord();
+  armarTablero();
 
   const btnJugar = document.getElementById('btn');
   const estado = document.getElementById('estado');
@@ -487,136 +489,5 @@ function cambiarModo() {
 
   estaGrabando = false;
   melodiaGrabada = [];
-  btnGrabar.classList.remove('grabando');
-  btnGrabar.innerText = '🔴 Grabar';
-
-  if (modoActual === 'libre') {
-    lock = false;
-    btnJugar.style.display = 'none';
-    btnRep.style.display = 'none';
-    btnGrabar.style.display = 'inline-block';
-    btnReproducer.style.display = 'inline-block';
-    estado.innerText = '🎹 Toca o graba tu propia melodía';
-    document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.85');
-  } else {
-    lock = true;
-    btnJugar.style.display = 'block';
-    btnRep.style.display = 'none';
-    btnGrabar.style.display = 'none';
-    btnReproducer.style.display = 'none';
-    estado.innerText = 'Selecciona opciones y presiona Jugar';
-    document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.45');
-  }
-}
-
-function toggleGrabacion() {
-  const btnGrabar = document.getElementById('btnGrabar');
-  const btnReproducer = document.getElementById('btnReproducerMelodia');
-  const estado = document.getElementById('estado');
-
-  if (!estaGrabando) {
-    estaGrabando = true;
-    melodiaGrabada = [];
-    tiempoInicioGrabacion = Date.now();
-    btnGrabar.classList.add('grabando');
-    btnGrabar.innerText = '⏹️ Detener';
-    btnReproducer.disabled = true;
-    estado.innerText = '🔴 Grabando melodía...';
-  } else {
-    estaGrabando = false;
-    btnGrabar.classList.remove('grabando');
-    btnGrabar.innerText = '🔴 Grabar';
-    if (melodiaGrabada.length > 0) {
-      btnReproducer.disabled = false;
-      estado.innerText = `✅ ¡Melodía grabada (${melodiaGrabada.length} notas)!`;
-    } else {
-      estado.innerText = '🎹 No grabaste ninguna nota';
-    }
-  }
-}
-
-function reproducirMelodiaGrabada() {
-  if (melodiaGrabada.length === 0 || lock) return;
-  lock = true;
-  const estado = document.getElementById('estado');
-  estado.innerText = '▶️ Reproduciendo melodía...';
-
-  melodiaGrabada.forEach((item) => {
-    setTimeout(() => { luz(item.bloque, 280); }, item.tiempo);
-  });
-
-  setTimeout(() => {
-    lock = false;
-    estado.innerText = '🎹 Reproducción finalizada';
-  }, melodiaGrabada[melodiaGrabada.length - 1].tiempo + 400);
-}
-
-function sonido(i, ms) {
-  try {
-    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
-    const now = ctx.currentTime, dur = ms / 1000;
-    const tipo = document.getElementById('tipoSonido').value;
-    const f = i === -1 ? 90 : notas[i % notas.length];
-
-    if (i === -1 || tipo === 'explosion') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sawtooth'; o.frequency.setValueAtTime(120, now); o.frequency.linearRampToValueAtTime(35, now + dur);
-      g.gain.setValueAtTime(0.9, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-      return;
-    }
-
-    if (tipo === 'maullido') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f * 0.8, now);
-      o.frequency.exponentialRampToValueAtTime(f * 1.4, now + dur * 0.45);
-      o.frequency.exponentialRampToValueAtTime(f * 0.9, now + dur);
-      g.gain.setValueAtTime(0.6, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-      return;
-    }
-
-    if (tipo === 'gota') {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f * 0.6, now);
-      o.frequency.exponentialRampToValueAtTime(f * 1.8, now + dur * 0.6);
-      g.gain.setValueAtTime(0.7, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-      o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
-      return;
-    }
-
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    if (tipo === 'piano' || tipo === 'campana' || tipo === 'timbre') o.type = 'sine';
-    else if (tipo === 'laser' || tipo === 'guitarra') o.type = 'sawtooth';
-    else if (tipo === 'violin') o.type = 'square';
-    else o.type = 'triangle';
-
-    o.frequency.setValueAtTime(tipo === 'timbre' ? f * 2 : f, now);
-    if (tipo === 'laser') o.frequency.exponentialRampToValueAtTime(f * 0.3, now + dur);
-
-    g.gain.setValueAtTime(tipo === 'violin' ? 0.35 : 0.75, now);
-    g.gain.exponentialRampToValueAtTime(0.001, now + (tipo === 'campana' ? dur * 1.4 : dur));
-    o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + (tipo === 'campana' ? dur * 1.4 : dur));
-  } catch (e) {}
-}
-
-function probarSonido() { sonido(2, 350); }
-
-function luz(i, customMs) {
-  const el = document.getElementById('b' + i);
-  if (!el) return;
-  const ms = customMs || cfg.vel;
-  el.classList.add('iluminado');
-  sonido(i, ms);
-  vibrar(40);
-  setTimeout(() => el.classList.remove('iluminado'), ms * 0.7);
-}
-
-function iniciar() {
-  clearInterval(temporizadorTurno);
-  armarTablero();
-  seq = [];
-  usr = [];
+  btnGrabar.classList.
+  
