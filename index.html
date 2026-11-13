@@ -36,8 +36,8 @@
             position: relative;
         }
 
-        /* Canvas de Lluvia Binaria (Unos y Ceros) para el Modo Hacker */
-        #matrix-canvas {
+        /* Canvas de Lluvia Binaria para el Modo Hacker y Canvas de Atmósfera */
+        #matrix-canvas, #atmosfera-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -45,12 +45,19 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
+        }
+
+        #matrix-canvas {
             display: none;
             opacity: 0.22;
         }
 
         body.modo-hacker #matrix-canvas {
             display: block;
+        }
+
+        #atmosfera-canvas {
+            z-index: 2;
         }
 
         .barra-superior, .app-contenedor, .modal-overlay {
@@ -316,14 +323,29 @@
             gap: 10px;
         }
 
+        /* Estilos de formas de los bloques */
         .bloque {
             width: 100%;
             height: 100%;
-            border-radius: 14px;
             cursor: pointer;
             opacity: 1;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
-            transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.3s ease;
+            transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.3s ease, border-radius 0.3s ease, clip-path 0.3s ease;
+        }
+
+        .bloque.forma-cuadrado {
+            border-radius: 14px;
+            clip-path: none;
+        }
+
+        .bloque.forma-circulo {
+            border-radius: 50%;
+            clip-path: none;
+        }
+
+        .bloque.forma-estrella {
+            border-radius: 0;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
         }
 
         .bloque:active {
@@ -494,6 +516,7 @@
 <body>
 
     <canvas id="matrix-canvas"></canvas>
+    <canvas id="atmosfera-canvas"></canvas>
 
     <div class="barra-superior">
         <div class="grupo-controles">
@@ -511,6 +534,21 @@
                 <option value="libre">Modo = 🎹 Libre (5x5)</option>
                 <option value="extremo">Modo = 💀 Extremo</option>
                 <option value="hacker">Modo = 💻 Hacker</option>
+            </select>
+
+            <!-- Selector de Formas de Bloques -->
+            <select id="selector-formas" class="btn-mini" onchange="actualizarFormasBloques()" title="Forma de Bloques">
+                <option value="0">Forma = 🔲 Cuadrados</option>
+                <option value="1">Forma = ⭕ Círculos</option>
+                <option value="2">Forma = ⭐ Estrellas</option>
+            </select>
+
+            <!-- Selector de Efectos Atmosféricos -->
+            <select id="selector-atmosfera" class="btn-mini" onchange="cambiarAtmosfera()" title="Efectos Atmosféricos">
+                <option value="0">Atmósfera = ☁️ Ninguno</option>
+                <option value="1" selected>Atmósfera = 🍃 Hojas</option>
+                <option value="2">Atmósfera = ❄️ Nieve</option>
+                <option value="3">Atmósfera = ✨ Brillitos</option>
             </select>
 
             <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)" title="Instrumento">
@@ -573,10 +611,10 @@
 
         <div class="tablero-contenedor" id="tablero-contenedor">
             <div class="tablero" id="tablero">
-                <div class="bloque" id="bloque-0" style="background-color: #ff4757;" onclick="manejarClicBloque(0)"></div>
-                <div class="bloque" id="bloque-1" style="background-color: #05d9e8;" onclick="manejarClicBloque(1)"></div>
-                <div class="bloque" id="bloque-2" style="background-color: #d1f7ff;" onclick="manejarClicBloque(2)"></div>
-                <div class="bloque" id="bloque-3" style="background-color: #7700a6;" onclick="manejarClicBloque(3)"></div>
+                <div class="bloque forma-cuadrado" id="bloque-0" style="background-color: #ff4757;" onclick="manejarClicBloque(0)"></div>
+                <div class="bloque forma-cuadrado" id="bloque-1" style="background-color: #05d9e8;" onclick="manejarClicBloque(1)"></div>
+                <div class="bloque forma-cuadrado" id="bloque-2" style="background-color: #d1f7ff;" onclick="manejarClicBloque(2)"></div>
+                <div class="bloque forma-cuadrado" id="bloque-3" style="background-color: #7700a6;" onclick="manejarClicBloque(3)"></div>
             </div>
         </div>
 
@@ -613,16 +651,16 @@
         const fondosOscuros = ['#1a1a2e', '#1e1b4b', '#064e3b', '#31102f', '#18181b', '#2e0854', '#581c87'];
         let indiceFondo = 0;
 
-        // Lógica de lluvia binaria (unos y ceros)
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
+        // Lógica de lluvia binaria (Modo Hacker)
+        const canvasMatrix = document.getElementById('matrix-canvas');
+        const ctxMatrix = canvasMatrix.getContext('2d');
         let matrixInterval = null;
 
         function iniciarMatrizHacker() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvasMatrix.width = window.innerWidth;
+            canvasMatrix.height = window.innerHeight;
             const fontSize = 16;
-            const columns = Math.floor(canvas.width / fontSize);
+            const columns = Math.floor(canvasMatrix.width / fontSize);
             const drops = [];
             for (let i = 0; i < columns; i++) {
                 drops[i] = 1;
@@ -630,17 +668,17 @@
 
             if (matrixInterval) clearInterval(matrixInterval);
             matrixInterval = setInterval(() => {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctxMatrix.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctxMatrix.fillRect(0, 0, canvasMatrix.width, canvasMatrix.height);
 
-                ctx.fillStyle = '#00ff00';
-                ctx.font = fontSize + 'px monospace';
+                ctxMatrix.fillStyle = '#00ff00';
+                ctxMatrix.font = fontSize + 'px monospace';
 
                 for (let i = 0; i < drops.length; i++) {
                     const text = Math.random() > 0.5 ? '1' : '0';
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    ctxMatrix.fillText(text, i * fontSize, drops[i] * fontSize);
 
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    if (drops[i] * fontSize > canvasMatrix.height && Math.random() > 0.975) {
                         drops[i] = 0;
                     }
                     drops[i]++;
@@ -653,16 +691,119 @@
                 clearInterval(matrixInterval);
                 matrixInterval = null;
             }
-            if (ctx && canvas) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (ctxMatrix && canvasMatrix) {
+                ctxMatrix.clearRect(0, 0, canvasMatrix.width, canvasMatrix.height);
             }
+        }
+
+        // Lógica de Efectos Atmosféricos (Hojas, Nieve, Brillitos)
+        const canvasAtmos = document.getElementById('atmosfera-canvas');
+        const ctxAtmos = canvasAtmos.getContext('2d');
+        let atmosParticles = [];
+        let atmosAnimId = null;
+
+        function iniciarAtmosfera() {
+            canvasAtmos.width = window.innerWidth;
+            canvasAtmos.height = window.innerHeight;
+            
+            const selector = document.getElementById('selector-atmosfera');
+            const tipo = selector ? parseInt(selector.value, 10) : 0;
+
+            if (tipo === 0) {
+                ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
+                if (atmosAnimId) cancelAnimationFrame(atmosAnimId);
+                return;
+            }
+
+            atmosParticles = [];
+            const count = 35;
+            for (let i = 0; i < count; i++) {
+                atmosParticles.push({
+                    x: Math.random() * canvasAtmos.width,
+                    y: Math.random() * canvasAtmos.height,
+                    size: Math.random() * 9 + 6,
+                    speedY: tipo === 1 ? (Math.random() * 1.5 + 0.6) : (tipo === 2 ? (Math.random() * 2 + 1) : (Math.random() * 1 - 0.5)),
+                    speedX: tipo === 1 ? (Math.random() * 2 - 1) : (tipo === 2 ? (Math.random() * 0.5 - 0.25) : (Math.random() * 2 - 1)),
+                    rotation: Math.random() * 360,
+                    rotSpeed: Math.random() * 2 - 1,
+                    opacity: Math.random() * 0.5 + 0.3,
+                    color: tipo === 1 ? (Math.random() > 0.5 ? '#a8e6cf' : '#dcedc1') : (tipo === 2 ? '#ffffff' : '#ffd700')
+                });
+            }
+
+            if (atmosAnimId) cancelAnimationFrame(atmosAnimId);
+            animarAtmosfera(tipo);
+        }
+
+        function animarAtmosfera(tipo) {
+            ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
+
+            atmosParticles.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX + Math.sin(p.y * 0.02) * 0.5;
+                p.rotation += p.rotSpeed;
+
+                if (p.y > canvasAtmos.height + 20) {
+                    p.y = -20;
+                    p.x = Math.random() * canvasAtmos.width;
+                }
+                if (p.x > canvasAtmos.width + 20) p.x = -20;
+                if (p.x < -20) p.x = canvasAtmos.width + 20;
+
+                ctxAtmos.save();
+                ctxAtmos.translate(p.x, p.y);
+                ctxAtmos.rotate((p.rotation * Math.PI) / 180);
+                ctxAtmos.globalAlpha = p.opacity;
+
+                if (tipo === 1) {
+                    // Hojas
+                    ctxAtmos.fillStyle = p.color;
+                    ctxAtmos.beginPath();
+                    ctxAtmos.ellipse(0, 0, p.size, p.size / 2, Math.PI / 4, 0, Math.PI * 2);
+                    ctxAtmos.fill();
+                } else if (tipo === 2) {
+                    // Nieve
+                    ctxAtmos.fillStyle = p.color;
+                    ctxAtmos.beginPath();
+                    ctxAtmos.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    ctxAtmos.fill();
+                } else if (tipo === 3) {
+                    // Brillitos
+                    ctxAtmos.fillStyle = p.color;
+                    ctxAtmos.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                }
+
+                ctxAtmos.restore();
+            });
+
+            atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
+        }
+
+        function cambiarAtmosfera() {
+            iniciarAtmosfera();
+        }
+
+        // Actualizar formas visuales de los bloques
+        function actualizarFormasBloques() {
+            const selectorForma = document.getElementById('selector-formas');
+            const formaIdx = selectorForma ? parseInt(selectorForma.value, 10) : 0;
+            
+            const bloques = document.querySelectorAll('.bloque');
+            bloques.forEach(b => {
+                b.classList.remove('forma-cuadrado', 'forma-circulo', 'forma-estrella');
+                if (formaIdx === 0) b.classList.add('forma-cuadrado');
+                else if (formaIdx === 1) b.classList.add('forma-circulo');
+                else if (formaIdx === 2) b.classList.add('forma-estrella');
+            });
         }
 
         window.addEventListener('resize', () => {
             if (document.body.classList.contains('modo-hacker')) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+                canvasMatrix.width = window.innerWidth;
+                canvasMatrix.height = window.innerHeight;
             }
+            canvasAtmos.width = window.innerWidth;
+            canvasAtmos.height = window.innerHeight;
         });
 
         // Efecto de Confeti y Banner al pasar cada 5 niveles
@@ -753,7 +894,7 @@
 
         let estadisticas = (() => {
             try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v7'));
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v8'));
                 if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
                 for (let m in estadisticasBase) {
                     if (!guardado[m]) guardado[m] = estadisticasBase[m];
@@ -771,7 +912,7 @@
 
         function guardarStats() {
             try {
-                localStorage.setItem('memoria_stats_v7', JSON.stringify(estadisticas));
+                localStorage.setItem('memoria_stats_v8', JSON.stringify(estadisticas));
             } catch (e) {}
         }
 
@@ -853,6 +994,8 @@
                 div.setAttribute('onclick', `manejarClicBloque(${i})`);
                 tablero.appendChild(div);
             }
+
+            actualizarFormasBloques();
         }
 
         function actualizarColoresTablero() {
@@ -959,7 +1102,7 @@
 
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v7');
+                localStorage.removeItem('memoria_stats_v8');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
                 abrirEstadisticas();
@@ -1466,7 +1609,6 @@
                     const mensaje = document.getElementById('mensaje');
                     if (mensaje) mensaje.textContent = "¡Excelente!";
 
-                    // Validar si el nivel es múltiplo de 5 (5, 10, 15, 20, 25, 30...)
                     if (nivel % 5 === 0) {
                         mostrarBannerNivel(nivel);
                     }
@@ -1559,8 +1701,9 @@
             timeoutsGrabacion.push(tFin);
         }
 
-        // Ejecución inicial al cargar
+        // Inicialización al cargar la página
         construirTablero();
+        iniciarAtmosfera();
         const btnJugarEl = document.getElementById('btn-jugar');
         if (btnJugarEl) {
             btnJugarEl.addEventListener('click', iniciarJuego);
