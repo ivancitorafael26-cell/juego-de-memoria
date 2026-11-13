@@ -477,7 +477,6 @@
             color: var(--subtext-color);
         }
 
-        /* Ajuste automático para pantallas pequeñas o tablets verticales */
         @media (max-width: 768px) {
             body {
                 padding-top: 130px;
@@ -665,6 +664,83 @@
                 canvas.height = window.innerHeight;
             }
         });
+
+        // Efecto de Confeti y Banner al pasar cada 5 niveles
+        function dispararConfetti() {
+            const contenedor = document.createElement('div');
+            contenedor.style.position = 'fixed';
+            contenedor.style.top = '0';
+            contenedor.style.left = '0';
+            contenedor.style.width = '100vw';
+            contenedor.style.height = '100vh';
+            contenedor.style.pointerEvents = 'none';
+            contenedor.style.zIndex = '9999';
+            document.body.appendChild(contenedor);
+
+            const colores = ['#ff4757', '#2ed573', '#ffa502', '#3742fa', '#ff6b81', '#70a1ff', '#eccc68', '#00ff00'];
+            for (let i = 0; i < 70; i++) {
+                const particula = document.createElement('div');
+                particula.style.position = 'absolute';
+                particula.style.width = `${Math.random() * 10 + 6}px`;
+                particula.style.height = `${Math.random() * 10 + 6}px`;
+                particula.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                particula.style.top = '50%';
+                particula.style.left = '50%';
+                particula.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                particula.style.opacity = '1';
+                contenedor.appendChild(particula);
+
+                const angulo = Math.random() * Math.PI * 2;
+                const velocidad = Math.random() * 180 + 60;
+                const destX = Math.cos(angulo) * velocidad;
+                const destY = Math.sin(angulo) * velocidad - 80;
+
+                particula.animate([
+                    { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(${destX}px, ${destY + 180}px) scale(0.3) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: 1800 + Math.random() * 800,
+                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+                });
+            }
+
+            setTimeout(() => {
+                contenedor.remove();
+            }, 2600);
+        }
+
+        function mostrarBannerNivel(nivelAlcanzado) {
+            const esHacker = document.body.classList.contains('modo-hacker');
+            const banner = document.createElement('div');
+            banner.textContent = `🎉 ¡Llegaste al nivel ${nivelAlcanzado}! 🎉`;
+            banner.style.position = 'fixed';
+            banner.style.top = '18%';
+            banner.style.left = '50%';
+            banner.style.transform = 'translate(-50%, -50%) scale(0.4)';
+            banner.style.backgroundColor = esHacker ? 'rgba(0, 20, 0, 0.95)' : 'rgba(22, 33, 62, 0.95)';
+            banner.style.color = esHacker ? '#00ff00' : '#ffbe0b';
+            banner.style.border = `2px solid ${esHacker ? '#00ff00' : '#ffbe0b'}`;
+            banner.style.padding = '14px 28px';
+            banner.style.borderRadius = '35px';
+            banner.style.fontSize = '1.3rem';
+            banner.style.fontWeight = 'bold';
+            banner.style.zIndex = '10000';
+            banner.style.boxShadow = esHacker ? '0 0 25px rgba(0, 255, 0, 0.6)' : '0 10px 30px rgba(0,0,0,0.6)';
+            banner.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            document.body.appendChild(banner);
+
+            setTimeout(() => {
+                banner.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 50);
+
+            setTimeout(() => {
+                banner.style.transform = 'translate(-50%, -50%) scale(0.4)';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 400);
+            }, 2200);
+
+            dispararConfetti();
+        }
 
         let estadisticasBase = {
             normal: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
@@ -1389,7 +1465,14 @@
                     detenerContadorTiempo();
                     const mensaje = document.getElementById('mensaje');
                     if (mensaje) mensaje.textContent = "¡Excelente!";
-                    const tSig = setTimeout(siguienteRonda, 900);
+
+                    // Validar si el nivel es múltiplo de 5 (5, 10, 15, 20, 25, 30...)
+                    if (nivel % 5 === 0) {
+                        mostrarBannerNivel(nivel);
+                    }
+
+                    const tiempoEspera = (nivel % 5 === 0) ? 2000 : 900;
+                    const tSig = setTimeout(siguienteRonda, tiempoEspera);
                     timeouts.push(tSig);
                 }
             } else {
