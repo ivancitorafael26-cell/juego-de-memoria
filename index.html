@@ -8,27 +8,22 @@
   :root {
     --bg-main: #0f1115;
     --panel-bg: rgba(22, 27, 34, 0.9);
-    --border-color: rgba(255, 255, 255, 0.12);
+    --border-color: rgba(255, 255, 255, 0.1);
     --text-main: #f0f3f6;
     --text-muted: #8b949e;
-    --accent: #00ff66;
+    --accent: #3b82f6;
   }
 
   body.modo-claro {
     --bg-main: #f0f3f6;
-    --panel-bg: rgba(255, 255, 255, 0.92);
-    --border-color: rgba(0, 0, 0, 0.12);
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(0, 0, 0, 0.1);
     --text-main: #0f1115;
     --text-muted: #57606a;
   }
 
-  /* Fondos Personalizados */
-  body.fondo-espacio { background: radial-gradient(circle at center, #1b1b3a, #0b091a); }
-  body.fondo-cyberpunk { background: linear-gradient(135deg, #2e0854, #0f051d, #00f0ff22); }
-  body.fondo-minimalista { background: #181a20; }
-  body.fondo-bosque-oscuro { background: radial-gradient(circle at center, #0f261c, #07130e); }
-
   body {
+    background: var(--bg-main);
     color: var(--text-main);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     display: flex;
@@ -37,136 +32,121 @@
     justify-content: flex-start;
     min-height: 100vh;
     margin: 0;
-    padding: 55px 12px 20px 12px;
+    padding: 70px 15px 20px 15px;
     box-sizing: border-box;
     user-select: none;
-    transition: background 0.3s ease, color 0.3s ease;
   }
 
   .top-bar {
     position: fixed;
-    top: 10px;
-    left: 12px;
-    right: 12px;
+    top: 15px;
+    left: 15px;
+    right: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
   }
 
-  .grupo-botones-top { display: flex; gap: 6px; align-items: center; }
-
-  .record-badge, .btn-vista {
+  .record-badge {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
-    padding: 6px 12px;
+    padding: 8px 14px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
+    color: var(--accent);
+  }
+
+  .grupo-botones-top { display: flex; gap: 8px; }
+
+  .btn-vista {
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: var(--panel-bg);
     color: var(--text-main);
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
-  .record-badge { color: var(--accent); }
 
-  h1 { margin: 4px 0 2px; font-size: 22px; font-weight: 800; text-align: center; }
-  #estado { font-size: 13px; margin-bottom: 6px; color: var(--text-muted); min-height: 18px; text-align: center; font-weight: 500; }
+  h1 { margin: 5px 0; font-size: 24px; font-weight: 800; text-align: center; }
+  #estado { font-size: 14px; margin-bottom: 8px; color: var(--text-muted); height: 20px; text-align: center; font-weight: 500; }
   
   #vidasContainer {
-    font-size: 15px;
-    height: 22px;
+    font-size: 16px;
+    height: 24px;
     text-align: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     display: none;
     letter-spacing: 4px;
   }
 
   .controles {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 12px;
-    width: 100%;
-    max-width: 560px;
+    margin-bottom: 15px;
+    max-width: 680px;
   }
 
   select {
-    padding: 7px 10px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
     border-radius: 10px;
     border: 1px solid var(--border-color);
     background: var(--panel-bg);
     color: var(--text-main);
     cursor: pointer;
     outline: none;
-    flex: 1 1 44%;
-    max-width: 260px;
   }
 
   .tablero-container {
     position: relative;
     background: var(--panel-bg);
-    padding: 14px;
+    padding: 15px;
     border-radius: 20px;
     border: 1px solid var(--border-color);
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 14px;
-  }
-
-  .tablero-container.panico {
-    animation: latidoPanico 0.4s infinite alternate;
-    border-color: #ef4444 !important;
-  }
-  @keyframes latidoPanico {
-    from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
-    to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.9); }
-  }
-
-  .barra-tiempo {
-    position: absolute;
-    top: 0; left: 0; height: 4px; background: var(--accent);
-    border-radius: 20px 20px 0 0; width: 100%;
-    transition: width 0.05s linear;
-    display: none;
+    margin-bottom: 15px;
   }
 
   .tablero { 
     display: grid; 
-    gap: 10px; 
+    grid-gap: 10px; 
     justify-content: center;
-    align-content: center;
   }
 
   .bloque {
     border-radius: 12px;
     cursor: pointer;
-    opacity: 0.45;
+    opacity: 0.4;
     transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .bloque:hover { opacity: 0.65; }
+  .bloque:hover { opacity: 0.6; }
   .iluminado {
     opacity: 1 !important;
-    transform: scale(1.05);
-    box-shadow: 0 0 22px rgba(255, 255, 255, 0.95);
+    transform: scale(1.04);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
   }
 
   .acciones {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
     width: 100%;
-    max-width: 380px;
-    flex-wrap: wrap;
+    max-width: 350px;
   }
 
   .acciones button {
-    padding: 11px 16px;
+    padding: 12px 18px;
     font-size: 14px;
     font-weight: 700;
     border: none;
@@ -177,23 +157,19 @@
   #btnRepetir { background: #eab308; color: #0f1115; display: none; }
   #btnRepetir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
-  #btnGrabar { background: #ef4444; color: #fff; display: none; flex: 1; }
-  #btnGrabar.grabando { background: #dc2626; animation: pulseRec 1s infinite alternate; }
-  @keyframes pulseRec { from { opacity: 1; } to { opacity: 0.6; } }
-
-  #btnReproducerMelodia { background: #10b981; color: #fff; display: none; flex: 1; }
-  #btnReproducerMelodia:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
+  .btn-grabacion { background: #ef4444; color: #fff; display: none; }
+  .btn-grabacion.grabando { background: #dc2626; }
+  .btn-reproducir { background: #10b981; color: #fff; display: none; }
+  .btn-reproducir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 </style>
 </head>
 <body>
 
 <div class="top-bar">
-  <div class="grupo-botones-top">
-    <div class="record-badge" id="recordBadge">🏆 Récord: 0</div>
-  </div>
+  <div class="record-badge" id="recordBadge">🏆 Récord: 0</div>
   <div class="grupo-botones-top">
     <button class="btn-vista" onclick="alternarTemaClaroDark()" id="btnTemaClaro">☀️ Claro</button>
-    <button class="btn-vista" onclick="alternarVista()" id="btnVista">📱 Móvil</button>
+    <button class="btn-vista" id="btnVista" onclick="alternarVista()">💻 Escritorio</button>
   </div>
 </div>
 
@@ -221,45 +197,26 @@
   <select id="tipoSonido" onchange="probarSonido()">
     <option value="melodia" selected>🎶 Melodía</option>
     <option value="piano">🎹 Piano</option>
-    <option value="campana">🔔 Campana</option>
     <option value="laser">🚀 Láser</option>
-    <option value="gota">💧 Gota de Agua</option>
-    <option value="violin">🎻 Violín</option>
-    <option value="guitarra">🎸 Guitarra</option>
-    <option value="explosion">💥 Explosión</option>
-    <option value="timbre">🛎️ Timbre</option>
-    <option value="maullido">🐱 Maullido</option>
   </select>
 
   <select id="temaColor" onchange="aplicarTema()">
     <option value="bosque" selected>🌿 Bosque</option>
     <option value="pastel">🌸 Pastel</option>
     <option value="galaxia">🌌 Galaxia</option>
-    <option value="tecnologico">💻 Tecnológico</option>
-    <option value="esmeralda">🌲 Esmeralda</option>
-    <option value="atardecer">🌅 Atardecer</option>
     <option value="neon">⚡ Neón</option>
-  </select>
-
-  <select id="tipoFondo" onchange="aplicarFondo()">
-    <option value="default" selected>🌌 Fondo Estándar</option>
-    <option value="espacio">🚀 Espacio Profundo</option>
-    <option value="cyberpunk">🌆 Cyberpunk Neon</option>
-    <option value="minimalista">⬛ Minimalista</option>
-    <option value="bosque-oscuro">🌲 Bosque Nocturno</option>
   </select>
 </div>
 
 <div class="tablero-container" id="tableroContainer">
-  <div class="barra-tiempo" id="barraTiempo"></div>
   <div class="tablero" id="tablero"></div>
 </div>
 
 <div class="acciones">
   <button id="btn" onclick="iniciar()">Jugar</button>
   <button id="btnRepetir" onclick="usarRepetir()">🔁 Repetir</button>
-  <button id="btnGrabar" onclick="toggleGrabacion()">🔴 Grabar</button>
-  <button id="btnReproducerMelodia" onclick="reproducirMelodiaGrabada()" disabled>▶️ Escuchar</button>
+  <button id="btnGrabar" class="btn-grabacion" onclick="toggleGrabacion()">🔴 Grabar</button>
+  <button id="btnReproducerMelodia" class="btn-reproducir" onclick="reproducirMelodiaGrabada()" disabled>▶️ Escuchar</button>
 </div>
 
 <script>
@@ -267,11 +224,320 @@ const temas = {
   bosque:      ['#00ff66', '#10b981', '#00e676', '#00c853', '#76ff03', '#69f0ae', '#00bfa5', '#aeea00'],
   pastel:      ['#ff4081', '#ff80ab', '#e040fb', '#d500f9', '#7c4dff', '#ff1744', '#aa00ff', '#ff6d00'],
   galaxia:     ['#00b0ff', '#2979ff', '#651fff', '#f50057', '#00e5ff', '#3d5afe', '#e040fb', '#0091ea'],
-  tecnologico: ['#0070ff', '#00e5ff', '#2979ff', '#00b0ff', '#0091ea', '#536dfe', '#2962ff', '#00d2ff'],
-  esmeralda:   ['#00c853', '#00e676', '#1de9b6', '#00b0ff', '#69f0ae', '#00bfa5', '#00e676', '#10b981'],
-  atardecer:   ['#ff3d00', '#ff6d00', '#ffea00', '#f50057', '#ff9100', '#ff1744', '#ffab00', '#ff2a00'],
   neon:        ['#d500f9', '#f50057', '#00e5ff', '#00e676', '#ffea00', '#651fff', '#1de9b6', '#ff6d00']
 };
 
-const notas = [261.6, 293.6, 329.6, 349.2, 392.0, 440.0, 493.8, 523.2
+const notas = [261.6, 293.6, 329.6, 349.2, 392.0, 440.0, 493.8, 523.2, 587.3, 659.2, 698.4, 783.9, 830.6, 880.0, 932.3];
+const niveles = {
+  facil:   { cant: 4,  col: 2, tam: 110, vel: 700 },
+  normal:  { cant: 6,  col: 3, tam: 95,  vel: 580 },
+  dificil: { cant: 9,  col: 3, tam: 80,  vel: 450 },
+  extremo: { cant: 15, col: 5, tam: 55,  vel: 320 }
+};
+
+let cfg = niveles.normal, seq = [], usr = [], lvl = 0, lock = true, ctx = null;
+let esMovil = false, comodinDisponible = true, modoActual = 'clasico';
+let esClaro = localStorage.getItem('simon_modo_claro') === 'true';
+let vidas = 3, estaGrabando = false, melodiaGrabada = [], tiempoInicioGrabacion = 0;
+
+if (esClaro) document.body.classList.add('modo-claro');
+actualizarVistaRecord();
+aplicarTema();
+armarTablero();
+
+function obtenerClaveRecord() {
+  const difSel = document.getElementById('dificultad');
+  return 'simon_record_' + (difSel ? difSel.value : 'normal');
+}
+
+function obtenerRecordActual() {
+  return parseInt(localStorage.getItem(obtenerClaveRecord()) || '0', 10);
+}
+
+function actualizarVistaRecord() {
+  const badge = document.getElementById('recordBadge');
+  if(badge) badge.innerText = `🏆 Récord: ${obtenerRecordActual()}`;
+}
+
+function cambiarDificultad() {
+  actualizarVistaRecord();
+  armarTablero();
+}
+
+function comprobarRecord(puntuacion) {
+  if (puntuacion > obtenerRecordActual()) {
+    localStorage.setItem(obtenerClaveRecord(), puntuacion);
+    actualizarVistaRecord();
+  }
+}
+
+function alternarTemaClaroDark() {
+  esClaro = !esClaro;
+  document.body.classList.toggle('modo-claro', esClaro);
+  localStorage.setItem('simon_modo_claro', esClaro);
+  const btnT = document.getElementById('btnTemaClaro');
+  if(btnT) btnT.innerText = esClaro ? '🌙 Oscuro' : '☀️ Claro';
+}
+
+function vibrar(patron) {
+  if (navigator.vibrate) { try { navigator.vibrate(patron); } catch (e) {} }
+}
+
+function aplicarTema() {
+  const temaSel = document.getElementById('temaColor');
+  const paleta = temas[temaSel ? temaSel.value : 'bosque'] || temas.bosque;
+  if(paleta && paleta[0]) document.documentElement.style.setProperty('--accent', paleta[0]);
+  armarTablero();
+}
+
+function alternarVista() {
+  esMovil = !esMovil;
+  const btn = document.getElementById('btnVista');
+  if(btn) btn.innerText = esMovil ? '💻 Escritorio' : '📱 Móvil';
+  armarTablero();
+}
+
+function armarTablero() {
+  const difSel = document.getElementById('dificultad');
+  cfg = niveles[difSel ? difSel.value : 'normal'] || niveles.normal;
+  const temaSel = document.getElementById('temaColor');
+  const paleta = temas[temaSel ? temaSel.value : 'bosque'] || temas.bosque;
+  const tab = document.getElementById('tablero');
+  if (!tab) return;
+  
+  tab.innerHTML = '';
+  tab.style.gridTemplateColumns = `repeat(${cfg.col}, ${cfg.tam}px)`;
+  
+  for (let i = 0; i < cfg.cant; i++) {
+    const d = document.createElement('div');
+    d.className = 'bloque'; 
+    d.id = 'b' + i;
+    d.style.background = paleta[i % paleta.length];
+    d.style.width = cfg.tam + 'px'; 
+    d.style.height = cfg.tam + 'px';
+    
+    d.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      tocar(i);
+    }, {passive: false});
+    d.onclick = () => tocar(i);
+
+    tab.appendChild(d);
+  }
+}
+
+function cambiarModo() {
+  const modoEl = document.getElementById('modoJuego');
+  if (!modoEl) return;
+  modoActual = modoEl.value;
+  const btnJugar = document.getElementById('btn');
+  const estado = document.getElementById('estado');
+  const vidasContainer = document.getElementById('vidasContainer');
+  const btnRep = document.getElementById('btnRepetir');
+  const btnGrabar = document.getElementById('btnGrabar');
+  const btnReproducer = document.getElementById('btnReproducerMelodia');
+  
+  if(vidasContainer) vidasContainer.style.display = (modoActual === 'supervivencia') ? 'block' : 'none';
+
+  estaGrabando = false;
+  melodiaGrabada = [];
+  if(btnGrabar) {
+    btnGrabar.classList.remove('grabando');
+    btnGrabar.innerText = '🔴 Grabar';
+  }
+
+  if (modoActual === 'libre') {
+    lock = false;
+    if(btnJugar) btnJugar.style.display = 'none';
+    if(btnRep) btnRep.style.display = 'none';
+    if(btnGrabar) btnGrabar.style.display = 'block';
+    if(btnReproducer) btnReproducer.style.display = 'block';
+    if(estado) estado.innerText = '🎹 Toca o graba tu propia melodía';
+    document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.8');
+  } else {
+    lock = true;
+    if(btnJugar) btnJugar.style.display = 'block';
+    if(btnGrabar) btnGrabar.style.display = 'none';
+    if(btnReproducer) btnReproducer.style.display = 'none';
+    if(estado) estado.innerText = 'Presiona Jugar para empezar';
+    document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.4');
+  }
+}
+
+function toggleGrabacion() {
+  const btnGrabar = document.getElementById('btnGrbar');
+  const btnReproducer = document.getElementById('btnReproducerMelodia');
+  const estado = document.getElementById('estado');
+
+  if (!estaGrabando) {
+    estaGrabando = true;
+    melodiaGrabada = [];
+    tiempoInicioGrabacion = Date.now();
+    if(btnGrabar) {
+      btnGrabar.classList.add('grabando');
+      btnGrabar.innerText = '⏹️ Detener';
+    }
+    if(btnReproducer) btnReproducer.disabled = true;
+    if(estado) estado.innerText = '🔴 Grabando melodía...';
+  } else {
+    estaGrabando = false;
+    if(btnGrabar) {
+      btnGrabar.classList.remove('grabando');
+      btnGrabar.innerText = '🔴 Grabar';
+    }
+    if(melodiaGrabada.length > 0) {
+      if(btnReproducer) btnReproducer.disabled = false;
+      if(estado) estado.innerText = `✅ ¡Melodía grabada (${melodiaGrabada.length} notas)!`;
+    } else {
+      if(estado) estado.innerText = '🎹 No grabaste ninguna nota';
+    }
+  }
+}
+
+function reproducirMelodiaGrabada() {
+  if (melodiaGrabada.length === 0 || lock) return;
+  lock = true;
+  const estado = document.getElementById('estado');
+  if(estado) estado.innerText = '▶️ Reproduciendo melodía...';
+
+  melodiaGrabada.forEach((item) => {
+    setTimeout(() => { luz(item.bloque, 300); }, item.tiempo);
+  });
+
+  setTimeout(() => {
+    lock = false;
+    if(estado) estado.innerText = '🎹 Reproducción finalizada';
+  }, melodiaGrabada[melodiaGrabada.length - 1].tiempo + 400);
+}
+
+function sonido(i, ms) {
+  try {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime, dur = ms / 1000;
+    const tipoSel = document.getElementById('tipoSonido');
+    const tipo = tipoSel ? tipoSel.value : 'melodia';
+    const f = i === -1 ? 90 : notas[i % notas.length];
+
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = tipo === 'piano' ? 'sine' : (tipo === 'laser' ? 'sawtooth' : 'triangle');
+    o.frequency.setValueAtTime(f, now);
+    g.gain.setValueAtTime(0.8, now); g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    o.connect(g); g.connect(ctx.destination); o.start(now); o.stop(now + dur);
+  } catch (e) {}
+}
+
+function probarSonido() { sonido(2, 350); }
+
+function luz(i, customMs) {
+  const el = document.getElementById('b' + i);
+  if (!el) return;
+  const ms = customMs || cfg.vel;
+  el.classList.add('iluminado');
+  sonido(i, ms);
+  vibrar(40);
+  setTimeout(() => el.classList.remove('iluminado'), ms * 0.7);
+}
+
+function iniciar() {
+  seq = [];
+  usr = [];
+  lvl = 0;
+  vidas = 3;
+  comodinDisponible = true;
+  const btnRep = document.getElementById('btnRepetir');
+  if(btnRep) {
+    btnRep.style.display = 'inline-block';
+    btnRep.innerText = '🔁 Repetir';
+    btnRep.disabled = false;
+  }
+  if(document.getElementById('vidasContainer')) {
+    document.getElementById('vidasContainer').innerText = '❤️'.repeat(vidas);
+  }
+  siguienteNivel();
+}
+
+function siguienteNivel() {
+  usr = [];
+  lvl++;
+  const est = document.getElementById('estado');
+  if(est) est.innerText = `Nivel ${lvl}`;
+  seq.push(Math.floor(Math.random() * cfg.cant));
+  reproducirSecuencia();
+}
+
+function reproducirSecuencia() {
+  lock = true;
+  let i = 0;
+  const velActual = Math.max(200, cfg.vel - (lvl * 15));
+  
+  const intervalo = setInterval(() => {
+    luz(seq[i], velActual);
+    i++;
+    if (i >= seq.length) {
+      clearInterval(intervalo);
+      setTimeout(() => { lock = false; }, velActual);
+    }
+  }, velActual * 1.3);
+}
+
+function tocar(i) {
+  if (modoActual === 'libre') {
+    luz(i, 300);
+    if (estaGrabando) {
+      melodiaGrabada.push({ bloque: i, tiempo: Date.now() - tiempoInicioGrabacion });
+    }
+    return;
+  }
+
+  if (lock) return;
+  luz(i, 300);
+  
+  let indiceActual = usr.length;
+  let bloqueEsperado = modoActual === 'inverso' ? seq[seq.length - 1 - indiceActual] : seq[indiceActual];
+
+  if (i === bloqueEsperado) {
+    usr.push(i);
+    if (usr.length === seq.length) {
+      lock = true;
+      comprobarRecord(lvl);
+      setTimeout(siguienteNivel, 1000);
+    }
+  } else {
+    lock = true;
+    if (modoActual === 'supervivencia' && vidas > 1) {
+      vidas--;
+      if(document.getElementById('vidasContainer')) {
+        document.getElementById('vidasContainer').innerText = '❤️'.repeat(vidas);
+      }
+      sonido(-1, 500);
+      vibrar([100, 50, 100]);
+      setTimeout(() => { usr = []; lock = false; }, 1200);
+    } else {
+      sonido(-1, 700);
+      comprobarRecord(lvl - 1 > 0 ? lvl - 1 : 0);
+      if(document.getElementById('estado')) {
+        document.getElementById('estado').innerText = `❌ Fin del juego! Nivel: ${lvl - 1}`;
+      }
+      if(document.getElementById('btn')) document.getElementById('btn').style.display = 'block';
+      if(document.getElementById('btnRepetir')) document.getElementById('btnRepetir').style.display = 'none';
+      document.querySelectorAll('.bloque').forEach(b => b.style.opacity = '0.4');
+      lock = true;
+    }
+  }
+}
+
+function usarRepetir() {
+  if (!comodinDisponible || lock) return;
+  comodinDisponible = false;
+  const btnRep = document.getElementById('btnRepetir');
+  if(btnRep) {
+    btnRep.disabled = true;
+    btnRep.innerText = '🔁 Usado';
+  }
+  reproducirSecuencia();
+}
+</script>
+</body>
+  </html>
   
