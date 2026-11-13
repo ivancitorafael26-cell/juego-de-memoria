@@ -23,7 +23,7 @@
             width: 100%;
             margin: 0;
             padding: 0;
-            overflow-y: auto; /* Permite scroll natural si es necesario */
+            overflow-y: auto;
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -188,6 +188,26 @@
             justify-content: center;
             background-image: none !important;
             padding-right: 0 !important;
+        }
+
+        /* Estilo para el slider (rayita deslizante de zoom) */
+        .slider-zoom-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background-color: var(--control-bg);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            color: var(--control-text);
+        }
+
+        #slider-zoom {
+            width: 65px;
+            accent-color: var(--subtext-color);
+            cursor: pointer;
+            margin: 0;
         }
 
         .app-contenedor {
@@ -502,9 +522,10 @@
                 <option value="hacker">Modo = 💻 Hacker</option>
             </select>
 
+            <!-- Sonido principal configurado en Campanas por defecto -->
             <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)" title="Instrumento">
                 <option value="0">Sonido = 🎹 Piano</option>
-                <option value="1">Sonido = 🔔 Campanas</option>
+                <option value="1" selected>Sonido = 🔔 Campanas</option>
                 <option value="2">Sonido = 🌊 Onda Suave</option>
                 <option value="3">Sonido = ⚡ Retro</option>
                 <option value="4">Sonido = 💧 Gotas</option>
@@ -525,8 +546,11 @@
         </div>
 
         <div class="grupo-controles">
-            <button class="btn-mini btn-circular" type="button" onclick="ajustarZoom(-0.1)" title="Reducir tamaño de página">🔍-</button>
-            <button class="btn-mini btn-circular" type="button" onclick="ajustarZoom(0.1)" title="Aumentar tamaño de página">🔍+</button>
+            <!-- Rayita deslizante (slider) para cambiar el tamaño de la página -->
+            <div class="slider-zoom-container" title="Desliza para cambiar tamaño">
+                <span>🔍</span>
+                <input type="range" id="slider-zoom" min="0.6" max="1.4" step="0.05" value="1.0" oninput="cambiarZoomSlider(this)">
+            </div>
             <button class="btn-mini btn-circular" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
             <button class="btn-mini" id="btn-stats" type="button" onclick="abrirEstadisticas()">📊 Stats</button>
             <button class="btn-mini" id="btn-fondo" type="button" onclick="cambiarFondo()">🖼️ Fondo</button>
@@ -575,10 +599,9 @@
     </div>
 
     <script>
-        // Control de Zoom / Escala manual de la página
-        let zoomActual = 1.0;
-        function ajustarZoom(cambio) {
-            zoomActual = Math.max(0.6, Math.min(1.4, zoomActual + cambio));
+        // Control de Zoom / Escala con la rayita deslizante (slider)
+        function cambiarZoomSlider(input) {
+            let zoomActual = parseFloat(input.value);
             const contenedor = document.getElementById('app-contenedor');
             if (contenedor) {
                 contenedor.style.transform = `scale(${zoomActual})`;
@@ -677,7 +700,7 @@
 
         let estadisticas = (() => {
             try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v9'));
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v10'));
                 if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
                 for (let m in estadisticasBase) {
                     if (!guardado[m]) guardado[m] = estadisticasBase[m];
@@ -695,7 +718,7 @@
 
         function guardarStats() {
             try {
-                localStorage.setItem('memoria_stats_v9', JSON.stringify(estadisticas));
+                localStorage.setItem('memoria_stats_v10', JSON.stringify(estadisticas));
             } catch (e) {}
         }
 
@@ -883,7 +906,7 @@
 
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v9');
+                localStorage.removeItem('memoria_stats_v10');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
                 abrirEstadisticas();
@@ -1147,7 +1170,7 @@
                 const selectorSonido = document.getElementById('selector-sonido');
                 const selectorModo = document.getElementById('selector-modo');
 
-                let tipoSonido = selectorSonido ? parseInt(selectorSonido.value, 10) : 0;
+                let tipoSonido = selectorSonido ? parseInt(selectorSonido.value, 10) : 1;
                 const modo = selectorModo ? selectorModo.value : 'normal';
 
                 const osc = audioCtx.createOscillator();
