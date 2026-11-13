@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oso Espacial Pro</title>
+    <title>Infla el Globo Pro</title>
     <style>
         body {
             background-color: #111;
@@ -12,140 +12,162 @@
             font-family: 'Courier New', Courier, monospace;
             margin: 0;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
-        h1 { margin: 10px 0; font-size: 24px; color: #00ffcc; }
-        canvas {
-            background: #1a1a2e;
-            display: block;
-            margin: 0 auto;
-            border: 3px solid #00ffcc;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        h1 { color: #ff0077; font-size: 24px; margin-bottom: 5px; }
+        #puntuacion { font-size: 18px; color: #00ffcc; margin-bottom: 20px; }
+        
+        #zona-juego {
+            width: 300px;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
-        #info { margin-top: 10px; font-size: 16px; }
+
+        #globo {
+            width: 50px;
+            height: 65px;
+            background-color: #ff3366;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            position: relative;
+            transition: transform 0.05s ease;
+            box-shadow: inset -8px -8px 0px rgba(0,0,0,0.15);
+        }
+
+        /* Hilito del globo */
+        #globo::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 22px;
+            width: 2px;
+            height: 15px;
+            background-color: #888;
+        }
+
+        #btn-inflar {
+            background-color: #00ffcc;
+            color: #111;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 15px rgba(0, 255, 204, 0.4);
+            transition: transform 0.1s;
+        }
+        #btn-inflar:active { transform: scale(0.95); }
+
+        #mensaje {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #ffcc00;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>🐻 ESPACIO ☄️</h1>
-    <canvas id="juego" width="360" height="500"></canvas>
-    <div id="info">Usa las flechas ⬅️ ➡️ o toca la pantalla</div>
+    <h1>🎈 INFLA EL GLOBO 💥</h1>
+    <div id="puntuacion">Puntos: 0 | Récord: 0</div>
+
+    <div id="zona-juego">
+        <div id="globo"></div>
+    </div>
+
+    <button id="btn-inflar">¡MANTÉN PARA INFLAR!</button>
+    <div id="mensaje">Mantén presionado y suelta antes de que explote</div>
 
     <script>
-        const canvas = document.getElementById("juego");
-        const ctx = canvas.getContext("2d");
+        const globo = document.getElementById("globo");
+        const btn = document.getElementById("btn-inflar");
+        const txtPuntuacion = document.getElementById("puntuacion");
+        const mensaje = document.getElementById("mensaje");
 
-        let oso = { x: 160, y: 420, ancho: 40, alto: 40, velocidad: 6 };
-        let meteoritos = [];
-        let puntuacion = 0;
-        let jugando = true;
-        let teclas = {};
+        let escala = 1;
+        let puntos = 0;
+        let record = 0;
+        let inflando = false;
+        let explotado = false;
+        let limiteExplosion = 2.4 + Math.random() * 0.6; // Límite aleatorio pa' que sea divertido
 
-        window.addEventListener("keydown", (e) => teclas[e.key] = true);
-        window.addEventListener("keyup", (e) => teclas[e.key] = false);
-
-        // Controles táctiles pa' celus
-        canvas.addEventListener("touchmove", (e) => {
-            let rect = canvas.getBoundingClientRect();
-            let touchX = e.touches[0].clientX - rect.left;
-            oso.x = touchX - oso.ancho / 2;
-        });
-
-        function crearMeteorito() {
-            let x = Math.random() * (canvas.width - 30);
-            meteoritos.push({ x: x, y: -30, tamaño: 30, velocidad: 4 + Math.random() * 3 });
+        function empezarInflar(e) {
+            e.preventDefault();
+            if (explotado) return;
+            inflando = true;
+            mensaje.innerText = "¡Inflando... suelta a tiempo!";
         }
 
-        function actualizar() {
-            if (!jugando) return;
+        function detenerInflar(e) {
+            e.preventDefault();
+            if (!inflando || explotado) return;
+            inflando = false;
 
-            // Movimiento del oso
-            if ((teclas["ArrowLeft"] || teclas["a"]) && oso.x > 0) {
-                oso.x -= oso.velocidad;
+            if (escala >= limiteExplosion) {
+                // ¡Pum! Exploto por pasarse
+                explotado = true;
+                globo.style.backgroundColor = "#444";
+                globo.style.transform = "scale(0)";
+                mensaje.innerText = "💥 ¡BOOM! Te pasaste de rosca.";
+                puntos = 0;
+                setTimeout(reiniciar, 1500);
+            } else {
+                // ¡Bien hecho! Suma puntos según qué tan grande lo dejó
+                let ganado = Math.floor(escala * 10);
+                puntos += ganado;
+                if (puntos > record) record = puntos;
+                mensaje.innerText = `🎉 ¡Perfecto! +${ganado} pts`;
+                actualizarScore();
+                setTimeout(reiniciar, 1200);
             }
-            if ((teclas["ArrowRight"] || teclas["d"]) && oso.x < canvas.width - oso.ancho) {
-                oso.x += oso.velocidad;
-            }
+        }
 
-            // Generar meteoritos
-            if (Math.random() < 0.04) {
-                crearMeteorito();
-            }
+        function reiniciar() {
+            explotado = false;
+            escala = 1;
+            limiteExplosion = 2.0 + Math.random() * 1.0; // Nuevo límite aleatorio
+            globo.style.backgroundColor = "#ff3366";
+            globo.style.transform = `scale(${escala})`;
+            mensaje.innerText = "Mantén presionado y suelta antes de que explote";
+        }
 
-            // Mover meteoritos y colisiones
-            for (let i = meteoritos.length - 1; i >= 0; i--) {
-                let m = meteoritos[i];
-                m.y += m.velocidad;
+        function actualizarScore() {
+            txtPuntuacion.innerText = `Puntos: ${puntos} | Récord: ${record}`;
+        }
 
-                // Colisión con el oso
-                if (
-                    oso.x < m.x + m.tamaño &&
-                    oso.x + oso.ancho > m.x &&
-                    oso.y < m.y + m.tamaño &&
-                    oso.y + oso.alto > m.y
-                ) {
-                    jugando = false;
+        // Eventos tanto para PC (mouse) como para Celular (touch)
+        btn.addEventListener("mousedown", empezarInflar);
+        btn.addEventListener("mouseup", detenerInflar);
+        
+        btn.addEventListener("touchstart", empezarInflar);
+        btn.addEventListener("touchend", detenerInflar);
+
+        // Bucle de crecimiento mientras se mantenga presionado
+        setInterval(() => {
+            if (inflando && !explotado) {
+                escala += 0.025;
+                globo.style.transform = `scale(${escala})`;
+
+                // Si se pasa del límite explota al instante
+                if (escala >= limiteExplosion) {
+                    inflando = false;
+                    explotado = true;
+                    globo.style.backgroundColor = "#444";
+                    globo.style.transform = "scale(0)";
+                    mensaje.innerText = "💥 ¡BOOM! Explotó muy rápido.";
+                    puntos = 0;
+                    setTimeout(reiniciar, 1500);
                 }
-
-                // Borrar si sale de la pantalla
-                if (m.y > canvas.height) {
-                    meteoritos.splice(i, 1);
-                    puntuacion += 10;
-                }
             }
-        }
-
-        function dibujar() {
-            // Fondo
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Dibujar Oso (como un cuadrado pro con carita)
-            ctx.fillStyle = "#ffcc00";
-            ctx.fillRect(oso.x, oso.y, oso.ancho, oso.alto);
-            ctx.fillStyle = "#000";
-            ctx.fillRect(oso.x + 8, oso.y + 10, 6, 6);
-            ctx.fillRect(oso.x + 26, oso.y + 10, 6, 6);
-
-            // Dibujar Meteoritos
-            ctx.fillStyle = "#ff4444";
-            for (let m of meteoritos) {
-                ctx.beginPath();
-                ctx.arc(m.x + m.tamaño / 2, m.y + m.tamaño / 2, m.tamaño / 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Puntuación
-            ctx.fillStyle = "#fff";
-            ctx.font = "16px Courier New";
-            ctx.fillText("Score: " + puntuacion, 15, 25);
-
-            if (!jugando) {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#ff4444";
-                ctx.font = "28px Courier New";
-                ctx.fillText("¡GAME OVER!", 80, 230);
-                ctx.fillStyle = "#fff";
-                ctx.font = "14px Courier New";
-                ctx.fillText("Toca pa' reiniciar", 110, 270);
-            }
-        }
-
-        function loop() {
-            actualizar();
-            dibujar();
-            requestAnimationFrame(loop);
-        }
-
-        canvas.addEventListener("click", () => {
-            if (!jugando) {
-                meteoritos = [];
-                puntuacion = 0;
-                oso.x = 160;
-                jugando = true;
-            }
-        });
-
-        loop();
+        }, 30);
     </script>
 </body>
 </html>
