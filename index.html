@@ -3,207 +3,1469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secuencia Hacker - Nivel 15</title>
+    <title>Juego de Memoria</title>
     <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --text-color: #ffffff;
+            --subtext-color: #a2a8d3;
+            --btn-bg: #ffffff;
+            --btn-text: #1a1a2e;
+            --control-bg: #16213e;
+            --control-hover: #1f305e;
+            --control-text: #ffffff;
+            --badge-bg: rgba(255, 255, 255, 0.1);
+            --modal-bg: #16213e;
+        }
+
         body {
-            background-color: #0b0c10;
-            color: #66fcf1;
-            text-align: center;
-            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding-top: 85px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            box-sizing: border-box;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas de Lluvia Binaria (Unos y Ceros) para el Modo Hacker */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            display: none;
+            opacity: 0.22;
+        }
+
+        body.modo-hacker #matrix-canvas {
+            display: block;
+        }
+
+        /* Asegurar que los elementos del juego estén por encima del canvas de matrix */
+        .barra-superior, .app-contenedor, .modal-overlay {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Estilos específicos para el Modo Hacker */
+        body.modo-hacker {
+            background-color: #000000 !important;
+        }
+
+        body.modo-hacker .barra-superior {
+            background-color: #000000 !important;
+            border-bottom: 2px solid #00ff00 !important;
+            box-shadow: 0 4px 20px rgba(0, 255, 0, 0.25) !important;
+        }
+
+        body.modo-hacker .btn-mini {
+            background-color: #0b0f0b !important;
+            color: #00ff00 !important;
+            border: 1px solid #00ff00 !important;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            background-size: 14px !important;
+        }
+
+        body.modo-hacker button.btn-mini {
+            background-image: none !important;
+        }
+
+        body.modo-hacker .btn-mini:hover:not(:disabled) {
+            background-color: #00ff00 !important;
+            color: #000000 !important;
+            box-shadow: 0 0 12px #00ff00 !important;
+        }
+
+        body.modo-hacker h1, 
+        body.modo-hacker #mensaje, 
+        body.modo-hacker .badge-modo {
+            color: #00ff00 !important;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
+        }
+
+        body.modo-hacker .bloque {
+            background-color: #0a0f0a !important;
+            border: 2px solid #00ff00 !important;
+            box-shadow: 0 0 12px #00ff00, inset 0 0 6px rgba(0, 255, 0, 0.4) !important;
+        }
+
+        body.modo-hacker .bloque.brillar {
+            background-color: #00ff00 !important;
+            box-shadow: 0 0 35px #00ff00, inset 0 0 15px #ffffff !important;
+            filter: brightness(1.5);
+        }
+
+        .barra-superior {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-color);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            z-index: 100;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .grupo-controles {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-mini {
+            background-color: var(--control-bg);
+            color: var(--control-text);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            border-radius: 12px;
+            padding: 9px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            padding-right: 32px;
+        }
+
+        button.btn-mini {
+            background-image: none;
+            padding-right: 16px;
+        }
+
+        .btn-mini:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-mini:hover:not(:disabled) {
+            background-color: var(--control-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #btn-silenciar {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: none;
+        }
+
+        .app-contenedor {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+            width: 100%;
+            padding-bottom: 30px;
         }
-        h1 { color: #66fcf1; font-size: 20px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102,252,241,0.5); }
-        #estado { font-size: 14px; margin-bottom: 15px; color: #45a29e; height: 20px; }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 90px);
-            grid-gap: 12px;
+
+        h1 {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .contenedor-info-partida {
+            display: flex;
+            gap: 10px;
+            align-items: center;
             justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge-modo {
+            background-color: var(--badge-bg);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--subtext-color);
+            letter-spacing: 0.5px;
+        }
+
+        #mensaje {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            height: 25px;
+            color: var(--subtext-color);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .contenedor-tiempo {
+            width: 280px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .contenedor-tiempo.activo {
+            display: block;
+            opacity: 1;
+        }
+
+        .barra-progreso-tiempo {
+            width: 100%;
+            height: 100%;
+            background-color: #2ed573;
+            transition: width 0.1s linear, background-color 0.3s;
+        }
+
+        .vibrando-alerta {
+            animation: vibrar-rojo 0.15s infinite alternate;
+        }
+
+        @keyframes vibrar-rojo {
+            0% { transform: translate(0, 0) scale(1); background-color: #ff4757; }
+            25% { transform: translate(-2px, 2px) scale(1.01); background-color: #ff3838; }
+            50% { transform: translate(2px, -2px) scale(1); background-color: #ff4757; }
+            75% { transform: translate(-1px, -1px) scale(1.01); background-color: #e84118; }
+            100% { transform: translate(1px, 1px) scale(1); background-color: #ff4757; }
+        }
+
+        .panel-grabadora {
+            display: none;
+            opacity: 0;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .panel-grabadora.activo {
+            display: flex;
+            opacity: 1;
+        }
+
+        .btn-grabadora {
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .btn-grabadora:hover { transform: scale(1.05); }
+        #btn-grabar { background-color: #ff4757; color: white; }
+        #btn-grabar.grabando { background-color: #c0392b; animation: pulse 1s infinite; }
+        #btn-reproducir { background-color: #2ed573; color: white; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .tablero-contenedor {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 20px;
         }
-        
-        .nodo {
-            width: 90px;
-            height: 90px;
-            background-color: #1f2833;
-            border: 3px solid #45a29e;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+
+        .tablero {
+            display: grid;
+            grid-template-columns: repeat(2, 130px);
+            grid-template-rows: repeat(2, 130px);
+            gap: 12px;
         }
-        .nodo:active { transform: scale(0.93); }
 
+        .bloque {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+            cursor: pointer;
+            opacity: 1;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.3s ease;
+        }
 
-        .activo-0 { background-color: #ff0055 !important; border-color: #ff88aa !important; box-shadow: 0 0 20px #ff0055; }
-        .activo-1 { background-color: #00ffcc !important; border-color: #88ffbb !important; box-shadow: 0 0 20px #00ffcc; }
-        .activo-2 { background-color: #ffcc00 !important; border-color: #ffee88 !important; box-shadow: 0 0 20px #ffcc00; }
-        .activo-3 { background-color: #9900ff !important; border-color: #cc88ff !important; box-shadow: 0 0 20px #9900ff; }
+        .bloque:active {
+            transform: scale(0.94);
+        }
 
+        .bloque.brillar {
+            transform: scale(1.06);
+            box-shadow: 0 0 35px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.8);
+            filter: brightness(1.2);
+            z-index: 10;
+        }
 
-        #btn {
-            background-color: #66fcf1;
-            color: #0b0c10;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+        #btn-jugar {
+            padding: 12px 36px;
+            font-size: 1.1rem;
             font-weight: bold;
-            border-radius: 8px;
+            color: var(--btn-text);
+            background-color: var(--btn-bg);
+            border: none;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(102,252,241,0.4);
-            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.15s, opacity 0.2s;
+            margin-bottom: 20px;
         }
-        #btn:hover { background-color: #45a29e; color: #fff; }
+
+        #btn-jugar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        #btn-jugar:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(3px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.activo {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-contenido {
+            background-color: var(--modal-bg);
+            color: var(--text-color);
+            padding: 24px;
+            border-radius: 20px;
+            width: 92%;
+            max-width: 540px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
+            border: 1px solid rgba(128, 128, 128, 0.25);
+        }
+
+        .modal-contenido h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 18px;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-modos-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-modo-stat {
+            background: rgba(128, 128, 128, 0.08);
+            border: 1px solid rgba(128, 128, 128, 0.15);
+            border-radius: 14px;
+            padding: 12px 14px;
+        }
+
+        .card-modo-stat h3 {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: var(--subtext-color);
+            font-weight: 700;
+        }
+
+        .grid-dificultades {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .item-dif {
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .item-dif .dif-titulo {
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+            padding-bottom: 3px;
+        }
+
+        .item-dif div {
+            line-height: 1.4;
+        }
+
+        .item-dif span {
+            font-weight: 600;
+            color: var(--subtext-color);
+        }
+
+        .grid-extremo-stat {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .grid-extremo-stat div {
+            line-height: 1.4;
+        }
+
+        .grid-extremo-stat span {
+            font-weight: 600;
+            color: var(--subtext-color);
+        }
     </style>
 </head>
 <body>
 
+    <canvas id="matrix-canvas"></canvas>
 
-    <h1>💻 SECUENCIA HACKER (NIVEL 1/15) 🔐</h1>
-    <div id="estado">¡Dale al botón para hackear el sistema!</div>
+    <div class="barra-superior">
+        <div class="grupo-controles">
+            <select id="selector-dificultad" class="btn-mini" onchange="cambiarDificultad(this)" title="Dificultad">
+                <option value="2">Dificultad = 🟢 Fácil (2x2)</option>
+                <option value="3">Dificultad = 🟡 Medio (3x3)</option>
+                <option value="4">Dificultad = 🔴 Difícil (4x4)</option>
+            </select>
 
+            <select id="selector-modo" class="btn-mini" onchange="cambiarModoJuego(this)" title="Modo de Juego">
+                <option value="normal">Modo = ➡️ Normal</option>
+                <option value="invertido">Modo = 🔄 Invertido</option>
+                <option value="relampago">Modo = ⚡ Relámpago</option>
+                <option value="contrarreloj">Modo = ⏱️ Contrarreloj</option>
+                <option value="libre">Modo = 🎹 Libre (5x5)</option>
+                <option value="extremo">Modo = 💀 Extremo</option>
+                <option value="hacker">Modo = 💻 Hacker</option>
+            </select>
 
-    <div class="grid" id="tablero">
-        <div class="nodo" data-index="0"></div>
-        <div class="nodo" data-index="1"></div>
-        <div class="nodo" data-index="2"></div>
-        <div class="nodo" data-index="3"></div>
-        <div class="nodo" data-index="4"></div>
-        <div class="nodo" data-index="5"></div>
-        <div class="nodo" data-index="6"></div>
-        <div class="nodo" data-index="7"></div>
-        <div class="nodo" data-index="8"></div>
+            <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)" title="Instrumento">
+                <option value="0">Sonido = 🎹 Piano</option>
+                <option value="1">Sonido = 🔔 Campanas</option>
+                <option value="2">Sonido = 🌊 Onda Suave</option>
+                <option value="3">Sonido = ⚡ Retro</option>
+                <option value="4">Sonido = 💧 Gotas</option>
+                <option value="5">Sonido = 🎸 Guitarra</option>
+                <option value="6">Sonido = 🎷 Viento</option>
+                <option value="7">Sonido = 🚀 Láser</option>
+                <option value="8">Sonido = 🕹️ Arcade</option>
+                <option value="9">Sonido = 🎶 Arpa</option>
+            </select>
+
+            <select id="selector-color-bloques" class="btn-mini" onchange="actualizarColoresTablero()" title="Tema de Colores">
+                <option value="0">Tema = ⚡ Neón</option>
+                <option value="1">Tema = 🌸 Pastel</option>
+                <option value="2">Tema = 🌅 Atardecer</option>
+                <option value="3">Tema = 🌊 Océano</option>
+                <option value="4">Tema = 🌲 Bosque</option>
+            </select>
+        </div>
+
+        <div class="grupo-controles">
+            <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
+            <button class="btn-mini" id="btn-stats" type="button" onclick="abrirEstadisticas()">📊 Estadísticas</button>
+            <button class="btn-mini" id="btn-fondo" type="button" onclick="cambiarFondo()">🖼️ Fondo</button>
+        </div>
     </div>
 
+    <!-- Modal de Estadísticas -->
+    <div class="modal-overlay" id="modal-estadisticas" onclick="cerrarEstadisticasFuera(event)">
+        <div class="modal-contenido" onclick="event.stopPropagation()">
+            <h2>📊 Resumen de Estadísticas</h2>
+            <div id="cuerpo-estadisticas"></div>
+            <div style="display: flex; gap: 10px; margin-top: 18px;">
+                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 10px;">🗑️ Borrar Datos</button>
+                <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 10px;">Cerrar</button>
+            </div>
+        </div>
+    </div>
 
-    <button id="btn" onclick="iniciarJuego()">Iniciar Hackeo</button>
+    <div class="app-contenedor" id="app-contenedor">
+        <h1>Juego de Memoria</h1>
+        <div class="contenedor-info-partida">
+            <div class="badge-modo" id="badge-modo">Modo = ➡️ Normal</div>
+            <div class="badge-modo" id="cronometro-juego" style="display: none;">⏱️ 00:00</div>
+        </div>
+        <div id="mensaje">Presiona "Jugar" para empezar</div>
 
+        <div class="contenedor-tiempo" id="contenedor-tiempo">
+            <div class="barra-progreso-tiempo" id="barra-progreso-tiempo"></div>
+        </div>
+
+        <div class="panel-grabadora" id="panel-grabadora">
+            <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
+            <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Reproducir</button>
+        </div>
+
+        <div class="tablero-contenedor" id="tablero-contenedor">
+            <div class="tablero" id="tablero">
+                <div class="bloque" id="bloque-0" style="background-color: #ff4757;" onclick="manejarClicBloque(0)"></div>
+                <div class="bloque" id="bloque-1" style="background-color: #05d9e8;" onclick="manejarClicBloque(1)"></div>
+                <div class="bloque" id="bloque-2" style="background-color: #d1f7ff;" onclick="manejarClicBloque(2)"></div>
+                <div class="bloque" id="bloque-3" style="background-color: #7700a6;" onclick="manejarClicBloque(3)"></div>
+            </div>
+        </div>
+
+        <button id="btn-jugar" type="button">Jugar</button>
+    </div>
 
     <script>
-        const nodos = document.querySelectorAll(".nodo");
-        const estado = document.getElementById("estado");
-        const titulo = document.querySelector("h1");
         let secuencia = [];
-        let jugadorSecuencia = [];
+        let secuenciaObjetivo = [];
+        let pasoUsuario = 0;
+        let bloqueado = true;
         let nivel = 0;
-        let jugando = false;
-        let coloresClase = ["activo-0", "activo-1", "activo-2", "activo-3"];
-
-
-        // Sintetizador de audio web (sin archivos externos)
         let audioCtx = null;
-        function reproducirSonido(freq, tipo = 'sine', duracion = 0.15) {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = tipo;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracion);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duracion);
-            } catch(e) {}
-        }
+        let timeouts = [];
+        let estaSilenciado = false;
 
+        let timerPartidaInterval = null;
+        let segundosPartida = 0;
 
-        function iniciarJuego() {
-            secuencia = [];
-            nivel = 0;
-            siguienteNivel();
-        }
+        let tamanoCuadricula = 2;
+        let totalBloques = 4;
 
+        let temporizadorTurno = null;
+        let intervaloProgreso = null;
+        let tiempoRestante = 6000;
+        const TIEMPO_MAXIMO = 6000;
 
-        function siguienteNivel() {
-            if (nivel >= 15) {
-                estado.innerText = "🏆 ¡INCREÍBLE! ¡HACKEAJTE TODO EL SISTEMA!";
-                titulo.innerText = "💻 ¡VICTORIA TOTAL (15/15)! 👑";
-                reproducirSonido(880, 'triangle', 0.5);
-                return;
+        let esGrabando = false;
+        let esReproduciendo = false;
+        let notasGrabadas = [];
+        let tiempoInicioGrabacion = 0;
+        let timeoutsGrabacion = [];
+
+        const fondosOscuros = ['#1a1a2e', '#1e1b4b', '#064e3b', '#31102f', '#18181b', '#2e0854', '#581c87'];
+        let indiceFondo = 0;
+
+        // Lógica de lluvia binaria (unos y ceros)
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        let matrixInterval = null;
+
+        function iniciarMatrizHacker() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const fontSize = 16;
+            const columns = Math.floor(canvas.width / fontSize);
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
             }
 
+            if (matrixInterval) clearInterval(matrixInterval);
+            matrixInterval = setInterval(() => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            jugadorSecuencia = [];
-            nivel++;
-            titulo.innerText = 💻 SECUENCIA HACKER (NIVEL ${nivel}/15) 🔐;
-            estado.innerText = Nivel ${nivel}: Descifrando código...;
-            
-            secuencia.push(Math.floor(Math.random() * 9));
-            mostrarSecuencia();
+                ctx.fillStyle = '#00ff00';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = Math.random() > 0.5 ? '1' : '0';
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }, 50);
         }
 
+        function detenerMatrizHacker() {
+            if (matrixInterval) {
+                clearInterval(matrixInterval);
+                matrixInterval = null;
+            }
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
 
-        function mostrarSecuencia() {
-            let i = 0;
-            let velocidadMuestra = Math.max(250, 550 - (nivel * 20));
-            
-            let intervalo = setInterval(() => {
-                if (i > 0) {
-                    let prevIdx = secuencia[i - 1];
-                    nodos[prevIdx].className = "nodo";
+        window.addEventListener('resize', () => {
+            if (document.body.classList.contains('modo-hacker')) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+
+        let estadisticasBase = {
+            normal: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
+            invertido: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
+            relampago: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
+            contrarreloj: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
+            extremo: { nivel: 0, derrotas: 0, notas: 0 },
+            hacker: { nivel: 0, derrotas: 0, notas: 0 }
+        };
+
+        let estadisticas = (() => {
+            try {
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v6'));
+                if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
+                for (let m in estadisticasBase) {
+                    if (!guardado[m]) guardado[m] = estadisticasBase[m];
+                    if (m !== 'extremo' && m !== 'hacker') {
+                        for (let d in estadisticasBase[m]) {
+                            if (!guardado[m][d]) guardado[m][d] = estadisticasBase[m][d];
+                        }
+                    }
                 }
-                if (i < secuencia.length) {
-                    let actualIdx = secuencia[i];
-                    let randomColor = coloresClase[Math.floor(Math.random() * coloresClase.length)];
-                    nodos[actualIdx].classList.add(randomColor);
-                    
-                    // Sonido según el nodo
-                    reproducirSonido(200 + (actualIdx * 60), 'sine', 0.2);
-                    i++;
+                return guardado;
+            } catch (e) {
+                return JSON.parse(JSON.stringify(estadisticasBase));
+            }
+        })();
+
+        function guardarStats() {
+            try {
+                localStorage.setItem('memoria_stats_v6', JSON.stringify(estadisticas));
+            } catch (e) {}
+        }
+
+        function toggleSilenciar() {
+            estaSilenciado = !estaSilenciado;
+            const btn = document.getElementById('btn-silenciar');
+            if (btn) btn.textContent = estaSilenciado ? '🔇' : '🔊';
+        }
+
+        const escalaNotas = [
+            261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25,
+            783.99, 880.00, 1046.50, 1174.66, 1318.51, 1567.98, 1760.00, 2093.00,
+            2349.32, 2637.02, 2793.83, 3135.96, 3520.00, 3951.07, 4186.01, 4698.63, 5274.04
+        ];
+
+        const temas25Colores = [
+            ['#ff4757','#05d9e8','#d1f7ff','#7700a6','#fe00fe','#defe47','#00ff9f','#00b8ff','#ff5500','#bd00ff','#ffbe0b','#fb5607','#ff006e','#8338ec','#3a86ff','#06d6a0','#ff0055','#00f2fe','#4facfe','#00f2fe','#fa709a','#fee140','#30cfd0','#330867','#f77062'],
+            ['#ffadad','#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#f4978e','#f8ad9d','#fbc4ab','#ffdab9','#b8e0d2','#d6eadf','#eac4d5','#95b8d1','#ffccd5','#cbf3f0','#2ec4b6','#ffbf69','#ff9f1c','#c77dff','#e0aaff','#90dbf4','#8ecae6'],
+            ['#590d22','#800f2f','#a4133c','#c9184a','#ff4d6d','#ff758f','#ff8fa3','#ffb3c1','#ff5400','#ff6d00','#ff8500','#ff9100','#ff9e00','#ffb703','#fb8500','#e85d04','#faa307','#ffba08','#d00000','#9d0208','#6a040f','#370617','#ff70a6','#ff9770','#ffd670'],
+            ['#03045e','#023e8a','#0077b6','#0096c7','#00b4d8','#48cae4','#90e0ef','#ade8f4','#006466','#065a60','#0b525b','#144552','#1b3a4b','#212f45','#272640','#312244','#1d3557','#457b9d','#a8dadc','#f1faee','#e63946','#1d3557','#457b9d','#1d3557','#00b4d8'],
+            ['#1b4332','#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2','#b7e4c7','#d8f3dc','#386641','#6a994e','#a7c957','#f2e8cf','#bc4749','#9b2226','#ca6702','#ee9b00','#386641','#6a994e','#a7c957','#f2e8cf','#52b788','#74c69d','#40916c','#2d6a4f','#1b4332']
+        ];
+
+        function obtenerTemaActual() {
+            const selectTema = document.getElementById('selector-color-bloques');
+            const idx = selectTema ? parseInt(selectTema.value, 10) : 0;
+            return temas25Colores[idx] || temas25Colores[0];
+        }
+
+        function construirTablero() {
+            const tablero = document.getElementById('tablero');
+            if (!tablero) return;
+            tablero.innerHTML = '';
+
+            const selectorModo = document.getElementById('selector-modo');
+            const selectorDif = document.getElementById('selector-dificultad');
+            const modo = selectorModo ? selectorModo.value : 'normal';
+
+            if (modo === 'libre') {
+                tamanoCuadricula = 5;
+            } else if (modo === 'extremo') {
+                if (nivel <= 3) tamanoCuadricula = 2;
+                else if (nivel <= 6) tamanoCuadricula = 3;
+                else if (nivel <= 9) tamanoCuadricula = 4;
+                else tamanoCuadricula = 5;
+
+                if (selectorDif) {
+                    if (tamanoCuadricula === 2) selectorDif.value = "2";
+                    else if (tamanoCuadricula === 3) selectorDif.value = "3";
+                    else selectorDif.value = "4";
+                }
+            } else if (modo === 'hacker') {
+                // Fijo en 2x2 para el modo hacker
+                tamanoCuadricula = 2;
+                if (selectorDif) selectorDif.value = "2";
+            } else {
+                tamanoCuadricula = selectorDif ? parseInt(selectorDif.value, 10) : 2;
+            }
+
+            let medida = 130;
+            let gap = 12;
+            if (tamanoCuadricula === 3) { medida = 95; gap = 10; }
+            if (tamanoCuadricula === 4) { medida = 70; gap = 8; }
+            if (tamanoCuadricula === 5) { medida = 55; gap = 6; }
+
+            tablero.style.gridTemplateColumns = `repeat(${tamanoCuadricula}, ${medida}px)`;
+            tablero.style.gridTemplateRows = `repeat(${tamanoCuadricula}, ${medida}px)`;
+            tablero.style.gap = `${gap}px`;
+
+            totalBloques = tamanoCuadricula * tamanoCuadricula;
+            const temaColores = obtenerTemaActual();
+
+            for (let i = 0; i < totalBloques; i++) {
+                const div = document.createElement('div');
+                div.className = 'bloque';
+                div.id = `bloque-${i}`;
+                if (modo !== 'hacker') {
+                    div.style.backgroundColor = temaColores[i % temaColores.length];
+                }
+                div.setAttribute('onclick', `manejarClicBloque(${i})`);
+                tablero.appendChild(div);
+            }
+        }
+
+        function actualizarColoresTablero() {
+            const selectorModo = document.getElementById('selector-modo');
+            if (selectorModo && selectorModo.value === 'hacker') return;
+
+            const temaColores = obtenerTemaActual();
+            for (let i = 0; i < totalBloques; i++) {
+                const bloque = document.getElementById(`bloque-${i}`);
+                if (bloque) {
+                    bloque.style.backgroundColor = temaColores[i % temaColores.length];
+                }
+            }
+        }
+
+        function actualizarBadgeModo(nombreModo) {
+            const badge = document.getElementById('badge-modo');
+            if (badge) badge.textContent = `Modo = ${nombreModo}`;
+        }
+
+        function abrirEstadisticas() {
+            const modal = document.getElementById('modal-estadisticas');
+            const cuerpo = document.getElementById('cuerpo-estadisticas');
+            if (!modal || !cuerpo) return;
+
+            const nombresModos = {
+                normal: '➡️ Normal',
+                invertido: '🔄 Invertido',
+                relampago: '⚡ Relámpago',
+                contrarreloj: '⏱️ Contrarreloj',
+                extremo: '💀 Extremo',
+                hacker: '💻 Hacker'
+            };
+
+            const nombresDif = { '2': '🟢 Fácil', '3': '🟡 Medio', '4': '🔴 Difícil' };
+
+            let totalNotasGlobal = 0;
+            for (let modoKey in estadisticas) {
+                if (modoKey === 'extremo' || modoKey === 'hacker') {
+                    totalNotasGlobal += (estadisticas[modoKey].notas || 0);
                 } else {
-                    clearInterval(intervalo);
-                    setTimeout(() => {
-                        nodos[secuencia[secuencia.length - 1]].className = "nodo";
-                        estado.innerText = ⚡ ¡Tu turno! Repite el patrón;
-                        jugando = true;
-                    }, 350);
+                    for (let difKey in estadisticas[modoKey]) {
+                        totalNotasGlobal += (estadisticas[modoKey][difKey].notas || 0);
+                    }
                 }
-            }, velocidadMuestra);
+            }
+
+            let html = `
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 14px; padding: 12px; text-align: center; margin-bottom: 14px;">
+                    <div style="font-size: 0.9rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
+                    <div style="font-size: 1.6rem; font-weight: bold; color: var(--text-color); margin-top: 4px;">${totalNotasGlobal}</div>
+                </div>
+                <div class="grid-modos-stats">
+            `;
+
+            const ordenModos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'extremo', 'hacker'];
+
+            ordenModos.forEach(modoKey => {
+                if (!estadisticas[modoKey]) return;
+                html += `<div class="card-modo-stat">`;
+                html += `<h3>Modo = ${nombresModos[modoKey]}</h3>`;
+
+                if (modoKey === 'extremo' || modoKey === 'hacker') {
+                    const st = estadisticas[modoKey] || { nivel: 0, derrotas: 0, notas: 0 };
+                    html += `
+                        <div class="grid-extremo-stat">
+                            <div>Récord: <span>${st.nivel || 0}</span></div>
+                            <div>Derrotas: <span>${st.derrotas || 0}</span></div>
+                            <div>Notas: <span>${st.notas || 0}</span></div>
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="grid-dificultades">`;
+                    for (let difKey in estadisticas[modoKey]) {
+                        const st = estadisticas[modoKey][difKey] || { nivel: 0, derrotas: 0, notas: 0 };
+                        html += `<div class="item-dif">`;
+                        html += `<div class="dif-titulo">${nombresDif[difKey]}</div>`;
+                        html += `Récord: <span>${st.nivel || 0}</span><br>`;
+                        html += `Derrotas: <span>${st.derrotas || 0}</span><br>`;
+                        html += `Notas: <span>${st.notas || 0}</span>`;
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            });
+
+            html += `</div>`;
+
+            cuerpo.innerHTML = html;
+            modal.classList.add('activo');
         }
 
+        function cerrarEstadisticas() {
+            const modal = document.getElementById('modal-estadisticas');
+            if (modal) modal.classList.remove('activo');
+        }
 
-        nodos.forEach((nodo, index) => {
-            nodo.addEventListener("click", () => {
-                if (!jugando) return;
+        function cerrarEstadisticasFuera(event) {
+            if (event.target.id === 'modal-estadisticas') {
+                cerrarEstadisticas();
+            }
+        }
 
+        function reiniciarEstadisticas() {
+            if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
+                localStorage.removeItem('memoria_stats_v6');
+                estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
+                guardarStats();
+                abrirEstadisticas();
+            }
+        }
 
-                jugadorSecuencia.push(index);
-                
-                let colorToque = coloresClase[index % coloresClase.length];
-                nodo.classList.add(colorToque);
-                reproducirSonido(250 + (index * 50), 'triangle', 0.15);
-                setTimeout(() => nodo.className = "nodo", 150);
+        function iniciarCronometroPartida() {
+            segundosPartida = 0;
+            const cronoEl = document.getElementById('cronometro-juego');
+            if (cronoEl) {
+                cronoEl.style.display = 'inline-block';
+                cronoEl.textContent = '⏱️ 00:00';
+            }
+            if (timerPartidaInterval) clearInterval(timerPartidaInterval);
+            timerPartidaInterval = setInterval(() => {
+                const selectorModo = document.getElementById('selector-modo');
+                const modo = selectorModo ? selectorModo.value : 'normal';
+                if (modo === 'libre') return;
 
+                segundosPartida++;
+                const m = Math.floor(segundosPartida / 60).toString().padStart(2, '0');
+                const s = (segundosPartida % 60).toString().padStart(2, '0');
+                if (cronoEl) cronoEl.textContent = `⏱️ ${m}:${s}`;
+            }, 1000);
+        }
 
-                const pasoActual = jugadorSecuencia.length - 1;
-                if (jugadorSecuencia[pasoActual] !== secuencia[pasoActual]) {
-                    jugando = false;
-                    reproducirSonido(120, 'sawtooth', 0.4);
-                    estado.innerText = ❌ ¡ALERTA! Fallaste en el nivel ${nivel};
+        function detenerCronometroPartida() {
+            if (timerPartidaInterval) {
+                clearInterval(timerPartidaInterval);
+                timerPartidaInterval = null;
+            }
+        }
+
+        function cambiarDificultad(select) {
+            limpiarTimeouts();
+            detenerContadorTiempo();
+            detenerCronometroPartida();
+            quitarBrilloTotal();
+            tamanoCuadricula = parseInt(select.value, 10);
+            secuencia = [];
+            secuenciaObjetivo = [];
+            nivel = 0;
+            bloqueado = true;
+            const cronoEl = document.getElementById('cronometro-juego');
+            if (cronoEl) cronoEl.style.display = 'none';
+
+            const btn = document.getElementById('btn-jugar');
+            const msg = document.getElementById('mensaje');
+            if (btn) {
+                btn.textContent = "Jugar";
+                btn.disabled = false;
+            }
+            if (msg) msg.textContent = 'Presiona "Jugar" para empezar';
+            construirTablero();
+        }
+
+        function cambiarModoJuego(select) {
+            const modo = select.value;
+            const panelGrabadora = document.getElementById('panel-grabadora');
+            const contenedorTiempo = document.getElementById('contenedor-tiempo');
+            const selectDif = document.getElementById('selector-dificultad');
+            const btnFondo = document.getElementById('btn-fondo');
+            const selectTema = document.getElementById('selector-color-bloques');
+            const btnJugar = document.getElementById('btn-jugar');
+            const mensaje = document.getElementById('mensaje');
+            const cronoEl = document.getElementById('cronometro-juego');
+
+            if (modo !== 'extremo' && modo !== 'hacker') {
+                indiceFondo = 0;
+                document.body.style.backgroundColor = fondosOscuros[0];
+                if (selectTema) selectTema.value = "0";
+            }
+
+            limpiarTimeouts();
+            detenerContadorTiempo();
+            detenerCronometroPartida();
+            if (cronoEl) cronoEl.style.display = 'none';
+            nivel = 0;
+            secuencia = [];
+            secuenciaObjetivo = [];
+
+            const textoModo = select.options[select.selectedIndex].text.replace(/^Modo\s*=\s*/, '');
+            actualizarBadgeModo(textoModo);
+
+            if (btnJugar) {
+                btnJugar.textContent = "Jugar";
+                btnJugar.disabled = false;
+            }
+
+            if (btnFondo) btnFondo.disabled = false;
+            if (selectTema) selectTema.disabled = false;
+            if (selectDif) selectDif.disabled = false;
+
+            if (modo === 'libre') {
+                if (panelGrabadora) panelGrabadora.classList.add('activo');
+                if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
+                if (selectDif) selectDif.disabled = true;
+                if (btnJugar) btnJugar.style.display = 'none';
+                if (mensaje) mensaje.textContent = '🎹 Modo Libre (5x5) — ¡Toca cuando quieras!';
+                bloqueado = false;
+            } else if (modo === 'extremo') {
+                if (panelGrabadora) panelGrabadora.classList.remove('activo');
+                if (selectDif) {
+                    selectDif.value = "2";
+                    selectDif.disabled = true;
+                }
+                if (btnJugar) btnJugar.style.display = 'inline-block';
+                if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
+                bloqueado = true;
+            } else if (modo === 'hacker') {
+                if (panelGrabadora) panelGrabadora.classList.remove('activo');
+                if (selectDif) {
+                    selectDif.value = "2";
+                    selectDif.disabled = true;
+                }
+                if (btnFondo) btnFondo.disabled = true;
+                if (selectTema) selectTema.disabled = true;
+                if (btnJugar) btnJugar.style.display = 'inline-block';
+                if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
+                bloqueado = true;
+            } else {
+                if (panelGrabadora) panelGrabadora.classList.remove('activo');
+                if (btnJugar) btnJugar.style.display = 'inline-block';
+                if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
+                bloqueado = true;
+                if (modo === 'contrarreloj') {
+                    if (contenedorTiempo) contenedorTiempo.classList.add('activo');
+                } else {
+                    if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
+                }
+            }
+
+            if (modo === 'hacker') {
+                document.body.classList.add('modo-hacker');
+                iniciarMatrizHacker();
+            } else {
+                document.body.classList.remove('modo-hacker');
+                detenerMatrizHacker();
+            }
+
+            construirTablero();
+        }
+
+        function cambiarFondo() {
+            const selectorModo = document.getElementById('selector-modo');
+            if (selectorModo && selectorModo.value === 'hacker') return;
+
+            indiceFondo = (indiceFondo + 1) % fondosOscuros.length;
+            document.body.style.backgroundColor = fondosOscuros[indiceFondo];
+        }
+
+        function limpiarTimeouts() {
+            timeouts.forEach(t => clearTimeout(t));
+            timeouts = [];
+        }
+
+        function detenerContadorTiempo() {
+            if (temporizadorTurno) clearTimeout(temporizadorTurno);
+            if (intervaloProgreso) clearInterval(intervaloProgreso);
+            const barra = document.getElementById('barra-progreso-tiempo');
+            if (barra) {
+                barra.classList.remove('vibrando-alerta');
+                barra.style.width = '100%';
+                barra.style.backgroundColor = '#2ed573';
+            }
+        }
+
+        function iniciarContadorContrarreloj() {
+            detenerContadorTiempo();
+            const modo = document.getElementById('selector-modo').value;
+            if (modo !== 'contrarreloj') return;
+
+            tiempoRestante = TIEMPO_MAXIMO;
+            const barra = document.getElementById('barra-progreso-tiempo');
+
+            intervaloProgreso = setInterval(() => {
+                tiempoRestante -= 50;
+                let porcentaje = (tiempoRestante / TIEMPO_MAXIMO) * 100;
+                if (porcentaje < 0) porcentaje = 0;
+                if (barra) barra.style.width = `${porcentaje}%`;
+
+                if (tiempoRestante <= 2000) {
+                    if (barra) barra.classList.add('vibrando-alerta');
+                } else {
+                    if (barra) {
+                        barra.classList.remove('vibrando-alerta');
+                        barra.style.backgroundColor = '#2ed573';
+                    }
+                }
+            }, 50);
+
+            temporizadorTurno = setTimeout(() => {
+                perderPartidaPorTiempo();
+            }, TIEMPO_MAXIMO);
+        }
+
+        function perderPartidaPorTiempo() {
+            bloqueado = true;
+            limpiarTimeouts();
+            detenerContadorTiempo();
+            detenerCronometroPartida();
+            reproducirSonido(0, true);
+
+            const modo = document.getElementById('selector-modo').value;
+            const dif = document.getElementById('selector-dificultad').value;
+
+            if (modo === 'extremo' || modo === 'hacker') {
+                if (estadisticas[modo]) {
+                    estadisticas[modo].derrotas = (estadisticas[modo].derrotas || 0) + 1;
+                    guardarStats();
+                }
+            } else {
+                if (estadisticas[modo] && estadisticas[modo][dif]) {
+                    estadisticas[modo][dif].derrotas = (estadisticas[modo][dif].derrotas || 0) + 1;
+                    guardarStats();
+                }
+            }
+
+            const mensaje = document.getElementById('mensaje');
+            if (mensaje) mensaje.textContent = `⏱️ ¡Se acabó el tiempo! Llegaste al nivel ${nivel}.`;
+            secuencia = [];
+            secuenciaObjetivo = [];
+
+            const selectDif = document.getElementById('selector-dificultad');
+            const selectModo = document.getElementById('selector-modo');
+            if (selectDif && modo !== 'extremo' && modo !== 'hacker') selectDif.disabled = false;
+            if (selectModo) selectModo.disabled = false;
+
+            const btn = document.getElementById('btn-jugar');
+            if (btn) {
+                btn.textContent = "Volver a jugar";
+                btn.disabled = false;
+            }
+        }
+
+        function quitarBrilloTotal() {
+            const bloques = document.querySelectorAll('.bloque');
+            bloques.forEach(b => {
+                b.classList.remove('brillar');
+            });
+        }
+
+        function inicializarAudio() {
+            try {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx = new AudioContextClass();
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            } catch (e) {}
+        }
+
+        function reproducirSonido(indice, esError = false) {
+            if (estaSilenciado) return;
+            try {
+                inicializarAudio();
+                if (!audioCtx) return;
+
+                const selectorSonido = document.getElementById('selector-sonido');
+                const selectorModo = document.getElementById('selector-modo');
+
+                let tipoSonido = selectorSonido ? parseInt(selectorSonido.value, 10) : 0;
+                const modo = selectorModo ? selectorModo.value : 'normal';
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const freq = escalaNotas[indice % escalaNotas.length];
+
+                let volumenAlto = 0.5;
+                let duracionSonido = 0.35;
+
+                if (modo === 'extremo') {
+                    duracionSonido = 0.1;
+                } else if (modo === 'relampago') {
+                    duracionSonido = 0.2;
+                }
+
+                if (esError) {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.4 * volumenAlto, audioCtx.currentTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.41);
                     return;
                 }
 
+                switch (tipoSonido) {
+                    case 0: osc.type = 'sine'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
+                    case 1: osc.type = 'triangle'; osc.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime); break;
+                    case 2: osc.type = 'sine'; osc.frequency.setValueAtTime(freq * 0.75, audioCtx.currentTime); break;
+                    case 3: osc.type = 'square'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
+                    case 4: 
+                        osc.type = 'sine'; 
+                        osc.frequency.setValueAtTime(freq * 0.8, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(freq * 1.4, audioCtx.currentTime + (duracionSonido * 0.6)); 
+                        break;
+                    case 5: osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
+                    case 6: 
+                        osc.type = 'triangle'; 
+                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                        osc.frequency.linearRampToValueAtTime(freq * 1.02, audioCtx.currentTime + (duracionSonido * 0.4)); 
+                        break;
+                    case 7: 
+                        osc.type = 'sawtooth'; 
+                        osc.frequency.setValueAtTime(freq * 2, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + duracionSonido); 
+                        break;
+                    case 8: osc.type = 'square'; osc.frequency.setValueAtTime(freq * 1.25, audioCtx.currentTime); break;
+                    case 9: osc.type = 'sine'; osc.frequency.setValueAtTime(freq * 1.25, audioCtx.currentTime); break;
+                }
 
-                if (jugadorSecuencia.length === secuencia.length) {
-                    jugando = false;
-                    if (nivel === 15) {
-                        siguienteNivel();
-                    } else {
-                        estado.innerText = 🔓 ¡Nivel ${nivel} superado! Siguiente...;
-                        setTimeout(siguienteNivel, 1000);
+                gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.4 * volumenAlto, audioCtx.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duracionSonido);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duracionSonido + 0.01);
+            } catch (e) {}
+        }
+
+        function activarBloque(id) {
+            const bloque = document.getElementById(`bloque-${id}`);
+            if (!bloque) return;
+
+            bloque.classList.add('brillar');
+            reproducirSonido(id, false);
+
+            const selectorModo = document.getElementById('selector-modo');
+            const modo = selectorModo ? selectorModo.value : 'normal';
+            let tiempoBrillo = 220;
+            if (modo === 'extremo') tiempoBrillo = 90;
+            else if (modo === 'relampago') tiempoBrillo = 150;
+
+            const t = setTimeout(() => {
+                if (bloque) {
+                    bloque.classList.remove('brillar');
+                }
+            }, tiempoBrillo);
+            timeouts.push(t);
+        }
+
+        function iniciarJuego() {
+            inicializarAudio();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            limpiarTimeouts();
+            detenerContadorTiempo();
+            quitarBrilloTotal();
+            secuencia = [];
+            secuenciaObjetivo = [];
+            nivel = 0;
+
+            const selectDif = document.getElementById('selector-dificultad');
+            const selectModo = document.getElementById('selector-modo');
+            const btnJugar = document.getElementById('btn-jugar');
+
+            if (selectDif && selectModo.value !== 'extremo' && selectModo.value !== 'hacker') selectDif.disabled = true;
+            if (selectModo) selectModo.disabled = true;
+            if (btnJugar) btnJugar.disabled = true;
+
+            const modo = selectModo ? selectModo.value : 'normal';
+            const contenedorTiempo = document.getElementById('contenedor-tiempo');
+            if (modo === 'contrarreloj' && contenedorTiempo) {
+                contenedorTiempo.classList.add('activo');
+            }
+
+            iniciarCronometroPartida();
+            siguienteRonda();
+        }
+
+        function siguienteRonda() {
+            bloqueado = true;
+            detenerContadorTiempo();
+            pasoUsuario = 0;
+            nivel++;
+
+            const selectorModo = document.getElementById('selector-modo');
+            const modo = selectorModo ? selectorModo.value : 'normal';
+            const dif = document.getElementById('selector-dificultad').value;
+            const mensaje = document.getElementById('mensaje');
+
+            if (modo === 'extremo' || modo === 'hacker') {
+                if (estadisticas[modo]) {
+                    if (nivel > (estadisticas[modo].nivel || 0)) {
+                        estadisticas[modo].nivel = nivel;
+                        guardarStats();
                     }
                 }
+            } else {
+                if (estadisticas[modo] && estadisticas[modo][dif]) {
+                    if (nivel > (estadisticas[modo][dif].nivel || 0)) {
+                        estadisticas[modo][dif].nivel = nivel;
+                        guardarStats();
+                    }
+                }
+            }
+
+            let velocidadPaso = 650;
+            if (modo === 'relampago') velocidadPaso = 350;
+            if (modo === 'extremo') velocidadPaso = 250;
+
+            if (modo === 'extremo') {
+                construirTablero();
+                indiceFondo = (indiceFondo + 1) % fondosOscuros.length;
+                document.body.style.backgroundColor = fondosOscuros[indiceFondo];
+
+                let etapaNombre = "🟢 Fácil (2x2)";
+                if (nivel > 3 && nivel <= 6) etapaNombre = "🟡 Medio (3x3)";
+                else if (nivel > 6 && nivel <= 9) etapaNombre = "🔴 Difícil (4x4)";
+                else if (nivel > 9) etapaNombre = "💀 Extremo Total (5x5)";
+
+                if (mensaje) mensaje.textContent = `💀 Nivel ${nivel} [${etapaNombre}] — ¡Atento!`;
+            } else if (modo === 'hacker') {
+                if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} (Modo Hacker 2x2) — Sistema comprometido`;
+            } else if (modo === 'relampago') {
+                if (mensaje) mensaje.textContent = `⚡ Nivel ${nivel} (⚡ Relámpago) — ¡Rápido!`;
+            } else if (modo === 'contrarreloj') {
+                if (mensaje) mensaje.textContent = `⏱️ Nivel ${nivel} (⏱️ Contrarreloj) — Observa...`;
+            } else {
+                if (mensaje) mensaje.textContent = `Nivel ${nivel} — Observa...`;
+            }
+
+            const siguienteBloque = Math.floor(Math.random() * totalBloques);
+            secuencia.push(siguienteBloque);
+
+            if (modo === 'invertido') {
+                secuenciaObjetivo = [...secuencia].reverse();
+            } else {
+                secuenciaObjetivo = [...secuencia];
+            }
+
+            secuencia.forEach((idBloque, index) => {
+                const t = setTimeout(() => {
+                    activarBloque(idBloque);
+                }, (index + 1) * velocidadPaso);
+                timeouts.push(t);
             });
-        });
+
+            const tTurno = setTimeout(() => {
+                bloqueado = false;
+                if (modo === 'invertido') {
+                    if (mensaje) mensaje.textContent = `Nivel ${nivel} — ¡Tu turno (🔄 Al revés)!`;
+                } else if (modo === 'extremo') {
+                    if (mensaje) mensaje.textContent = `💀 Nivel ${nivel} — ¡Tu turno!`;
+                } else if (modo === 'hacker') {
+                    if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} — ¡Tu turno hacker!`;
+                } else if (modo === 'relampago') {
+                    if (mensaje) mensaje.textContent = `⚡ ¡Tu turno (⚡ Rápido)!`;
+                } else if (modo === 'contrarreloj') {
+                    if (mensaje) mensaje.textContent = `⏱️ ¡Tu turno! (Tienes 6 segundos)`;
+                    iniciarContadorContrarreloj();
+                } else {
+                    if (mensaje) mensaje.textContent = `Nivel ${nivel} — ¡Tu turno!`;
+                }
+            }, (secuencia.length + 1) * velocidadPaso);
+            timeouts.push(tTurno);
+        }
+
+        function manejarClicBloque(id) {
+            const selectorModo = document.getElementById('selector-modo');
+            const modo = selectorModo ? selectorModo.value : 'normal';
+            const dif = document.getElementById('selector-dificultad').value;
+
+            if (modo === 'libre') {
+                activarBloque(id);
+                if (esGrabando) {
+                    const tiempoActual = Date.now() - tiempoInicioGrabacion;
+                    notasGrabadas.push({ id: id, tiempo: tiempoActual });
+                }
+                return;
+            }
+
+            if (bloqueado) return;
+
+            if (modo === 'extremo' || modo === 'hacker') {
+                if (estadisticas[modo]) {
+                    estadisticas[modo].notas = (estadisticas[modo].notas || 0) + 1;
+                    guardarStats();
+                }
+            } else {
+                if (estadisticas[modo] && estadisticas[modo][dif]) {
+                    estadisticas[modo][dif].notas = (estadisticas[modo][dif].notas || 0) + 1;
+                    guardarStats();
+                }
+            }
+
+            activarBloque(id);
+
+            if (id === secuenciaObjetivo[pasoUsuario]) {
+                pasoUsuario++;
+                if (pasoUsuario === secuenciaObjetivo.length) {
+                    bloqueado = true;
+                    detenerContadorTiempo();
+                    const mensaje = document.getElementById('mensaje');
+                    if (mensaje) mensaje.textContent = "¡Excelente!";
+                    const tSig = setTimeout(siguienteRonda, 900);
+                    timeouts.push(tSig);
+                }
+            } else {
+                bloqueado = true;
+                limpiarTimeouts();
+                detenerContadorTiempo();
+                detenerCronometroPartida();
+                quitarBrilloTotal();
+                reproducirSonido(0, true);
+
+                if (modo === 'extremo' || modo === 'hacker') {
+                    if (estadisticas[modo]) {
+                        estadisticas[modo].derrotas = (estadisticas[modo].derrotas || 0) + 1;
+                        guardarStats();
+                    }
+                } else {
+                    if (estadisticas[modo] && estadisticas[modo][dif]) {
+                        estadisticas[modo][dif].derrotas = (estadisticas[modo][dif].derrotas || 0) + 1;
+                        guardarStats();
+                    }
+                }
+
+                const mensaje = document.getElementById('mensaje');
+                if (mensaje) mensaje.textContent = `¡Te equivocaste! Llegaste al nivel ${nivel}.`;
+                secuencia = [];
+                secuenciaObjetivo = [];
+
+                const selectDif = document.getElementById('selector-dificultad');
+                const selectModo = document.getElementById('selector-modo');
+                if (selectDif && modo !== 'extremo' && modo !== 'hacker') selectDif.disabled = false;
+                if (selectModo) selectModo.disabled = false;
+
+                const btn = document.getElementById('btn-jugar');
+                if (btn) {
+                    btn.textContent = "Volver a jugar";
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        function toggleGrabar() {
+            const btnGrabar = document.getElementById('btn-grabar');
+            const mensaje = document.getElementById('mensaje');
+            if (!esGrabando) {
+                esGrabando = true;
+                notasGrabadas = [];
+                tiempoInicioGrabacion = Date.now();
+                if (btnGrabar) {
+                    btnGrabar.textContent = "⏹️ Detener";
+                    btnGrabar.classList.add('grabando');
+                }
+                if (mensaje) mensaje.textContent = "🔴 Grabando melodía...";
+            } else {
+                esGrabando = false;
+                if (btnGrabar) {
+                    btnGrabar.textContent = "🔴 Grabar";
+                    btnGrabar.classList.remove('grabando');
+                }
+                if (mensaje) mensaje.textContent = `✅ ¡Grabación guardada (${notasGrabadas.length} notas)!`;
+            }
+        }
+
+        function reproducirGrabacion() {
+            if (notasGrabadas.length === 0 || esReproduciendo) return;
+            esReproduciendo = true;
+            const mensaje = document.getElementById('mensaje');
+            if (mensaje) mensaje.textContent = "▶️ Reproduciendo melodía...";
+
+            timeoutsGrabacion.forEach(t => clearTimeout(t));
+            timeoutsGrabacion = [];
+
+            notasGrabadas.forEach((nota) => {
+                const t = setTimeout(() => {
+                    activarBloque(nota.id);
+                }, nota.tiempo);
+                timeoutsGrabacion.push(t);
+            });
+
+            const tiempoTotal = notasGrabadas[notasGrabadas.length - 1].tiempo + 500;
+            const tFin = setTimeout(() => {
+                esReproduciendo = false;
+                if (mensaje) mensaje.textContent = "🎹 Modo Libre (5x5) — Reproducción finalizada";
+            }, tiempoTotal);
+            timeoutsGrabacion.push(tFin);
+        }
+
+        // Ejecución inicial al cargar
+        construirTablero();
+        const btnJugarEl = document.getElementById('btn-jugar');
+        if (btnJugarEl) {
+            btnJugarEl.addEventListener('click', iniciarJuego);
+        }
     </script>
 </body>
 </html>
