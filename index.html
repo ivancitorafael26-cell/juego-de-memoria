@@ -114,21 +114,10 @@
             box-shadow: 0 0 12px rgba(0, 255, 0, 0.5), inset 0 0 6px rgba(0, 255, 0, 0.3) !important;
         }
 
-        /* Borde y brillo total verde en modo hacker para las estrellas */
-        body.modo-hacker .bloque.forma-estrella {
-            border: none !important;
-            filter: drop-shadow(1.5px 0 0 #00ff00) drop-shadow(-1.5px 0 0 #00ff00) drop-shadow(0 1.5px 0 #00ff00) drop-shadow(0 -1.5px 0 #00ff00) drop-shadow(0 0 12px #00ff00);
-        }
-
         body.modo-hacker .bloque.brillar {
             background-color: #00ff00 !important;
             box-shadow: 0 0 35px #00ff00, inset 0 0 15px #ffffff !important;
             filter: brightness(1.5);
-        }
-
-        body.modo-hacker .bloque.forma-estrella.brillar {
-            background-color: #00ff00 !important;
-            filter: drop-shadow(2px 0 0 #ffffff) drop-shadow(-2px 0 0 #ffffff) drop-shadow(0 2px 0 #ffffff) drop-shadow(0 -2px 0 #ffffff) drop-shadow(0 0 25px #00ff00) brightness(1.6) !important;
         }
 
         .barra-superior {
@@ -355,28 +344,17 @@
             height: 100%;
             cursor: pointer;
             opacity: 1;
-            transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-radius 0.4s ease, clip-path 0.4s ease;
+            transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-radius 0.4s ease;
         }
 
         .bloque.forma-cuadrado {
             border-radius: 14px;
-            clip-path: none;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
-            filter: none;
         }
 
         .bloque.forma-circulo {
             border-radius: 50%;
-            clip-path: none;
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
-            filter: none;
-        }
-
-        .bloque.forma-estrella {
-            border-radius: 0;
-            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-            box-shadow: none;
-            filter: drop-shadow(1px 0 0 rgba(255,255,255,0.4)) drop-shadow(-1px 0 0 rgba(255,255,255,0.4)) drop-shadow(0 1px 0 rgba(255,255,255,0.4)) drop-shadow(0 -1px 0 rgba(255,255,255,0.4)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
         }
 
         .bloque:active {
@@ -388,11 +366,6 @@
             box-shadow: 0 0 35px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.8);
             filter: brightness(1.2);
             z-index: 10;
-        }
-
-        .bloque.forma-estrella.brillar {
-            box-shadow: none;
-            filter: drop-shadow(0 0 22px currentColor) brightness(1.4);
         }
 
         #btn-jugar {
@@ -572,11 +545,10 @@
                 <option value="hacker">Modo = 💻 Hacker</option>
             </select>
 
-            <!-- Selector de Formas de Bloques -->
+            <!-- Selector de Formas de Bloques (Sin estrellas) -->
             <select id="selector-formas" class="btn-mini" onchange="actualizarFormasBloques()" title="Forma de Bloques">
                 <option value="0">Forma = 🔲 Cuadrados</option>
                 <option value="1">Forma = ⭕ Círculos</option>
-                <option value="2">Forma = ⭐ Estrellas</option>
             </select>
 
             <!-- Selector de Efectos Atmosféricos -->
@@ -831,11 +803,10 @@
             
             const bloques = document.querySelectorAll('.bloque');
             bloques.forEach(b => {
-                b.classList.remove('forma-cuadrado', 'forma-circulo', 'forma-estrella', 'animando-forma');
+                b.classList.remove('forma-cuadrado', 'forma-circulo', 'animando-forma');
                 void b.offsetWidth; // Reinicia el contador de animaciones
                 if (formaIdx === 0) b.classList.add('forma-cuadrado');
                 else if (formaIdx === 1) b.classList.add('forma-circulo');
-                else if (formaIdx === 2) b.classList.add('forma-estrella');
                 b.classList.add('animando-forma');
             });
         }
@@ -937,7 +908,7 @@
 
         let estadisticas = (() => {
             try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v9'));
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v10'));
                 if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
                 for (let m in estadisticasBase) {
                     if (!guardado[m]) guardado[m] = estadisticasBase[m];
@@ -955,7 +926,7 @@
 
         function guardarStats() {
             try {
-                localStorage.setItem('memoria_stats_v9', JSON.stringify(estadisticas));
+                localStorage.setItem('memoria_stats_v10', JSON.stringify(estadisticas));
             } catch (e) {}
         }
 
@@ -1145,7 +1116,7 @@
 
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v9');
+                localStorage.removeItem('memoria_stats_v10');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
                 abrirEstadisticas();
