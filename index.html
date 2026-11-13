@@ -114,9 +114,10 @@
             box-shadow: 0 0 12px rgba(0, 255, 0, 0.5), inset 0 0 6px rgba(0, 255, 0, 0.3) !important;
         }
 
+        /* Borde y brillo total verde en modo hacker para las estrellas */
         body.modo-hacker .bloque.forma-estrella {
             border: none !important;
-            filter: drop-shadow(0 0 8px #00ff00) drop-shadow(0 0 2px #ffffff);
+            filter: drop-shadow(1.5px 0 0 #00ff00) drop-shadow(-1.5px 0 0 #00ff00) drop-shadow(0 1.5px 0 #00ff00) drop-shadow(0 -1.5px 0 #00ff00) drop-shadow(0 0 12px #00ff00);
         }
 
         body.modo-hacker .bloque.brillar {
@@ -127,7 +128,7 @@
 
         body.modo-hacker .bloque.forma-estrella.brillar {
             background-color: #00ff00 !important;
-            filter: drop-shadow(0 0 20px #00ff00) brightness(1.6) !important;
+            filter: drop-shadow(2px 0 0 #ffffff) drop-shadow(-2px 0 0 #ffffff) drop-shadow(0 2px 0 #ffffff) drop-shadow(0 -2px 0 #ffffff) drop-shadow(0 0 25px #00ff00) brightness(1.6) !important;
         }
 
         .barra-superior {
@@ -348,7 +349,7 @@
             animation: morphShapeAnim 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        /* Estilos y bordes luminosos para las formas */
+        /* Estilos y contornos luminosos para las formas */
         .bloque {
             width: 100%;
             height: 100%;
@@ -375,7 +376,7 @@
             border-radius: 0;
             clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
             box-shadow: none;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 6px currentColor);
+            filter: drop-shadow(1px 0 0 rgba(255,255,255,0.4)) drop-shadow(-1px 0 0 rgba(255,255,255,0.4)) drop-shadow(0 1px 0 rgba(255,255,255,0.4)) drop-shadow(0 -1px 0 rgba(255,255,255,0.4)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
         }
 
         .bloque:active {
