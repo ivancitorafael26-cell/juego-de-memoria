@@ -112,7 +112,8 @@
         }
 
         body.modo-hacker .bloque.forma-cuadrado,
-        body.modo-hacker .bloque.forma-circulo {
+        body.modo-hacker .bloque.forma-circulo,
+        body.modo-hacker .bloque.forma-pentagono {
             border: 2px solid #00ff00 !important;
             box-shadow: 0 0 12px rgba(0, 255, 0, 0.5), inset 0 0 6px rgba(0, 255, 0, 0.3) !important;
         }
@@ -359,6 +360,12 @@
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
         }
 
+        .bloque.forma-pentagono {
+            border-radius: 0;
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+        }
+
         .bloque:active {
             transform: scale(0.94);
         }
@@ -547,10 +554,11 @@
                 <option value="hacker">Modo = 💻 Hacker</option>
             </select>
 
-            <!-- Selector de Formas de Bloques -->
+            <!-- Selector de Formas de Bloques (Incluye Pentágono) -->
             <select id="selector-formas" class="btn-mini" onchange="actualizarFormasBloques()" title="Forma de Bloques">
                 <option value="0">Forma = 🔲 Cuadrados</option>
                 <option value="1">Forma = ⭕ Círculos</option>
+                <option value="2">Forma = ⬠ Pentágonos</option>
             </select>
 
             <!-- Selector de Efectos Atmosféricos -->
@@ -812,10 +820,11 @@
             
             const bloques = document.querySelectorAll('.bloque');
             bloques.forEach(b => {
-                b.classList.remove('forma-cuadrado', 'forma-circulo', 'animando-forma');
+                b.classList.remove('forma-cuadrado', 'forma-circulo', 'forma-pentagono', 'animando-forma');
                 void b.offsetWidth;
                 if (formaIdx === 0) b.classList.add('forma-cuadrado');
                 else if (formaIdx === 1) b.classList.add('forma-circulo');
+                else if (formaIdx === 2) b.classList.add('forma-pentagono');
                 b.classList.add('animando-forma');
             });
         }
@@ -1294,7 +1303,7 @@
                 bloqueado = false;
             } else if (modo === 'extremo') {
                 if (panelGrabadora) panelGrabadora.classList.remove('activo');
-                if (contenedorTiempo) contenedorTiempo.classList.remove('activo'); // Ocultar barra de tiempo
+                if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
                 if (selectDif) {
                     selectDif.value = "2";
                     selectDif.disabled = true;
@@ -1304,7 +1313,7 @@
                 bloqueado = true;
             } else if (modo === 'hacker') {
                 if (panelGrabadora) panelGrabadora.classList.remove('activo');
-                if (contenedorTiempo) contenedorTiempo.classList.remove('activo'); // Ocultar barra de tiempo
+                if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
                 if (selectDif) {
                     selectDif.value = "2";
                     selectDif.disabled = true;
