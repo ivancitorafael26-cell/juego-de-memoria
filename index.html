@@ -112,16 +112,26 @@
         }
 
         body.modo-hacker .bloque.forma-cuadrado,
-        body.modo-hacker .bloque.forma-circulo,
-        body.modo-hacker .bloque.forma-pentagono {
+        body.modo-hacker .bloque.forma-circulo {
             border: 2px solid #00ff00 !important;
             box-shadow: 0 0 12px rgba(0, 255, 0, 0.5), inset 0 0 6px rgba(0, 255, 0, 0.3) !important;
+        }
+
+        /* Estilo Hacker adaptado específicamente para el Pentágono (respeta la silueta con drop-shadow) */
+        body.modo-hacker .bloque.forma-pentagono {
+            border: none !important;
+            box-shadow: none !important;
+            filter: drop-shadow(0 0 6px #00ff00) drop-shadow(0 0 2px #00ff00);
         }
 
         body.modo-hacker .bloque.brillar {
             background-color: #00ff00 !important;
             box-shadow: 0 0 35px #00ff00, inset 0 0 15px #ffffff !important;
             filter: brightness(1.5);
+        }
+
+        body.modo-hacker .bloque.forma-pentagono.brillar {
+            filter: brightness(1.5) drop-shadow(0 0 16px #00ff00);
         }
 
         .barra-superior {
@@ -554,7 +564,7 @@
                 <option value="hacker">Modo = 💻 Hacker</option>
             </select>
 
-            <!-- Selector de Formas de Bloques (Incluye Pentágono) -->
+            <!-- Selector de Formas de Bloques -->
             <select id="selector-formas" class="btn-mini" onchange="actualizarFormasBloques()" title="Forma de Bloques">
                 <option value="0">Forma = 🔲 Cuadrados</option>
                 <option value="1">Forma = ⭕ Círculos</option>
