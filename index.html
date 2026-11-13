@@ -19,26 +19,25 @@
         }
 
         html, body {
-            height: 100vh;
-            width: 100vw;
+            min-height: 100vh;
+            width: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Evita por completo el scroll */
+            overflow-y: auto; /* Permite scroll natural si es necesario */
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
             transition: background-color 0.3s ease, color 0.3s ease;
             box-sizing: border-box;
-            position: relative;
         }
 
         body {
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
             align-items: center;
             padding-top: 70px;
+            padding-bottom: 20px;
         }
 
         /* Canvas de Lluvia Binaria (Unos y Ceros) para el Modo Hacker */
@@ -58,43 +57,9 @@
             display: block;
         }
 
-        .barra-superior, .app-contenedor, .modal-overlay, #aviso-rotacion {
+        .barra-superior, .app-contenedor, .modal-overlay {
             position: relative;
             z-index: 10;
-        }
-
-        /* Aviso para celulares en vertical */
-        #aviso-rotacion {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #000000;
-            color: #00ff00;
-            z-index: 9999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-            font-size: 1.3rem;
-            font-weight: bold;
-            border: 4px solid #00ff00;
-        }
-
-        #aviso-rotacion span {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            animation: girar-icono 1.5s infinite ease-in-out;
-        }
-
-        @keyframes girar-icono {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(90deg); }
-            100% { transform: rotate(0deg); }
         }
 
         /* Estilos específicos para el Modo Hacker */
@@ -114,8 +79,8 @@
             border: 1px solid #00ff00 !important;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
             background-repeat: no-repeat !important;
-            background-position: right 8px center !important;
-            background-size: 12px !important;
+            background-position: right 6px center !important;
+            background-size: 10px !important;
         }
 
         body.modo-hacker button.btn-mini {
@@ -154,12 +119,12 @@
             width: 100vw;
             height: 60px;
             background-color: var(--bg-color);
-            padding: 8px 12px;
+            padding: 6px 10px;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 5px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             z-index: 100;
             box-sizing: border-box;
@@ -168,7 +133,7 @@
 
         .grupo-controles {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
@@ -178,9 +143,9 @@
             background-color: var(--control-bg);
             color: var(--control-text);
             border: 1px solid rgba(128, 128, 128, 0.3);
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 0.8rem;
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
             outline: none;
@@ -190,14 +155,14 @@
             -moz-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: right 6px center;
-            background-size: 10px;
-            padding-right: 24px;
+            background-position: right 5px center;
+            background-size: 9px;
+            padding-right: 20px;
         }
 
         button.btn-mini {
             background-image: none;
-            padding-right: 10px;
+            padding-right: 8px;
         }
 
         .btn-mini:disabled {
@@ -212,69 +177,71 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        #btn-silenciar {
-            width: 34px;
-            height: 34px;
+        .btn-circular {
+            width: 32px;
+            height: 32px;
             padding: 0;
             border-radius: 50%;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: none;
+            background-image: none !important;
+            padding-right: 0 !important;
         }
 
         .app-contenedor {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             width: 100vw;
-            height: calc(100vh - 60px);
-            padding: 5px;
+            padding: 4px;
             box-sizing: border-box;
+            transform-origin: top center;
+            transition: transform 0.1s ease;
         }
 
         h1 {
-            margin: 0 0 4px 0;
-            font-size: 1.5rem;
+            margin: 2px 0 2px 0;
+            font-size: 1.3rem;
             letter-spacing: 1px;
             text-align: center;
         }
 
         .contenedor-info-partida {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .badge-modo {
             background-color: var(--badge-bg);
             border: 1px solid rgba(128, 128, 128, 0.2);
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
             color: var(--subtext-color);
         }
 
         #mensaje {
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            height: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            height: 18px;
             color: var(--subtext-color);
             font-weight: bold;
             text-align: center;
         }
 
         .contenedor-tiempo {
-            width: 240px;
-            height: 8px;
+            width: 220px;
+            height: 6px;
             background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-            margin-bottom: 8px;
+            border-radius: 3px;
+            margin-bottom: 6px;
             overflow: hidden;
             display: none;
             opacity: 0;
@@ -308,8 +275,8 @@
         .panel-grabadora {
             display: none;
             opacity: 0;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 6px;
             align-items: center;
             transition: opacity 0.3s ease;
         }
@@ -320,11 +287,11 @@
         }
 
         .btn-grabadora {
-            padding: 6px 14px;
-            font-size: 0.8rem;
+            padding: 5px 12px;
+            font-size: 0.75rem;
             font-weight: bold;
             border: none;
-            border-radius: 15px;
+            border-radius: 12px;
             cursor: pointer;
             transition: transform 0.1s, background-color 0.2s;
         }
@@ -343,23 +310,23 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .tablero {
             display: grid;
-            grid-template-columns: repeat(2, 110px);
-            grid-template-rows: repeat(2, 110px);
-            gap: 10px;
+            grid-template-columns: repeat(2, 100px);
+            grid-template-rows: repeat(2, 100px);
+            gap: 8px;
         }
 
         .bloque {
             width: 100%;
             height: 100%;
-            border-radius: 14px;
+            border-radius: 12px;
             cursor: pointer;
             opacity: 1;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
             transition: transform 0.1s ease, box-shadow 0.15s ease, background-color 0.3s ease;
         }
 
@@ -369,21 +336,21 @@
 
         .bloque.brillar {
             transform: scale(1.06);
-            box-shadow: 0 0 35px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 30px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.8);
             filter: brightness(1.2);
             z-index: 10;
         }
 
         #btn-jugar {
-            padding: 10px 30px;
-            font-size: 1rem;
+            padding: 8px 28px;
+            font-size: 0.9rem;
             font-weight: bold;
             color: var(--btn-text);
             background-color: var(--btn-bg);
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: transform 0.15s, opacity 0.2s;
         }
 
@@ -423,10 +390,10 @@
         .modal-contenido {
             background-color: var(--modal-bg);
             color: var(--text-color);
-            padding: 18px;
-            border-radius: 16px;
-            width: 88%;
-            max-width: 480px;
+            padding: 16px;
+            border-radius: 14px;
+            width: 85%;
+            max-width: 450px;
             max-height: 75vh;
             overflow-y: auto;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -437,26 +404,26 @@
         .modal-contenido h2 {
             margin-top: 0;
             text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 12px;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
         }
 
         .grid-modos-stats {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .card-modo-stat {
             background: rgba(128, 128, 128, 0.08);
             border: 1px solid rgba(128, 128, 128, 0.15);
-            border-radius: 10px;
-            padding: 8px 10px;
+            border-radius: 8px;
+            padding: 6px 8px;
         }
 
         .card-modo-stat h3 {
-            margin: 0 0 6px 0;
-            font-size: 0.9rem;
+            margin: 0 0 4px 0;
+            font-size: 0.85rem;
             color: var(--subtext-color);
             font-weight: 700;
         }
@@ -464,28 +431,28 @@
         .grid-dificultades {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
+            gap: 4px;
         }
 
         .item-dif {
             background: rgba(0, 0, 0, 0.18);
-            border-radius: 6px;
-            padding: 5px 3px;
+            border-radius: 5px;
+            padding: 4px 2px;
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
 
         .item-dif .dif-titulo {
             font-weight: 700;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             color: var(--text-color);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-            padding-bottom: 2px;
+            padding-bottom: 1px;
         }
 
         .item-dif div {
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .item-dif span {
@@ -497,14 +464,14 @@
             display: flex;
             justify-content: space-around;
             background: rgba(0, 0, 0, 0.18);
-            border-radius: 6px;
-            padding: 6px;
+            border-radius: 5px;
+            padding: 5px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .grid-extremo-stat div {
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .grid-extremo-stat span {
@@ -514,12 +481,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Aviso para celulares en vertical -->
-    <div id="aviso-rotacion">
-        <span>📱🔄</span>
-        Por favor, gira tu celular a posición horizontal para jugar correctamente.
-    </div>
 
     <canvas id="matrix-canvas"></canvas>
 
@@ -564,8 +525,10 @@
         </div>
 
         <div class="grupo-controles">
-            <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
-            <button class="btn-mini" id="btn-stats" type="button" onclick="abrirEstadisticas()">📊 Estadísticas</button>
+            <button class="btn-mini btn-circular" type="button" onclick="ajustarZoom(-0.1)" title="Reducir tamaño de página">🔍-</button>
+            <button class="btn-mini btn-circular" type="button" onclick="ajustarZoom(0.1)" title="Aumentar tamaño de página">🔍+</button>
+            <button class="btn-mini btn-circular" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
+            <button class="btn-mini" id="btn-stats" type="button" onclick="abrirEstadisticas()">📊 Stats</button>
             <button class="btn-mini" id="btn-fondo" type="button" onclick="cambiarFondo()">🖼️ Fondo</button>
         </div>
     </div>
@@ -575,9 +538,9 @@
         <div class="modal-contenido" onclick="event.stopPropagation()">
             <h2>📊 Resumen de Estadísticas</h2>
             <div id="cuerpo-estadisticas"></div>
-            <div style="display: flex; gap: 8px; margin-top: 12px;">
-                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 6px;">🗑️ Borrar Datos</button>
-                <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 6px;">Cerrar</button>
+            <div style="display: flex; gap: 6px; margin-top: 10px;">
+                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 5px;">🗑️ Borrar Datos</button>
+                <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 5px;">Cerrar</button>
             </div>
         </div>
     </div>
@@ -612,22 +575,15 @@
     </div>
 
     <script>
-        // Detección automática para celulares en vertical
-        function verificarOrientacionMovil() {
-            const aviso = document.getElementById('aviso-rotacion');
-            // Detecta si es un dispositivo táctil con pantalla estrecha (celular) y está en vertical
-            const esMovil = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-            const enVertical = window.innerHeight > window.innerWidth;
-
-            if (esMovil && enVertical) {
-                aviso.style.display = 'flex';
-            } else {
-                aviso.style.display = 'none';
+        // Control de Zoom / Escala manual de la página
+        let zoomActual = 1.0;
+        function ajustarZoom(cambio) {
+            zoomActual = Math.max(0.6, Math.min(1.4, zoomActual + cambio));
+            const contenedor = document.getElementById('app-contenedor');
+            if (contenedor) {
+                contenedor.style.transform = `scale(${zoomActual})`;
             }
         }
-
-        window.addEventListener('resize', verificarOrientacionMovil);
-        window.addEventListener('load', verificarOrientacionMovil);
 
         let secuencia = [];
         let secuenciaObjetivo = [];
@@ -721,7 +677,7 @@
 
         let estadisticas = (() => {
             try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v8'));
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v9'));
                 if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
                 for (let m in estadisticasBase) {
                     if (!guardado[m]) guardado[m] = estadisticasBase[m];
@@ -739,7 +695,7 @@
 
         function guardarStats() {
             try {
-                localStorage.setItem('memoria_stats_v8', JSON.stringify(estadisticas));
+                localStorage.setItem('memoria_stats_v9', JSON.stringify(estadisticas));
             } catch (e) {}
         }
 
@@ -798,11 +754,11 @@
                 tamanoCuadricula = selectorDif ? parseInt(selectorDif.value, 10) : 2;
             }
 
-            let medida = 110;
-            let gap = 10;
-            if (tamanoCuadricula === 3) { medida = 82; gap = 8; }
-            if (tamanoCuadricula === 4) { medida = 62; gap = 6; }
-            if (tamanoCuadricula === 5) { medida = 48; gap = 5; }
+            let medida = 100;
+            let gap = 8;
+            if (tamanoCuadricula === 3) { medida = 75; gap = 6; }
+            if (tamanoCuadricula === 4) { medida = 56; gap = 5; }
+            if (tamanoCuadricula === 5) { medida = 44; gap = 4; }
 
             tablero.style.gridTemplateColumns = `repeat(${tamanoCuadricula}, ${medida}px)`;
             tablero.style.gridTemplateRows = `repeat(${tamanoCuadricula}, ${medida}px)`;
@@ -869,9 +825,9 @@
             }
 
             let html = `
-                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 10px; padding: 8px; text-align: center; margin-bottom: 10px;">
-                    <div style="font-size: 0.8rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
-                    <div style="font-size: 1.3rem; font-weight: bold; color: var(--text-color); margin-top: 2px;">${totalNotasGlobal}</div>
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 8px; padding: 6px; text-align: center; margin-bottom: 8px;">
+                    <div style="font-size: 0.75rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--text-color); margin-top: 2px;">${totalNotasGlobal}</div>
                 </div>
                 <div class="grid-modos-stats">
             `;
@@ -927,7 +883,7 @@
 
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v8');
+                localStorage.removeItem('memoria_stats_v9');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
                 abrirEstadisticas();
