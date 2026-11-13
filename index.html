@@ -18,22 +18,27 @@
             --modal-bg: #16213e;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 100vh;
+        html, body {
+            height: 100vh;
+            width: 100vw;
             margin: 0;
-            padding-top: 105px; /* Espacio extra para barra superior flexible en móviles/tablets */
+            padding: 0;
+            overflow: hidden; /* Evita por completo el scroll */
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
             transition: background-color 0.3s ease, color 0.3s ease;
             box-sizing: border-box;
-            overflow-x: hidden;
             position: relative;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 70px;
         }
 
         /* Canvas de Lluvia Binaria (Unos y Ceros) para el Modo Hacker */
@@ -41,8 +46,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             pointer-events: none;
             z-index: 1;
             display: none;
@@ -53,9 +58,43 @@
             display: block;
         }
 
-        .barra-superior, .app-contenedor, .modal-overlay {
+        .barra-superior, .app-contenedor, .modal-overlay, #aviso-rotacion {
             position: relative;
             z-index: 10;
+        }
+
+        /* Aviso para celulares en vertical */
+        #aviso-rotacion {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            color: #00ff00;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: 4px solid #00ff00;
+        }
+
+        #aviso-rotacion span {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: girar-icono 1.5s infinite ease-in-out;
+        }
+
+        @keyframes girar-icono {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+            100% { transform: rotate(0deg); }
         }
 
         /* Estilos específicos para el Modo Hacker */
@@ -75,8 +114,8 @@
             border: 1px solid #00ff00 !important;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
             background-repeat: no-repeat !important;
-            background-position: right 10px center !important;
-            background-size: 14px !important;
+            background-position: right 8px center !important;
+            background-size: 12px !important;
         }
 
         body.modo-hacker button.btn-mini {
@@ -112,14 +151,15 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
+            width: 100vw;
+            height: 60px;
             background-color: var(--bg-color);
-            padding: 10px 15px;
+            padding: 8px 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             z-index: 100;
             box-sizing: border-box;
@@ -128,7 +168,7 @@
 
         .grupo-controles {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
@@ -138,9 +178,9 @@
             background-color: var(--control-bg);
             color: var(--control-text);
             border: 1px solid rgba(128, 128, 128, 0.3);
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             outline: none;
@@ -150,14 +190,14 @@
             -moz-appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 12px;
-            padding-right: 28px;
+            background-position: right 6px center;
+            background-size: 10px;
+            padding-right: 24px;
         }
 
         button.btn-mini {
             background-image: none;
-            padding-right: 12px;
+            padding-right: 10px;
         }
 
         .btn-mini:disabled {
@@ -173,11 +213,11 @@
         }
 
         #btn-silenciar {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             padding: 0;
             border-radius: 50%;
-            font-size: 1rem;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -188,55 +228,53 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            padding: 0 10px 30px 10px;
+            justify-content: center;
+            width: 100vw;
+            height: calc(100vh - 60px);
+            padding: 5px;
             box-sizing: border-box;
         }
 
         h1 {
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-size: 1.8rem;
+            margin: 0 0 4px 0;
+            font-size: 1.5rem;
             letter-spacing: 1px;
             text-align: center;
         }
 
         .contenedor-info-partida {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
+            margin-bottom: 6px;
         }
 
         .badge-modo {
             background-color: var(--badge-bg);
             border: 1px solid rgba(128, 128, 128, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--subtext-color);
-            letter-spacing: 0.5px;
         }
 
         #mensaje {
-            font-size: 1rem;
-            margin-bottom: 12px;
-            height: 22px;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            height: 20px;
             color: var(--subtext-color);
             font-weight: bold;
             text-align: center;
-            padding: 0 10px;
         }
 
         .contenedor-tiempo {
-            width: 260px;
-            height: 10px;
+            width: 240px;
+            height: 8px;
             background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 5px;
-            margin-bottom: 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
             overflow: hidden;
             display: none;
             opacity: 0;
@@ -270,8 +308,8 @@
         .panel-grabadora {
             display: none;
             opacity: 0;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 8px;
             align-items: center;
             transition: opacity 0.3s ease;
         }
@@ -282,11 +320,11 @@
         }
 
         .btn-grabadora {
-            padding: 8px 16px;
-            font-size: 0.85rem;
+            padding: 6px 14px;
+            font-size: 0.8rem;
             font-weight: bold;
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             cursor: pointer;
             transition: transform 0.1s, background-color 0.2s;
         }
@@ -305,14 +343,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
-            width: 100%;
+            margin-bottom: 12px;
         }
 
         .tablero {
             display: grid;
-            grid-template-columns: repeat(2, 120px);
-            grid-template-rows: repeat(2, 120px);
+            grid-template-columns: repeat(2, 110px);
+            grid-template-rows: repeat(2, 110px);
             gap: 10px;
         }
 
@@ -338,7 +375,7 @@
         }
 
         #btn-jugar {
-            padding: 10px 32px;
+            padding: 10px 30px;
             font-size: 1rem;
             font-weight: bold;
             color: var(--btn-text);
@@ -348,7 +385,6 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.15s, opacity 0.2s;
-            margin-bottom: 20px;
         }
 
         #btn-jugar:hover:not(:disabled) {
@@ -366,8 +402,8 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(3px);
             display: flex;
@@ -387,11 +423,11 @@
         .modal-contenido {
             background-color: var(--modal-bg);
             color: var(--text-color);
-            padding: 20px;
-            border-radius: 18px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
+            padding: 18px;
+            border-radius: 16px;
+            width: 88%;
+            max-width: 480px;
+            max-height: 75vh;
             overflow-y: auto;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             box-sizing: border-box;
@@ -401,27 +437,26 @@
         .modal-contenido h2 {
             margin-top: 0;
             text-align: center;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            letter-spacing: 0.5px;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
         }
 
         .grid-modos-stats {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .card-modo-stat {
             background: rgba(128, 128, 128, 0.08);
             border: 1px solid rgba(128, 128, 128, 0.15);
-            border-radius: 12px;
-            padding: 10px 12px;
+            border-radius: 10px;
+            padding: 8px 10px;
         }
 
         .card-modo-stat h3 {
-            margin: 0 0 8px 0;
-            font-size: 0.95rem;
+            margin: 0 0 6px 0;
+            font-size: 0.9rem;
             color: var(--subtext-color);
             font-weight: 700;
         }
@@ -429,28 +464,28 @@
         .grid-dificultades {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 5px;
         }
 
         .item-dif {
             background: rgba(0, 0, 0, 0.18);
-            border-radius: 8px;
-            padding: 6px 4px;
+            border-radius: 6px;
+            padding: 5px 3px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .item-dif .dif-titulo {
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             color: var(--text-color);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             border-bottom: 1px solid rgba(128, 128, 128, 0.2);
             padding-bottom: 2px;
         }
 
         .item-dif div {
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         .item-dif span {
@@ -462,37 +497,29 @@
             display: flex;
             justify-content: space-around;
             background: rgba(0, 0, 0, 0.18);
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 6px;
+            padding: 6px;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .grid-extremo-stat div {
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         .grid-extremo-stat span {
             font-weight: 600;
             color: var(--subtext-color);
         }
-
-        /* Ajuste automático para pantallas pequeñas o tablets verticales */
-        @media (max-width: 768px) {
-            body {
-                padding-top: 130px;
-            }
-            .barra-superior {
-                padding: 8px 10px;
-                justify-content: center;
-            }
-            .grupo-controles {
-                justify-content: center;
-            }
-        }
     </style>
 </head>
 <body>
+
+    <!-- Aviso para celulares en vertical -->
+    <div id="aviso-rotacion">
+        <span>📱🔄</span>
+        Por favor, gira tu celular a posición horizontal para jugar correctamente.
+    </div>
 
     <canvas id="matrix-canvas"></canvas>
 
@@ -548,9 +575,9 @@
         <div class="modal-contenido" onclick="event.stopPropagation()">
             <h2>📊 Resumen de Estadísticas</h2>
             <div id="cuerpo-estadisticas"></div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 8px;">🗑️ Borrar Datos</button>
-                <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 8px;">Cerrar</button>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 6px;">🗑️ Borrar Datos</button>
+                <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 6px;">Cerrar</button>
             </div>
         </div>
     </div>
@@ -585,6 +612,23 @@
     </div>
 
     <script>
+        // Detección automática para celulares en vertical
+        function verificarOrientacionMovil() {
+            const aviso = document.getElementById('aviso-rotacion');
+            // Detecta si es un dispositivo táctil con pantalla estrecha (celular) y está en vertical
+            const esMovil = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+            const enVertical = window.innerHeight > window.innerWidth;
+
+            if (esMovil && enVertical) {
+                aviso.style.display = 'flex';
+            } else {
+                aviso.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('resize', verificarOrientacionMovil);
+        window.addEventListener('load', verificarOrientacionMovil);
+
         let secuencia = [];
         let secuenciaObjetivo = [];
         let pasoUsuario = 0;
@@ -677,7 +721,7 @@
 
         let estadisticas = (() => {
             try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v7'));
+                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v8'));
                 if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
                 for (let m in estadisticasBase) {
                     if (!guardado[m]) guardado[m] = estadisticasBase[m];
@@ -695,7 +739,7 @@
 
         function guardarStats() {
             try {
-                localStorage.setItem('memoria_stats_v7', JSON.stringify(estadisticas));
+                localStorage.setItem('memoria_stats_v8', JSON.stringify(estadisticas));
             } catch (e) {}
         }
 
@@ -754,11 +798,11 @@
                 tamanoCuadricula = selectorDif ? parseInt(selectorDif.value, 10) : 2;
             }
 
-            let medida = 120;
+            let medida = 110;
             let gap = 10;
-            if (tamanoCuadricula === 3) { medida = 90; gap = 8; }
-            if (tamanoCuadricula === 4) { medida = 68; gap = 6; }
-            if (tamanoCuadricula === 5) { medida = 52; gap = 5; }
+            if (tamanoCuadricula === 3) { medida = 82; gap = 8; }
+            if (tamanoCuadricula === 4) { medida = 62; gap = 6; }
+            if (tamanoCuadricula === 5) { medida = 48; gap = 5; }
 
             tablero.style.gridTemplateColumns = `repeat(${tamanoCuadricula}, ${medida}px)`;
             tablero.style.gridTemplateRows = `repeat(${tamanoCuadricula}, ${medida}px)`;
@@ -825,9 +869,9 @@
             }
 
             let html = `
-                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px;">
-                    <div style="font-size: 0.85rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
-                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--text-color); margin-top: 3px;">${totalNotasGlobal}</div>
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 10px; padding: 8px; text-align: center; margin-bottom: 10px;">
+                    <div style="font-size: 0.8rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
+                    <div style="font-size: 1.3rem; font-weight: bold; color: var(--text-color); margin-top: 2px;">${totalNotasGlobal}</div>
                 </div>
                 <div class="grid-modos-stats">
             `;
@@ -883,7 +927,7 @@
 
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v7');
+                localStorage.removeItem('memoria_stats_v8');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
                 abrirEstadisticas();
