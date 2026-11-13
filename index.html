@@ -808,7 +808,6 @@
             iniciarAtmosfera();
         }
 
-        // Actualizar formas visuales con animación fluida de transición
         function actualizarFormasBloques() {
             const selectorForma = document.getElementById('selector-formas');
             const formaIdx = selectorForma ? parseInt(selectorForma.value, 10) : 0;
@@ -832,7 +831,6 @@
             canvasAtmos.height = window.innerHeight;
         });
 
-        // Generar código compacto
         function generarCodigoMelodia() {
             if (notasGrabadas.length === 0) {
                 alert("¡Primero graba una melodía en el Modo Libre tocando los bloques!");
@@ -856,7 +854,6 @@
             }
         }
 
-        // Cargar melodía y cambiar automáticamente a Modo Libre (5x5)
         function cargarMelodiaPorCodigo() {
             const input = document.getElementById('input-codigo-melodia');
             if (!input || !input.value.trim()) {
@@ -864,7 +861,6 @@
                 return;
             }
             try {
-                // Cambiar automáticamente al Modo Libre (5x5) para que existan todos los bloques (0 al 24)
                 const selectorModo = document.getElementById('selector-modo');
                 if (selectorModo) {
                     selectorModo.value = 'libre';
@@ -902,7 +898,6 @@
             }
         }
 
-        // Efecto de Confeti y Banner al pasar cada 5 niveles
         function dispararConfetti() {
             const contenedor = document.createElement('div');
             contenedor.style.position = 'fixed';
@@ -1611,7 +1606,18 @@
             if (modo === 'extremo') velocidadPaso = 250;
 
             if (modo === 'extremo') {
-                construirTablero();
+                // Verificar si necesitamos cambiar de tamaño de cuadrícula
+                let nuevoTamano = 2;
+                if (nivel <= 3) nuevoTamano = 2;
+                else if (nivel <= 6) nuevoTamano = 3;
+                else if (nivel <= 9) nuevoTamano = 4;
+                else nuevoTamano = 5;
+
+                if (nuevoTamano !== tamanoCuadricula) {
+                    tamanoCuadricula = nuevoTamano;
+                    construirTablero();
+                }
+
                 indiceFondo = (indiceFondo + 1) % fondosOscuros.length;
                 document.body.style.backgroundColor = fondosOscuros[indiceFondo];
 
