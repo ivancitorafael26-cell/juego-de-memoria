@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secuencia Hacker Pro</title>
+    <title>Secuencia Hacker - Nivel 15</title>
     <style>
         body {
             background-color: #0b0c10;
@@ -19,15 +19,15 @@
             height: 100vh;
             overflow: hidden;
         }
-        h1 { color: #66fcf1; font-size: 22px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102,252,241,0.5); }
-        #estado { font-size: 15px; margin-bottom: 20px; color: #45a29e; height: 20px; }
+        h1 { color: #66fcf1; font-size: 20px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(102,252,241,0.5); }
+        #estado { font-size: 14px; margin-bottom: 15px; color: #45a29e; height: 20px; }
         
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 90px);
             grid-gap: 12px;
             justify-content: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .nodo {
@@ -41,11 +41,12 @@
         }
         .nodo:active { transform: scale(0.93); }
 
-        /* Colores activos de los nodos */
+
         .activo-0 { background-color: #ff0055 !important; border-color: #ff88aa !important; box-shadow: 0 0 20px #ff0055; }
         .activo-1 { background-color: #00ffcc !important; border-color: #88ffbb !important; box-shadow: 0 0 20px #00ffcc; }
         .activo-2 { background-color: #ffcc00 !important; border-color: #ffee88 !important; box-shadow: 0 0 20px #ffcc00; }
         .activo-3 { background-color: #9900ff !important; border-color: #cc88ff !important; box-shadow: 0 0 20px #9900ff; }
+
 
         #btn {
             background-color: #66fcf1;
@@ -64,8 +65,10 @@
 </head>
 <body>
 
-    <h1>💻 SECUENCIA HACKER 🔐</h1>
+
+    <h1>💻 SECUENCIA HACKER (NIVEL 1/15) 🔐</h1>
     <div id="estado">¡Dale al botón para hackear el sistema!</div>
+
 
     <div class="grid" id="tablero">
         <div class="nodo" data-index="0"></div>
@@ -79,16 +82,39 @@
         <div class="nodo" data-index="8"></div>
     </div>
 
+
     <button id="btn" onclick="iniciarJuego()">Iniciar Hackeo</button>
+
 
     <script>
         const nodos = document.querySelectorAll(".nodo");
         const estado = document.getElementById("estado");
+        const titulo = document.querySelector("h1");
         let secuencia = [];
         let jugadorSecuencia = [];
         let nivel = 0;
         let jugando = false;
         let coloresClase = ["activo-0", "activo-1", "activo-2", "activo-3"];
+
+
+        // Sintetizador de audio web (sin archivos externos)
+        let audioCtx = null;
+        function reproducirSonido(freq, tipo = 'sine', duracion = 0.15) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = tipo;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracion);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duracion);
+            } catch(e) {}
+        }
+
 
         function iniciarJuego() {
             secuencia = [];
@@ -96,20 +122,29 @@
             siguienteNivel();
         }
 
+
         function siguienteNivel() {
+            if (nivel >= 15) {
+                estado.innerText = "🏆 ¡INCREÍBLE! ¡HACKEAJTE TODO EL SISTEMA!";
+                titulo.innerText = "💻 ¡VICTORIA TOTAL (15/15)! 👑";
+                reproducirSonido(880, 'triangle', 0.5);
+                return;
+            }
+
+
             jugadorSecuencia = [];
             nivel++;
-            estado.innerText = `Nivel ${nivel}: Descifrando código...`;
+            titulo.innerText = 💻 SECUENCIA HACKER (NIVEL ${nivel}/15) 🔐;
+            estado.innerText = Nivel ${nivel}: Descifrando código...;
             
-            // Añadir un nuevo nodo aleatorio al patrón
             secuencia.push(Math.floor(Math.random() * 9));
-            
             mostrarSecuencia();
         }
 
+
         function mostrarSecuencia() {
             let i = 0;
-            let velocidadMuestra = Math.max(300, 600 - (nivel * 25)); // Se pone más rápido cada nivel
+            let velocidadMuestra = Math.max(250, 550 - (nivel * 20));
             
             let intervalo = setInterval(() => {
                 if (i > 0) {
@@ -120,42 +155,52 @@
                     let actualIdx = secuencia[i];
                     let randomColor = coloresClase[Math.floor(Math.random() * coloresClase.length)];
                     nodos[actualIdx].classList.add(randomColor);
+                    
+                    // Sonido según el nodo
+                    reproducirSonido(200 + (actualIdx * 60), 'sine', 0.2);
                     i++;
                 } else {
                     clearInterval(intervalo);
                     setTimeout(() => {
                         nodos[secuencia[secuencia.length - 1]].className = "nodo";
-                        estado.innerText = `⚡ ¡Tu turno! Repite el patrón`;
+                        estado.innerText = ⚡ ¡Tu turno! Repite el patrón;
                         jugando = true;
-                    }, 400);
+                    }, 350);
                 }
             }, velocidadMuestra);
         }
+
 
         nodos.forEach((nodo, index) => {
             nodo.addEventListener("click", () => {
                 if (!jugando) return;
 
+
                 jugadorSecuencia.push(index);
                 
-                // Efecto visual al tocar
                 let colorToque = coloresClase[index % coloresClase.length];
                 nodo.classList.add(colorToque);
-                setTimeout(() => nodo.className = "nodo", 180);
+                reproducirSonido(250 + (index * 50), 'triangle', 0.15);
+                setTimeout(() => nodo.className = "nodo", 150);
 
-                // Comprobar paso actual
+
                 const pasoActual = jugadorSecuencia.length - 1;
                 if (jugadorSecuencia[pasoActual] !== secuencia[pasoActual]) {
                     jugando = false;
-                    estado.innerText = `❌ ¡ALERTA! Fallaste en el nivel ${nivel}`;
+                    reproducirSonido(120, 'sawtooth', 0.4);
+                    estado.innerText = ❌ ¡ALERTA! Fallaste en el nivel ${nivel};
                     return;
                 }
 
-                // Si completó la secuencia de este nivel
+
                 if (jugadorSecuencia.length === secuencia.length) {
                     jugando = false;
-                    estado.innerText = `🔓 ¡Sistema hackeado! Subiendo nivel...`;
-                    setTimeout(siguienteNivel, 1000);
+                    if (nivel === 15) {
+                        siguienteNivel();
+                    } else {
+                        estado.innerText = 🔓 ¡Nivel ${nivel} superado! Siguiente...;
+                        setTimeout(siguienteNivel, 1000);
+                    }
                 }
             });
         });
