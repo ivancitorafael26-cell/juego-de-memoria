@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Memoria de Bloques 67</title>
+<title>Memoria de Bloques Pro</title>
 <style>
   :root {
     --bg-main: #0f1115;
     --panel-bg: rgba(22, 27, 34, 0.9);
-    --border-color: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.12);
     --text-main: #f0f3f6;
     --text-muted: #8b949e;
-    --accent: #3b82f6;
+    --accent: #00ff66;
   }
 
   body.modo-claro {
     --bg-main: #f0f3f6;
-    --panel-bg: rgba(255, 255, 255, 0.9);
-    --border-color: rgba(0, 0, 0, 0.1);
+    --panel-bg: rgba(255, 255, 255, 0.92);
+    --border-color: rgba(0, 0, 0, 0.12);
     --text-main: #0f1115;
     --text-muted: #57606a;
   }
@@ -32,96 +32,85 @@
     justify-content: flex-start;
     min-height: 100vh;
     margin: 0;
-    padding: 70px 10px 20px 10px;
+    padding: 58px 12px 24px 12px;
     box-sizing: border-box;
     user-select: none;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   .top-bar {
     position: fixed;
-    top: 15px;
-    left: 15px;
-    right: 15px;
+    top: 10px;
+    left: 12px;
+    right: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
   }
 
-  .record-badge {
+  .grupo-botones-top { display: flex; gap: 6px; align-items: center; }
+
+  .record-badge, .btn-vista {
     background: var(--panel-bg);
     border: 1px solid var(--border-color);
-    padding: 8px 14px;
+    padding: 6px 12px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    color: var(--accent);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  }
-
-  .grupo-botones-top { display: flex; gap: 8px; }
-
-  .btn-vista {
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    background: var(--panel-bg);
     color: var(--text-main);
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
+  .record-badge { color: var(--accent); }
 
-  h1 { margin: 5px 0; font-size: 24px; font-weight: 800; text-align: center; }
-  #estado { font-size: 14px; margin-bottom: 8px; color: var(--text-muted); height: 20px; text-align: center; font-weight: 500; }
+  h1 { margin: 4px 0 2px; font-size: 22px; font-weight: 800; text-align: center; }
+  #estado { font-size: 13px; margin-bottom: 6px; color: var(--text-muted); min-height: 18px; text-align: center; font-weight: 500; }
   
   #vidasContainer {
-    font-size: 16px;
-    height: 24px;
+    font-size: 15px;
+    height: 22px;
     text-align: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     display: none;
     letter-spacing: 4px;
   }
 
   .controles {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
   }
 
   select {
-    padding: 8px 10px;
+    padding: 7px 10px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: 10px;
     border: 1px solid var(--border-color);
     background: var(--panel-bg);
     color: var(--text-main);
     cursor: pointer;
     outline: none;
-    flex: 1 1 45%;
-    max-width: 220px;
+    flex: 1 1 44%;
+    max-width: 240px;
   }
 
   .tablero-container {
     position: relative;
     background: var(--panel-bg);
-    padding: 15px;
+    padding: 14px;
     border-radius: 20px;
     border: 1px solid var(--border-color);
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
-    min-width: 260px;
-    min-height: 260px;
+    margin-bottom: 14px;
   }
 
   .tablero-container.panico {
@@ -143,62 +132,118 @@
 
   .tablero { 
     display: grid; 
+    grid-template-columns: repeat(3, 72px);
     gap: 10px; 
     justify-content: center;
     align-content: center;
   }
 
   .bloque {
+    width: 72px;
+    height: 72px;
     border-radius: 12px;
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.45;
     transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .bloque:hover { opacity: 0.6; }
+  .bloque:hover { opacity: 0.65; }
   .iluminado {
     opacity: 1 !important;
-    transform: scale(1.04);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+    box-shadow: 0 0 22px rgba(255, 255, 255, 0.95);
   }
 
   .acciones {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     width: 100%;
-    max-width: 420px;
+    max-width: 380px;
     flex-wrap: wrap;
   }
 
   .acciones button {
-    padding: 12px 18px;
+    padding: 11px 16px;
     font-size: 14px;
     font-weight: 700;
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    display: inline-block;
   }
   #btn { background: var(--text-main); color: var(--bg-main); flex: 1; }
   #btnRepetir { background: #eab308; color: #0f1115; display: none; }
   #btnRepetir:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
-  #btnGrabar { background: #ef4444; color: #fff; display: none; }
+  #btnGrabar { background: #ef4444; color: #fff; display: none; flex: 1; }
   #btnGrabar.grabando { background: #dc2626; animation: pulseRec 1s infinite alternate; }
   @keyframes pulseRec { from { opacity: 1; } to { opacity: 0.6; } }
 
-  #btnReproducerMelodia { background: #10b981; color: #fff; display: none; }
+  #btnReproducerMelodia { background: #10b981; color: #fff; display: none; flex: 1; }
   #btnReproducerMelodia:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
+
+  /* Modal Tabla de Récords */
+  .modal-fondo {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+  }
+  .modal-caja {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 18px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .modal-header h2 { margin: 0; font-size: 18px; }
+  .btn-cerrar {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: center;
+  }
+  th, td {
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  th { color: var(--accent); font-weight: 700; }
+  td:first-child, th:first-child { text-align: left; font-weight: 600; }
 </style>
 </head>
 <body>
 
 <div class="top-bar">
-  <div class="record-badge" id="recordBadge">🏆 Récord: 0</div>
+  <div class="grupo-botones-top">
+    <div class="record-badge" id="recordBadge">🏆 Récord: 0</div>
+    <button class="btn-vista" onclick="abrirTablaRecords()">📊 Tabla</button>
+  </div>
   <div class="grupo-botones-top">
     <button class="btn-vista" onclick="alternarTemaClaroDark()" id="btnTemaClaro">☀️ Claro</button>
-    <button class="btn-vista" id="btnVista" onclick="alternarVista()">💻 Escritorio</button>
+    <button class="btn-vista" id="btnVista" onclick="alternarVista()">📱 Móvil</button>
   </div>
 </div>
 
@@ -228,7 +273,7 @@
     <option value="piano">🎹 Piano</option>
     <option value="campana">🔔 Campana</option>
     <option value="laser">🚀 Láser</option>
-    <option value="gota">💧 Gota</option>
+    <option value="gota">💧 Gota de Agua</option>
     <option value="violin">🎻 Violín</option>
     <option value="guitarra">🎸 Guitarra</option>
     <option value="explosion">💥 Explosión</option>
@@ -249,7 +294,14 @@
 
 <div class="tablero-container" id="tableroContainer">
   <div class="barra-tiempo" id="barraTiempo"></div>
-  <div class="tablero" id="tablero"></div>
+  <div class="tablero" id="tablero">
+    <div class="bloque" id="b0" style="background:#00ff66;"></div>
+    <div class="bloque" id="b1" style="background:#10b981;"></div>
+    <div class="bloque" id="b2" style="background:#00e676;"></div>
+    <div class="bloque" id="b3" style="background:#00c853;"></div>
+    <div class="bloque" id="b4" style="background:#76ff03;"></div>
+    <div class="bloque" id="b5" style="background:#69f0ae;"></div>
+  </div>
 </div>
 
 <div class="acciones">
@@ -257,6 +309,27 @@
   <button id="btnRepetir" onclick="usarRepetir()">🔁 Repetir</button>
   <button id="btnGrabar" onclick="toggleGrabacion()">🔴 Grabar</button>
   <button id="btnReproducerMelodia" onclick="reproducirMelodiaGrabada()" disabled>▶️ Escuchar</button>
+</div>
+
+<div class="modal-fondo" id="modalRecords" onclick="if(event.target===this) cerrarTablaRecords()">
+  <div class="modal-caja">
+    <div class="modal-header">
+      <h2>🏆 Tabla de Récords</h2>
+      <button class="btn-cerrar" onclick="cerrarTablaRecords()">✕</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Modo</th>
+          <th>🟢 Fácil</th>
+          <th>🟡 Normal</th>
+          <th>🟠 Difícil</th>
+          <th>🔴 Extremo</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpoTablaRecords"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
@@ -270,5 +343,92 @@ const temas = {
   neon:        ['#d500f9', '#f50057', '#00e5ff', '#00e676', '#ffea00', '#651fff', '#1de9b6', '#ff6d00']
 };
 
-const notas = [261.6, 293.6, 329.6, 349.2, 3
-               
+const notas = [261.6, 293.6, 329.6, 349.2, 392.0, 440.0, 493.8, 523.2, 587.3, 659.2, 698.4, 783.9, 830.6, 880.0, 932.3];
+const niveles = {
+  facil:   { cant: 4,  col: 2, tam: 82, vel: 700 },
+  normal:  { cant: 6,  col: 3, tam: 72, vel: 580 },
+  dificil: { cant: 9,  col: 3, tam: 62, vel: 450 },
+  extremo: { cant: 15, col: 5, tam: 44, vel: 320 }
+};
+
+let cfg = niveles.normal, seq = [], usr = [], lvl = 0, lock = true, ctx = null;
+let esMovil = false, comodinDisponible = true, modoActual = 'clasico';
+let esClaro = localStorage.getItem('simon_modo_claro') === 'true';
+let vidas = 3, temporizadorTurno = null, tiempoRestante = 100;
+let estaGrabando = false, melodiaGrabada = [], tiempoInicioGrabacion = 0;
+
+if (esClaro) {
+  document.body.classList.add('modo-claro');
+  document.getElementById('btnTemaClaro').innerText = '🌙 Oscuro';
+}
+actualizarVistaRecord();
+aplicarTema();
+
+function obtenerClaveRecord(modo, dif) {
+  return `simon_rec_${modo}_${dif}`;
+}
+
+function obtenerRecord(modo, dif) {
+  return parseInt(localStorage.getItem(obtenerClaveRecord(modo, dif)) || '0', 10);
+}
+
+function actualizarVistaRecord() {
+  const badge = document.getElementById('recordBadge');
+  if (!badge) return;
+  if (modoActual === 'libre') {
+    badge.innerText = '🎹 Modo Libre';
+  } else {
+    const dif = document.getElementById('dificultad').value;
+    badge.innerText = `🏆 Récord: ${obtenerRecord(modoActual, dif)}`;
+  }
+}
+
+function comprobarRecord(puntuacion) {
+  if (modoActual === 'libre') return;
+  const dif = document.getElementById('dificultad').value;
+  if (puntuacion > obtenerRecord(modoActual, dif)) {
+    localStorage.setItem(obtenerClaveRecord(modoActual, dif), puntuacion);
+    actualizarVistaRecord();
+  }
+}
+
+function abrirTablaRecords() {
+  const modosLista = [
+    { id: 'clasico', nom: '🕹️ Clásico' },
+    { id: 'inverso', nom: '🔄 Espejo' },
+    { id: 'contrarreloj', nom: '⏱️ Contrarreloj' },
+    { id: 'caos', nom: '⚡ Caos' },
+    { id: 'supervivencia', nom: '🛡️ Supervivencia' }
+  ];
+  const difs = ['facil', 'normal', 'dificil', 'extremo'];
+  const tbody = document.getElementById('cuerpoTablaRecords');
+  tbody.innerHTML = '';
+
+  modosLista.forEach(m => {
+    const tr = document.createElement('tr');
+    let celdas = `<td>${m.nom}</td>`;
+    difs.forEach(d => {
+      celdas += `<td>${obtenerRecord(m.id, d)}</td>`;
+    });
+    tr.innerHTML = celdas;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('modalRecords').style.display = 'flex';
+}
+
+function cerrarTablaRecords() {
+  document.getElementById('modalRecords').style.display = 'none';
+}
+
+function cambiarDificultad() {
+  actualizarVistaRecord();
+  armarTablero();
+}
+
+function alternarTemaClaroDark() {
+  esClaro = !esClaro;
+  document.body.classList.toggle('modo-claro', esClaro);
+  localStorage.setItem('simon_modo_claro', esClaro);
+  document.get
+  
