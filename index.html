@@ -667,16 +667,11 @@
             <div class="grupo-opcion-config">
                 <label>🎹 Instrumento / Sonido</label>
                 <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)">
-                    <option value="0">Piano</option>
                     <option value="1" selected>Campanas</option>
-                    <option value="2">Onda Suave</option>
                     <option value="3">Retro</option>
-                    <option value="4">Gotas</option>
                     <option value="5">Guitarra</option>
-                    <option value="6">Viento</option>
                     <option value="7">Láser</option>
                     <option value="8">Arcade</option>
-                    <option value="9">Arpa</option>
                 </select>
             </div>
 
@@ -1534,7 +1529,7 @@
                 const gain = audioCtx.createGain();
                 const freq = escalaNotas[indice % escalaNotas.length];
 
-                let volumenAlto = 0.5;
+                let volumenAlto = 0.6;
                 let duracionSonido = 0.35;
 
                 if (modo === 'extremo') {
@@ -1547,7 +1542,7 @@
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(120, audioCtx.currentTime);
                     gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.4 * volumenAlto, audioCtx.currentTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.5 * volumenAlto, audioCtx.currentTime + 0.05);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
@@ -1557,32 +1552,20 @@
                 }
 
                 switch (tipoSonido) {
-                    case 0: osc.type = 'sine'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
                     case 1: osc.type = 'triangle'; osc.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime); break;
-                    case 2: osc.type = 'sine'; osc.frequency.setValueAtTime(freq * 0.75, audioCtx.currentTime); break;
                     case 3: osc.type = 'square'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
-                    case 4: 
-                        osc.type = 'sine'; 
-                        osc.frequency.setValueAtTime(freq * 0.8, audioCtx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(freq * 1.4, audioCtx.currentTime + (duracionSonido * 0.6)); 
-                        break;
                     case 5: osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
-                    case 6: 
-                        osc.type = 'triangle'; 
-                        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                        osc.frequency.linearRampToValueAtTime(freq * 1.02, audioCtx.currentTime + (duracionSonido * 0.4)); 
-                        break;
                     case 7: 
                         osc.type = 'sawtooth'; 
                         osc.frequency.setValueAtTime(freq * 2, audioCtx.currentTime);
                         osc.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + duracionSonido); 
                         break;
                     case 8: osc.type = 'square'; osc.frequency.setValueAtTime(freq * 1.25, audioCtx.currentTime); break;
-                    case 9: osc.type = 'sine'; osc.frequency.setValueAtTime(freq * 1.25, audioCtx.currentTime); break;
+                    default: osc.type = 'triangle'; osc.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime); break;
                 }
 
                 gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.4 * volumenAlto, audioCtx.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.5 * volumenAlto, audioCtx.currentTime + 0.02);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duracionSonido);
 
                 osc.connect(gain);
