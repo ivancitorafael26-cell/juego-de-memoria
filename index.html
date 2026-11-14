@@ -535,8 +535,9 @@
     <div class="modal-overlay" id="modal-usuario">
         <div class="modal-contenido" style="text-align: center;">
             <h2>👋 ¡Bienvenido al Juego de Memoria!</h2>
-            <p style="color: var(--subtext-color); font-size: 0.9rem; margin-bottom: 15px;">Ingresa tu nombre de usuario para comenzar:</p>
-            <input type="text" id="input-nombre-usuario" placeholder="Ej. AlexGamer" maxlength="16" style="width: 80%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(128,128,128,0.4); background: rgba(0,0,0,0.2); color: white; font-size: 1rem; text-align: center; outline: none; margin-bottom: 15px;">
+            <p style="color: var(--subtext-color); font-size: 0.9rem; margin-bottom: 10px;">Ingresa tu nombre de usuario para comenzar:</p>
+            <input type="text" id="input-nombre-usuario" placeholder="Ej. AlexGamer" maxlength="16" style="width: 80%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(128,128,128,0.4); background: rgba(0,0,0,0.2); color: white; font-size: 1rem; text-align: center; outline: none; margin-bottom: 8px;">
+            <div style="color: #ff4757; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px;">⚠️ No Podras Cambiarlo Despues</div>
             <br>
             <button class="btn-mini" type="button" onclick="guardarUsuario()" style="padding: 10px 25px; font-size: 0.95rem; background-color: #2ed573; color: white; border: none; border-radius: 20px;">¡Empezar a Jugar!</button>
         </div>
@@ -703,7 +704,7 @@
 
             if (modalUsuario) {
                 modalUsuario.classList.remove('activo');
-                modalUsuario.style.display = 'none'; // Asegura que se oculte y libere la pantalla
+                modalUsuario.style.display = 'none';
             }
             if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
         }
@@ -1267,7 +1268,7 @@
                 bloqueado = true;
             } else if (modo === 'hacker') {
                 if (panelGrabadora) panelGrabadora.classList.remove('activo');
-                if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
+                if (contenedorTiempo) panelGrabadora.classList.remove('activo');
                 if (selectDif) {
                     selectDif.value = "2";
                     selectDif.disabled = true;
