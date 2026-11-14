@@ -18,7 +18,7 @@
             --control-hover: rgba(31, 48, 94, 0.65);
             --control-text: #ffffff;
             --badge-bg: rgba(255, 255, 255, 0.08);
-            --modal-bg: rgba(22, 33, 62, 0.45); /* Más translúcido */
+            --modal-bg: rgba(22, 33, 62, 0.45);
         }
 
         body {
@@ -389,14 +389,14 @@
             transform: none;
         }
 
-        /* Modales con Glassmorphism más translúcido y claro */
+        /* Modales con Glassmorphism translúcido */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.45); /* Fondo oscuro exterior más suave */
+            background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(4px);
             -webkit-backdrop-filter: blur(4px);
             display: flex;
@@ -415,7 +415,7 @@
 
         .modal-contenido {
             background-color: var(--modal-bg);
-            backdrop-filter: blur(12px); /* Desenfoque sutil para ver el fondo */
+            backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             color: var(--text-color);
             padding: 24px;
@@ -574,6 +574,7 @@
         </div>
 
         <div class="grupo-controles">
+            <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
             <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;">⚙️ Configuración</button>
         </div>
@@ -646,11 +647,6 @@
             <div class="grupo-opcion-config">
                 <label>🖼️ Fondo de Pantalla</label>
                 <button class="btn-mini" type="button" onclick="cambiarFondo()">Cambiar Color de Fondo</button>
-            </div>
-
-            <div class="grupo-opcion-config">
-                <label>📊 Estadísticas</label>
-                <button class="btn-mini" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;">Ver Estadísticas</button>
             </div>
 
             <div style="margin-top: 15px;">
