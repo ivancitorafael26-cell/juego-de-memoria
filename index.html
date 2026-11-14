@@ -399,7 +399,7 @@
             padding: 20px;
             border-radius: 18px;
             width: 90%;
-            max-width: 480px;
+            max-width: 450px;
             max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -517,23 +517,6 @@
             font-weight: 600;
             color: var(--subtext-color);
         }
-
-        /* Tabla de Ranking Global */
-        .tabla-ranking {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-        .tabla-ranking th, .tabla-ranking td {
-            padding: 8px 6px;
-            text-align: left;
-            border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-        }
-        .tabla-ranking th {
-            color: var(--subtext-color);
-            font-weight: 700;
-        }
     </style>
 </head>
 <body>
@@ -565,7 +548,7 @@
         </div>
     </div>
 
-    <!-- Modal de Configuración -->
+    <!-- Modal de Configuración (Menú de Ajustes) -->
     <div class="modal-overlay" id="modal-configuracion" onclick="cerrarConfiguracionFuera(event)">
         <div class="modal-contenido" onclick="event.stopPropagation()">
             <h2>⚙️ Menú de Configuración</h2>
@@ -635,7 +618,7 @@
             </div>
 
             <div class="grupo-opcion-config">
-                <label>📊 Estadísticas y Récords</label>
+                <label>📊 Estadísticas</label>
                 <button class="btn-mini" type="button" onclick="abrirEstadisticas()" style="background-color: #ffa502; color: white;">Ver Estadísticas</button>
             </div>
 
@@ -645,19 +628,13 @@
         </div>
     </div>
 
-    <!-- Modal de Estadísticas y Ranking Global -->
+    <!-- Modal de Estadísticas -->
     <div class="modal-overlay" id="modal-estadisticas" onclick="cerrarEstadisticasFuera(event)">
         <div class="modal-contenido" onclick="event.stopPropagation()">
-            <h2>📊 Resumen y Récords</h2>
+            <h2>📊 Resumen de Estadísticas</h2>
             <div id="cuerpo-estadisticas"></div>
-            
-            <h3 style="margin-top: 20px; font-size: 1rem; color: #2ed573; text-align: center;">🌐 Ranking Global (Mundial)</h3>
-            <div id="cuerpo-ranking-global" style="max-height: 200px; overflow-y: auto;">
-                <p style="text-align: center; font-size: 0.85rem; color: var(--subtext-color);">Cargando mejores puntajes...</p>
-            </div>
-
             <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 8px;">🗑️ Borrar Locales</button>
+                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: #ff4757; color: white; padding: 8px;">🗑️ Borrar Datos</button>
                 <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 8px;">Cerrar</button>
             </div>
         </div>
@@ -695,86 +672,6 @@
         <button id="btn-jugar" type="button">Jugar</button>
     </div>
 
-    <!-- Script de Firebase e Inicialización del Juego -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // Tus credenciales de Firebase configuradas
-        const firebaseConfig = {
-            apiKey: "AIzaSyDjdG1bjdbeB_Ncn76IYT9Cgm8iH82xZW4",
-            projectId: "juegodememoria-ba7cc",
-            appId: "1:263848986065:web:1313a18c579fef82eb4cf0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Función global para guardar puntuación en Firebase
-        window.guardarPuntuacionGlobal = async function(modo, nivelAlcanzado) {
-            if (!window.usuarioActual || !window.usuarioActual.nombre || nivelAlcanzado <= 1) return;
-            try {
-                await addDoc(collection(db, "ranking_global"), {
-                    nombre: window.usuarioActual.nombre,
-                    emoji: window.usuarioActual.emoji || '👤',
-                    modo: modo,
-                    nivel: nivelAlcanzado,
-                    fecha: new Date().toISOString()
-                });
-            } catch (e) {
-                console.error("Error al guardar en Firebase:", e);
-            }
-        };
-
-        // Función global para cargar el ranking mundial
-        window.cargarRankingGlobal = async function() {
-            const contenedor = document.getElementById('cuerpo-ranking-global');
-            if (!contenedor) return;
-
-            try {
-                const q = query(collection(db, "ranking_global"), orderBy("nivel", "desc"), limit(10));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    contenedor.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: var(--subtext-color);">Aún no hay récords globales. ¡Sé el primero!</p>`;
-                    return;
-                }
-
-                let html = `
-                    <table class="tabla-ranking">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Jugador</th>
-                                <th>Modo</th>
-                                <th>Nivel</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                let pos = 1;
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    html += `
-                        <tr>
-                            <td>${pos++}</td>
-                            <td>${data.emoji} ${data.nombre}</td>
-                            <td style="text-transform: capitalize;">${data.modo}</td>
-                            <td><b>${data.nivel}</b></td>
-                        </tr>
-                    `;
-                });
-
-                html += `</tbody></table>`;
-                contenedor.innerHTML = html;
-            } catch (e) {
-                console.error("Error al cargar ranking:", e);
-                contenedor.innerHTML = `<p style="text-align: center; font-size: 0.85rem; color: #ff4757;">Error al cargar el ranking global.</p>`;
-            }
-        };
-    </script>
-
     <script>
         let secuencia = [];
         let secuenciaObjetivo = [];
@@ -803,7 +700,7 @@
         let timeoutsGrabacion = [];
 
         const listaEmojis = ['🚀', '🐱', '🌟', '🎮', '🔥', '⚡', '🤖', '👑', '🍕', '🎸', '🦄', '💎', '🍀', '🎯', '🐉'];
-        window.usuarioActual = { nombre: '', emoji: '' };
+        let usuarioActual = { nombre: '', emoji: '' };
 
         window.addEventListener('DOMContentLoaded', () => {
             const guardado = localStorage.getItem('memoria_usuario_v1');
@@ -811,9 +708,9 @@
             const badgeUsuario = document.getElementById('badge-usuario');
 
             if (guardado) {
-                window.usuarioActual = JSON.parse(guardado);
+                usuarioActual = JSON.parse(guardado);
                 if (modalUsuario) modalUsuario.classList.remove('activo');
-                if (badgeUsuario) badgeUsuario.textContent = `${window.usuarioActual.emoji} ${window.usuarioActual.nombre}`;
+                if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
             } else {
                 if (modalUsuario) modalUsuario.classList.add('activo');
             }
@@ -830,15 +727,15 @@
             }
 
             const emojiAleatorio = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
-            window.usuarioActual = { nombre: nombreVal, emoji: emojiAleatorio };
+            usuarioActual = { nombre: nombreVal, emoji: emojiAleatorio };
 
-            localStorage.setItem('memoria_usuario_v1', JSON.stringify(window.usuarioActual));
+            localStorage.setItem('memoria_usuario_v1', JSON.stringify(usuarioActual));
 
             if (modalUsuario) {
                 modalUsuario.classList.remove('activo');
                 modalUsuario.style.display = 'none';
             }
-            if (badgeUsuario) badgeUsuario.textContent = `${window.usuarioActual.emoji} ${window.usuarioActual.nombre}`;
+            if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
         }
 
         function abrirConfiguracion() {
@@ -1244,7 +1141,7 @@
 
             let html = `
                 <div style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px;">
-                    <div style="font-size: 0.85rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas (Local)</div>
+                    <div style="font-size: 0.85rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
                     <div style="font-size: 1.4rem; font-weight: bold; color: var(--text-color); margin-top: 3px;">${totalNotasGlobal}</div>
                 </div>
                 <div class="grid-modos-stats">
@@ -1286,11 +1183,6 @@
 
             cuerpo.innerHTML = html;
             modal.classList.add('activo');
-
-            // Cargar ranking global al abrir
-            if (window.cargarRankingGlobal) {
-                window.cargarRankingGlobal();
-            }
         }
 
         function cerrarEstadisticas() {
@@ -1305,7 +1197,7 @@
         }
 
         function reiniciarEstadisticas() {
-            if (confirm("¿Estás seguro de borrar todas tus estadísticas locales?")) {
+            if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
                 localStorage.removeItem('memoria_stats_v14');
                 estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
                 guardarStats();
@@ -1511,11 +1403,6 @@
 
             const modo = document.getElementById('selector-modo').value;
             const dif = document.getElementById('selector-dificultad').value;
-
-            // Enviar puntuación a la nube de Firebase si alcanzó al menos nivel 2
-            if (window.guardarPuntuacionGlobal) {
-                window.guardarPuntuacionGlobal(modo, nivel);
-            }
 
             if (modo === 'extremo' || modo === 'hacker') {
                 if (estadisticas[modo]) {
@@ -1890,11 +1777,6 @@
                 quitarBrilloTotal();
                 reproducirSonido(0, true);
 
-                // Enviar puntuación a la nube de Firebase si perdió la partida
-                if (window.guardarPuntuacionGlobal) {
-                    window.guardarPuntuacionGlobal(modo, nivel);
-                }
-
                 if (modo === 'extremo' || modo === 'hacker') {
                     if (estadisticas[modo]) {
                         estadisticas[modo].derrotas = (estadisticas[modo].derrotas || 0) + 1;
@@ -1939,9 +1821,9 @@
                 if (mensaje) mensaje.textContent = "🔴 Grabando melodía...";
             } else {
                 esGrabando = false;
-                if (btnGrbar) {
+                if (btnGrabar) {
                     btnGrabar.textContent = "🔴 Grabar Melodía";
-                    btnGrbar.classList.remove('grabando');
+                    btnGrabar.classList.remove('grabando');
                 }
                 if (mensaje) mensaje.textContent = `✅ ¡Grabación guardada (${notasGrabadas.length} notas)!`;
             }
