@@ -414,6 +414,7 @@
         }
 
         .modal-contenido {
+            position: relative;
             background-color: var(--modal-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -434,12 +435,55 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        .modal-contenido h2 {
-            margin-top: 0;
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 16px;
+            min-height: 34px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
             text-align: center;
-            font-size: 1.35rem;
-            margin-bottom: 15px;
+            font-size: 1.3rem;
             letter-spacing: 0.5px;
+            padding: 0 36px;
+        }
+
+        .btn-cerrar-x {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 71, 87, 0.22);
+            border: 1.5px solid #ff4757;
+            color: #ff4757;
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 10px rgba(255, 71, 87, 0.25);
+        }
+
+        .btn-cerrar-x:hover {
+            background-color: #ff4757;
+            color: #ffffff;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 4px 14px rgba(255, 71, 87, 0.5);
+        }
+
+        .btn-cerrar-x:active {
+            transform: translateY(-50%) scale(0.95);
         }
 
         .grupo-opcion-config {
@@ -558,7 +602,7 @@
     <!-- Modal de Nombre de Usuario (Primera Vez / Nuevo Dispositivo) -->
     <div class="modal-overlay" id="modal-usuario">
         <div class="modal-contenido" style="text-align: center;">
-            <h2>👋 ¡Bienvenido al Juego de Memoria!</h2>
+            <h2 style="margin-top: 0;">👋 ¡Bienvenido al Juego de Memoria!</h2>
             <p style="color: var(--subtext-color); font-size: 0.9rem; margin-bottom: 10px;">Ingresa tu nombre de usuario para comenzar:</p>
             <input type="text" id="input-nombre-usuario" placeholder="Ej. AlexGamer" maxlength="16" style="width: 80%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.35); color: white; font-size: 1rem; text-align: center; outline: none; margin-bottom: 8px;">
             <div style="color: #ff4757; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px;">⚠️ No Podras Cambiarlo Despues</div>
@@ -580,10 +624,13 @@
         </div>
     </div>
 
-    <!-- Modal de Configuración (Menú de Ajustes) -->
-    <div class="modal-overlay" id="modal-configuracion" onclick="cerrarConfiguracionFuera(event)">
-        <div class="modal-contenido" onclick="event.stopPropagation()">
-            <h2>⚙️ Menú de Configuración</h2>
+    <!-- Modal de Configuración (Solo se cierra con la X) -->
+    <div class="modal-overlay" id="modal-configuracion">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>⚙️ Configuración</h2>
+                <button class="btn-cerrar-x" type="button" onclick="cerrarConfiguracion()" title="Cerrar">✕</button>
+            </div>
             
             <div class="grupo-opcion-config">
                 <label>🟢 Dificultad</label>
@@ -644,25 +691,23 @@
                 </select>
             </div>
 
-            <div class="grupo-opcion-config">
+            <div class="grupo-opcion-config" style="margin-bottom: 0;">
                 <label>🖼️ Fondo de Pantalla</label>
                 <button class="btn-mini" type="button" onclick="cambiarFondo()">Cambiar Color de Fondo</button>
-            </div>
-
-            <div style="margin-top: 15px;">
-                <button class="btn-mini" type="button" onclick="cerrarConfiguracion()" style="width: 100%; background-color: rgba(46, 213, 115, 0.75); color: white; padding: 10px;">Cerrar Menú</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Estadísticas -->
-    <div class="modal-overlay" id="modal-estadisticas" onclick="cerrarEstadisticasFuera(event)">
-        <div class="modal-contenido" onclick="event.stopPropagation()">
-            <h2>📊 Resumen de Estadísticas</h2>
+    <!-- Modal de Estadísticas (Solo se cierra con la X) -->
+    <div class="modal-overlay" id="modal-estadisticas">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>📊 Estadísticas</h2>
+                <button class="btn-cerrar-x" type="button" onclick="cerrarEstadisticas()" title="Cerrar">✕</button>
+            </div>
             <div id="cuerpo-estadisticas"></div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.7); color: white; padding: 8px;">🗑️ Borrar Datos</button>
-                <button class="btn-mini" type="button" onclick="cerrarEstadisticas()" style="flex: 1; padding: 8px;">Cerrar</button>
+            <div style="margin-top: 15px;">
+                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="width: 100%; background-color: rgba(255, 71, 87, 0.7); color: white; padding: 9px;">🗑️ Borrar Datos</button>
             </div>
         </div>
     </div>
@@ -773,12 +818,6 @@
         function cerrarConfiguracion() {
             const modal = document.getElementById('modal-configuracion');
             if (modal) modal.classList.remove('activo');
-        }
-
-        function cerrarConfiguracionFuera(event) {
-            if (event.target.id === 'modal-configuracion') {
-                cerrarConfiguracion();
-            }
         }
 
         const fondosOscuros = ['#1a1a2e', '#1e1b4b', '#064e3b', '#31102f', '#18181b', '#2e0854', '#581c87'];
@@ -1218,12 +1257,6 @@
             if (modal) modal.classList.remove('activo');
         }
 
-        function cerrarEstadisticasFuera(event) {
-            if (event.target.id === 'modal-estadisticas') {
-                cerrarEstadisticas();
-            }
-        }
-
         function reiniciarEstadisticas() {
             if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
                 localStorage.removeItem('memoria_stats_v14');
@@ -1454,6 +1487,11 @@
             if (selectDif && modo !== 'extremo' && modo !== 'hacker') selectDif.disabled = false;
             if (selectModo) selectModo.disabled = false;
 
+            const btnStats = document.getElementById('btn-estadisticas-top');
+            const btnConfig = document.getElementById('btn-config');
+            if (btnStats) btnStats.disabled = false;
+            if (btnConfig) btnConfig.disabled = false;
+
             const btn = document.getElementById('btn-jugar');
             if (btn) {
                 btn.textContent = "Volver a jugar";
@@ -1638,10 +1676,14 @@
             const selectDif = document.getElementById('selector-dificultad');
             const selectModo = document.getElementById('selector-modo');
             const btnJugar = document.getElementById('btn-jugar');
+            const btnStats = document.getElementById('btn-estadisticas-top');
+            const btnConfig = document.getElementById('btn-config');
 
             if (selectDif && selectModo.value !== 'extremo' && selectModo.value !== 'hacker') selectDif.disabled = true;
             if (selectModo) selectModo.disabled = true;
             if (btnJugar) btnJugar.disabled = true;
+            if (btnStats) btnStats.disabled = true;
+            if (btnConfig) btnConfig.disabled = true;
 
             const modo = selectModo ? selectModo.value : 'normal';
             const contenedorTiempo = document.getElementById('contenedor-tiempo');
@@ -1826,6 +1868,11 @@
                 const selectModo = document.getElementById('selector-modo');
                 if (selectDif && modo !== 'extremo' && modo !== 'hacker') selectDif.disabled = false;
                 if (selectModo) selectModo.disabled = false;
+
+                const btnStats = document.getElementById('btn-estadisticas-top');
+                const btnConfig = document.getElementById('btn-config');
+                if (btnStats) btnStats.disabled = false;
+                if (btnConfig) btnConfig.disabled = false;
 
                 const btn = document.getElementById('btn-jugar');
                 if (btn) {
