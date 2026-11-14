@@ -28,7 +28,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding-top: 105px;
+            padding-top: 80px;
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -79,18 +79,10 @@
             box-shadow: 0 4px 20px rgba(0, 255, 0, 0.25) !important;
         }
 
-        body.modo-hacker .btn-mini {
+        body.modo-hacker .btn-mini, body.modo-hacker select {
             background-color: #0b0f0b !important;
             color: #00ff00 !important;
             border: 1px solid #00ff00 !important;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300ff00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 10px center !important;
-            background-size: 14px !important;
-        }
-
-        body.modo-hacker button.btn-mini {
-            background-image: none !important;
         }
 
         body.modo-hacker .btn-mini:hover:not(:disabled) {
@@ -127,10 +119,8 @@
             background-color: var(--bg-color);
             padding: 10px 15px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             z-index: 100;
             box-sizing: border-box;
@@ -141,8 +131,6 @@
             display: flex;
             gap: 8px;
             align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .btn-mini {
@@ -150,25 +138,12 @@
             color: var(--control-text);
             border: 1px solid rgba(128, 128, 128, 0.3);
             border-radius: 10px;
-            padding: 8px 12px;
+            padding: 8px 14px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             outline: none;
             transition: all 0.2s ease;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            background-size: 12px;
-            padding-right: 28px;
-        }
-
-        button.btn-mini {
-            background-image: none;
-            padding-right: 12px;
         }
 
         .btn-mini:disabled {
@@ -192,7 +167,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: none;
         }
 
         .app-contenedor {
@@ -224,7 +198,7 @@
         .badge-modo {
             background-color: var(--badge-bg);
             border: 1px solid rgba(128, 128, 128, 0.2);
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -425,8 +399,8 @@
             padding: 20px;
             border-radius: 18px;
             width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
+            max-width: 450px;
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             box-sizing: border-box;
@@ -439,6 +413,39 @@
             font-size: 1.3rem;
             margin-bottom: 15px;
             letter-spacing: 0.5px;
+        }
+
+        /* Estilos para el menú de Configuración */
+        .grupo-opcion-config {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .grupo-opcion-config label {
+            font-size: 0.85rem;
+            color: var(--subtext-color);
+            font-weight: 600;
+        }
+
+        .grupo-opcion-config select, .grupo-opcion-config button {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background-color: var(--control-bg);
+            color: var(--control-text);
+            border: 1px solid rgba(128, 128, 128, 0.3);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            box-sizing: border-box;
+            transition: background-color 0.2s;
+        }
+
+        .grupo-opcion-config select:hover, .grupo-opcion-config button:hover {
+            background-color: var(--control-hover);
         }
 
         .grid-modos-stats {
@@ -511,19 +518,6 @@
             font-weight: 600;
             color: var(--subtext-color);
         }
-
-        @media (max-width: 768px) {
-            body {
-                padding-top: 130px;
-            }
-            .barra-superior {
-                padding: 8px 10px;
-                justify-content: center;
-            }
-            .grupo-controles {
-                justify-content: center;
-            }
-        }
     </style>
 </head>
 <body>
@@ -543,58 +537,95 @@
         </div>
     </div>
 
+    <!-- Barra Superior Limpia y Minimalista -->
     <div class="barra-superior">
         <div class="grupo-controles">
-            <select id="selector-dificultad" class="btn-mini" onchange="cambiarDificultad(this)" title="Dificultad">
-                <option value="2">Dificultad = 🟢 Fácil (2x2)</option>
-                <option value="3">Dificultad = 🟡 Medio (3x3)</option>
-                <option value="4">Dificultad = 🔴 Difícil (4x4)</option>
-            </select>
-
-            <select id="selector-modo" class="btn-mini" onchange="cambiarModoJuego(this)" title="Modo de Juego">
-                <option value="normal">Modo = ➡️ Normal</option>
-                <option value="invertido">Modo = 🔄 Invertido</option>
-                <option value="relampago">Modo = ⚡ Relámpago</option>
-                <option value="contrarreloj">Modo = ⏱️ Contrarreloj</option>
-                <option value="libre">Modo = 🎹 Libre (5x5)</option>
-                <option value="extremo">Modo = 💀 Extremo</option>
-                <option value="hacker">Modo = 💻 Hacker</option>
-            </select>
-
-            <select id="selector-atmosfera" class="btn-mini" onchange="cambiarAtmosfera()" title="Efectos Atmosféricos">
-                <option value="0">Atmósfera = ☁️ Ninguno</option>
-                <option value="1" selected>Atmósfera = 🍃 Hojas</option>
-                <option value="2">Atmósfera = ❄️ Nieve</option>
-                <option value="3">Atmósfera = ✨ Brillitos</option>
-            </select>
-
-            <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)" title="Instrumento">
-                <option value="0">Sonido = 🎹 Piano</option>
-                <option value="1" selected>Sonido = 🔔 Campanas</option>
-                <option value="2">Sonido = 🌊 Onda Suave</option>
-                <option value="3">Sonido = ⚡ Retro</option>
-                <option value="4">Sonido = 💧 Gotas</option>
-                <option value="5">Sonido = 🎸 Guitarra</option>
-                <option value="6">Sonido = 🎷 Viento</option>
-                <option value="7">Sonido = 🚀 Láser</option>
-                <option value="8">Sonido = 🕹️ Arcade</option>
-                <option value="9">Sonido = 🎶 Arpa</option>
-            </select>
-
-            <select id="selector-color-bloques" class="btn-mini" onchange="actualizarColoresTablero()" title="Tema de Colores">
-                <option value="0">Tema = ⚡ Neón</option>
-                <option value="1">Tema = 🌸 Pastel</option>
-                <option value="2">Tema = 🌅 Atardecer</option>
-                <option value="3">Tema = 🌊 Océano</option>
-                <option value="4">Tema = 🌲 Bosque</option>
-            </select>
+            <div id="badge-usuario" class="badge-modo" style="background-color: rgba(46, 213, 115, 0.2); color: #2ed573; border-color: rgba(46, 213, 115, 0.4);">👤 Jugador</div>
         </div>
 
         <div class="grupo-controles">
-            <div id="badge-usuario" class="badge-modo" style="background-color: rgba(46, 213, 115, 0.2); color: #2ed573; border-color: rgba(46, 213, 115, 0.4);">👤 Jugador</div>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
-            <button class="btn-mini" id="btn-stats" type="button" onclick="abrirEstadisticas()">📊 Estadísticas</button>
-            <button class="btn-mini" id="btn-fondo" type="button" onclick="cambiarFondo()">🖼️ Fondo</button>
+            <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: #3742fa; color: white;">⚙️ Configuración</button>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración (Menú de Ajustes) -->
+    <div class="modal-overlay" id="modal-configuracion" onclick="cerrarConfiguracionFuera(event)">
+        <div class="modal-contenido" onclick="event.stopPropagation()">
+            <h2>⚙️ Menú de Configuración</h2>
+            
+            <div class="grupo-opcion-config">
+                <label>🟢 Dificultad</label>
+                <select id="selector-dificultad" class="btn-mini" onchange="cambiarDificultad(this)">
+                    <option value="2">Fácil (2x2)</option>
+                    <option value="3">Medio (3x3)</option>
+                    <option value="4">Difícil (4x4)</option>
+                </select>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label>🎮 Modo de Juego</label>
+                <select id="selector-modo" class="btn-mini" onchange="cambiarModoJuego(this)">
+                    <option value="normal">Normal</option>
+                    <option value="invertido">Invertido</option>
+                    <option value="relampago">Relámpago</option>
+                    <option value="contrarreloj">Contrarreloj</option>
+                    <option value="libre">Libre (5x5)</option>
+                    <option value="extremo">Extremo</option>
+                    <option value="hacker">Hacker</option>
+                </select>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label>🍃 Efectos Atmosféricos</label>
+                <select id="selector-atmosfera" class="btn-mini" onchange="cambiarAtmosfera()">
+                    <option value="0">Ninguno</option>
+                    <option value="1" selected>Hojas</option>
+                    <option value="2">Nieve</option>
+                    <option value="3">Brillitos</option>
+                </select>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label>🎹 Instrumento / Sonido</label>
+                <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)">
+                    <option value="0">Piano</option>
+                    <option value="1" selected>Campanas</option>
+                    <option value="2">Onda Suave</option>
+                    <option value="3">Retro</option>
+                    <option value="4">Gotas</option>
+                    <option value="5">Guitarra</option>
+                    <option value="6">Viento</option>
+                    <option value="7">Láser</option>
+                    <option value="8">Arcade</option>
+                    <option value="9">Arpa</option>
+                </select>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label>🎨 Tema de Colores</label>
+                <select id="selector-color-bloques" class="btn-mini" onchange="actualizarColoresTablero()">
+                    <option value="0">Neón</option>
+                    <option value="1">Pastel</option>
+                    <option value="2">Atardecer</option>
+                    <option value="3">Océano</option>
+                    <option value="4">Bosque</option>
+                </select>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label>🖼️ Fondo de Pantalla</label>
+                <button class="btn-mini" type="button" onclick="cambiarFondo()">Cambiar Color de Fondo</button>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label>📊 Estadísticas</label>
+                <button class="btn-mini" type="button" onclick="abrirEstadisticas()" style="background-color: #ffa502; color: white;">Ver Estadísticas</button>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <button class="btn-mini" type="button" onclick="cerrarConfiguracion()" style="width: 100%; background-color: #2ed573; color: white; padding: 10px;">Cerrar Menú</button>
+            </div>
         </div>
     </div>
 
@@ -613,7 +644,7 @@
     <div class="app-contenedor" id="app-contenedor">
         <h1 id="titulo-principal">Juego de Memoria</h1>
         <div class="contenedor-info-partida">
-            <div class="badge-modo" id="badge-modo">Modo = ➡️ Normal</div>
+            <div class="badge-modo" id="badge-modo">Modo = Normal</div>
             <div class="badge-modo" id="cronometro-juego" style="display: none;">⏱️ 00:00</div>
         </div>
         <div id="mensaje">Presiona "Jugar" para empezar</div>
@@ -672,7 +703,6 @@
         const listaEmojis = ['🚀', '🐱', '🌟', '🎮', '🔥', '⚡', '🤖', '👑', '🍕', '🎸', '🦄', '💎', '🍀', '🎯', '🐉'];
         let usuarioActual = { nombre: '', emoji: '' };
 
-        // Comprobar si ya existe usuario guardado al cargar la página
         window.addEventListener('DOMContentLoaded', () => {
             const guardado = localStorage.getItem('memoria_usuario_v1');
             const modalUsuario = document.getElementById('modal-usuario');
@@ -709,10 +739,25 @@
             if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
         }
 
+        function abrirConfiguracion() {
+            const modal = document.getElementById('modal-configuracion');
+            if (modal) modal.classList.add('activo');
+        }
+
+        function cerrarConfiguracion() {
+            const modal = document.getElementById('modal-configuracion');
+            if (modal) modal.classList.remove('activo');
+        }
+
+        function cerrarConfiguracionFuera(event) {
+            if (event.target.id === 'modal-configuracion') {
+                cerrarConfiguracion();
+            }
+        }
+
         const fondosOscuros = ['#1a1a2e', '#1e1b4b', '#064e3b', '#31102f', '#18181b', '#2e0854', '#581c87'];
         let indiceFondo = 0;
 
-        // Lógica de lluvia binaria (Modo Hacker)
         const canvasMatrix = document.getElementById('matrix-canvas');
         const ctxMatrix = canvasMatrix.getContext('2d');
         let matrixInterval = null;
@@ -757,7 +802,6 @@
             }
         }
 
-        // Lógica de Efectos Atmosféricos
         const canvasAtmos = document.getElementById('atmosfera-canvas');
         const ctxAtmos = canvasAtmos.getContext('2d');
         let atmosParticles = [];
@@ -1217,7 +1261,6 @@
             const panelGrabadora = document.getElementById('panel-grabadora');
             const contenedorTiempo = document.getElementById('contenedor-tiempo');
             const selectDif = document.getElementById('selector-dificultad');
-            const btnFondo = document.getElementById('btn-fondo');
             const selectTema = document.getElementById('selector-color-bloques');
             const btnJugar = document.getElementById('btn-jugar');
             const mensaje = document.getElementById('mensaje');
@@ -1237,7 +1280,7 @@
             secuencia = [];
             secuenciaObjetivo = [];
 
-            const textoModo = select.options[select.selectedIndex].text.replace(/^Modo\s*=\s*/, '');
+            const textoModo = select.options[select.selectedIndex].text;
             actualizarBadgeModo(textoModo);
 
             if (btnJugar) {
@@ -1245,7 +1288,6 @@
                 btnJugar.disabled = false;
             }
 
-            if (btnFondo) btnFondo.disabled = false;
             if (selectTema) selectTema.disabled = false;
             if (selectDif) selectDif.disabled = false;
 
@@ -1273,7 +1315,6 @@
                     selectDif.value = "2";
                     selectDif.disabled = true;
                 }
-                if (btnFondo) btnFondo.disabled = true;
                 if (selectTema) selectTema.disabled = true;
                 if (btnJugar) btnJugar.style.display = 'inline-block';
                 if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
@@ -1631,18 +1672,18 @@
                 indiceFondo = (indiceFondo + 1) % fondosOscuros.length;
                 document.body.style.backgroundColor = fondosOscuros[indiceFondo];
 
-                let etapaNombre = "🟢 Fácil (2x2)";
-                if (nivel > 3 && nivel <= 6) etapaNombre = "🟡 Medio (3x3)";
-                else if (nivel > 6 && nivel <= 9) etapaNombre = "🔴 Difícil (4x4)";
-                else if (nivel > 9) etapaNombre = "💀 Extremo Total (5x5)";
+                let etapaNombre = "Fácil (2x2)";
+                if (nivel > 3 && nivel <= 6) etapaNombre = "Medio (3x3)";
+                else if (nivel > 6 && nivel <= 9) etapaNombre = "Difícil (4x4)";
+                else if (nivel > 9) etapaNombre = "Extremo Total (5x5)";
 
                 if (mensaje) mensaje.textContent = `💀 Nivel ${nivel} [${etapaNombre}] — ¡Atento!`;
             } else if (modo === 'hacker') {
-                if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} (Modo Hacker 2x2) — Sistema comprometido`;
+                if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} (Hacker 2x2) — Sistema comprometido`;
             } else if (modo === 'relampago') {
-                if (mensaje) mensaje.textContent = `⚡ Nivel ${nivel} (⚡ Relámpago) — ¡Rápido!`;
+                if (mensaje) mensaje.textContent = `⚡ Nivel ${nivel} (Relámpago) — ¡Rápido!`;
             } else if (modo === 'contrarreloj') {
-                if (mensaje) mensaje.textContent = `⏱️ Nivel ${nivel} (⏱️ Contrarreloj) — Observa...`;
+                if (mensaje) mensaje.textContent = `⏱️ Nivel ${nivel} (Contrarreloj) — Observa...`;
             } else {
                 if (mensaje) mensaje.textContent = `Nivel ${nivel} — Observa...`;
             }
@@ -1666,13 +1707,13 @@
             const tTurno = setTimeout(() => {
                 bloqueado = false;
                 if (modo === 'invertido') {
-                    if (mensaje) mensaje.textContent = `Nivel ${nivel} — ¡Tu turno (🔄 Al revés)!`;
+                    if (mensaje) mensaje.textContent = `Nivel ${nivel} — ¡Tu turno (Al revés)!`;
                 } else if (modo === 'extremo') {
                     if (mensaje) mensaje.textContent = `💀 Nivel ${nivel} — ¡Tu turno!`;
                 } else if (modo === 'hacker') {
                     if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} — ¡Tu turno hacker!`;
                 } else if (modo === 'relampago') {
-                    if (mensaje) mensaje.textContent = `⚡ ¡Tu turno (⚡ Rápido)!`;
+                    if (mensaje) mensaje.textContent = `⚡ ¡Tu turno (Rápido)!`;
                 } else if (modo === 'contrarreloj') {
                     if (mensaje) mensaje.textContent = `⏱️ ¡Tu turno! (Tienes 6 segundos)`;
                     iniciarContadorContrarreloj();
@@ -1813,7 +1854,6 @@
             timeoutsGrabacion.push(tFin);
         }
 
-        // Inicialización al cargar la página
         construirTablero();
         iniciarAtmosfera();
         const btnJugarEl = document.getElementById('btn-jugar');
