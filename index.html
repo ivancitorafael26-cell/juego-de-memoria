@@ -679,7 +679,7 @@
     <div class="modal-overlay" id="modal-logros">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2>🏆 Logros (<span id="contador-logros">0/12</span>)</h2>
+                <h2>🏆 Logros (<span id="contador-logros">0/18</span>)</h2>
                 <button class="btn-cerrar-x" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
             </div>
             <div class="lista-logros" id="lista-logros"></div>
@@ -842,10 +842,16 @@
 
         let timerPartidaInterval = null;
         let segundosPartida = 0;
+        let haJugadoPartida = false;
 
         let tamanoCuadricula = 2;
         let totalBloques = 4;
         let totalNotasTocadas = parseInt(localStorage.getItem('memoria_total_notas_v1')) || 0;
+
+        let toquesLibreSinGrabar = 0;
+        let toquesHacker = 0;
+        let firmaUltimaGrabacion = '';
+        let repeticionesConsecutivas = 0;
 
         let temporizadorTurno = null;
         let intervaloProgreso = null;
@@ -922,13 +928,19 @@
             { id: 'cerebro_titanio', icono: '🥈', nombre: 'Cerebro de Titanio', desc: 'Supera el nivel 6 en modo Normal.' },
             { id: 'memoria_fotografica', icono: '🥇', nombre: 'Memoria Fotográfica', desc: 'Llega al nivel 8 en cualquier modo.' },
             { id: 'hacker_maestro', icono: '💻', nombre: 'Hacker Maestro', desc: 'Llega al nivel 6 en modo Hacker.' },
-            { id: 'mete_al_reves', icono: '🔄', nombre: 'Mete al Revés', desc: 'Supera el nivel 6 en modo Invertido.' },
+            { id: 'mete_al_reves', icono: '🔄', nombre: 'Mente al Revés', desc: 'Supera el nivel 6 en modo Invertido.' },
             { id: 'bajo_presion', icono: '⏱️', nombre: 'Bajo Presión', desc: 'Gana el modo Contrarreloj llegando hasta el nivel 8.' },
             { id: 'estetico', icono: '🎨', nombre: 'Estético', desc: 'Prueba todos los sonidos y atmósferas.' },
             { id: 'jugador_frecuente', icono: '🌟', nombre: 'Jugador Frecuente', desc: 'Juega el juego 2 días seguidos.' },
             { id: 'compositor', icono: '🎵', nombre: 'Compositor', desc: 'Graba y reproduce una melodía en el Modo Libre.' },
             { id: 'gran_compositor', icono: '🎼', nombre: 'Gran Compositor', desc: 'Graba una melodía de 15 notas o más en el Modo Libre.' },
+            { id: 'cien_notas', icono: '🎵', nombre: 'Cien Notas', desc: 'Llega a 100 notas tocadas en total.' },
+            { id: 'quinientas_notas', icono: '🎶', nombre: 'Quinientas Notas', desc: 'Llega a 500 notas tocadas en total.' },
             { id: 'mil_notas', icono: '🎹', nombre: 'Mil Notas', desc: 'Toca 1,000 notas en total entre tus partidas.' },
+            { id: 'tecla_loca', icono: '🎹', nombre: 'Tecla Loca', desc: 'Toca 25 bloques en el Modo Libre sin estar grabando.' },
+            { id: 'repeticion', icono: '🔁', nombre: 'Repetición', desc: 'Reproduce tu misma melodía grabada 2 veces seguidas.' },
+            { id: 'modo_matrix', icono: '💻', nombre: 'Modo Matrix', desc: 'Activa el modo Hacker y toca al menos 10 bloques.' },
+            { id: 'curioso', icono: '👀', nombre: 'Curioso', desc: 'Abre Estadísticas o Logros después de jugar una partida.' },
             { id: 'cien_por_ciento', icono: '👑', nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
         ];
 
@@ -940,6 +952,18 @@
 
         let colaToasts = [];
         let mostrandoToast = false;
+
+        function verificarLogrosDeNotas() {
+            if (totalNotasTocadas >= 100) desbloquearLogro('cien_notas');
+            if (totalNotasTocadas >= 500) desbloquearLogro('quinientas_notas');
+            if (totalNotasTocadas >= 1000) desbloquearLogro('mil_notas');
+        }
+
+        function comprobarLogroCurioso() {
+            if (haJugadoPartida) {
+                desbloquearLogro('curioso');
+            }
+        }
 
         function desbloquearLogro(id) {
             if (logrosDesbloqueados[id]) return;
@@ -1014,6 +1038,7 @@
         }
 
         function abrirLogros() {
+            comprobarLogroCurioso();
             const modal = document.getElementById('modal-logros');
             const lista = document.getElementById('lista-logros');
             const contador = document.getElementById('contador-logros');
@@ -1082,10 +1107,7 @@
                 });
             }
 
-            if (totalNotasTocadas >= 1000) {
-                desbloquearLogro('mil_notas');
-            }
-
+            verificarLogrosDeNotas();
             iniciarAtmosfera();
             verificarProgresoEstetico();
         });
@@ -1306,9 +1328,7 @@
                 totalNotasTocadas++;
                 localStorage.setItem('memoria_total_notas_v1', totalNotasTocadas);
                 registrarNotaEstadistica(modoJuego, tamanoCuadricula);
-                if (totalNotasTocadas >= 1000) {
-                    desbloquearLogro('mil_notas');
-                }
+                verificarLogrosDeNotas();
             }
 
             if (estaSilenciado) return;
@@ -1418,6 +1438,8 @@
             nivel = 0;
             bloqueado = true;
             segundosPartida = 0;
+            toquesLibreSinGrabar = 0;
+            toquesHacker = 0;
 
             const crono = document.getElementById('cronometro-juego');
             if (crono) {
@@ -1427,6 +1449,8 @@
 
             esGrabando = false;
             notasGrabadas = [];
+            firmaUltimaGrabacion = '';
+            repeticionesConsecutivas = 0;
             const btnGrabar = document.getElementById('btn-grabar');
             const btnReproducir = document.getElementById('btn-reproducir');
             if (btnGrabar) {
@@ -1498,6 +1522,7 @@
                 return;
             }
 
+            haJugadoPartida = true;
             registrarDiaJugado();
 
             limpiarTimers();
@@ -1622,12 +1647,24 @@
                 iluminarBloque(indice, 220, false);
                 if (esGrabando) {
                     notasGrabadas.push({ bloque: indice, tiempo: Date.now() - tiempoInicioGrabacion });
+                } else {
+                    toquesLibreSinGrabar++;
+                    if (toquesLibreSinGrabar >= 25) {
+                        desbloquearLogro('tecla_loca');
+                    }
                 }
                 return;
             }
 
             if (bloqueado) return;
             iluminarBloque(indice, 220, true);
+
+            if (modoJuego === 'hacker') {
+                toquesHacker++;
+                if (toquesHacker >= 10) {
+                    desbloquearLogro('modo_matrix');
+                }
+            }
 
             if (indice === secuenciaObjetivo[pasoUsuario]) {
                 pasoUsuario++;
@@ -1717,6 +1754,8 @@
                 btn.classList.remove('grabando');
                 btn.textContent = '🔴 Grabar Melodía';
                 if (notasGrabadas.length > 0) {
+                    firmaUltimaGrabacion = notasGrabadas.map(n => n.bloque).join(',');
+                    repeticionesConsecutivas = 0;
                     btnReproducir.classList.add('visible');
                     if (notasGrabadas.length >= 15) {
                         desbloquearLogro('gran_compositor');
@@ -1731,6 +1770,17 @@
                 document.getElementById('mensaje').textContent = "⚠️ Primero graba una melodía";
                 return;
             }
+            const firmaActual = notasGrabadas.map(n => n.bloque).join(',');
+            if (firmaActual === firmaUltimaGrabacion) {
+                repeticionesConsecutivas++;
+            } else {
+                firmaUltimaGrabacion = firmaActual;
+                repeticionesConsecutivas = 1;
+            }
+            if (repeticionesConsecutivas >= 2) {
+                desbloquearLogro('repeticion');
+            }
+
             desbloquearLogro('compositor');
             if (notasGrabadas.length >= 15) {
                 desbloquearLogro('gran_compositor');
@@ -1775,6 +1825,7 @@
         }
 
         function abrirEstadisticas() {
+            comprobarLogroCurioso();
             const stats = obtenerDatosStats();
             const cuerpo = document.getElementById('cuerpo-estadisticas');
 
