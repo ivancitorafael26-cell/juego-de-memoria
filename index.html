@@ -327,6 +327,18 @@
             100% { transform: translate(-1px, 1px) scale(1); background-color: #ff4757; }
         }
 
+        .vibrar-error {
+            animation: vibrar-fallo 0.34s ease;
+        }
+
+        @keyframes vibrar-fallo {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px) rotate(-1deg); }
+            40% { transform: translateX(8px) rotate(1deg); }
+            60% { transform: translateX(-6px) rotate(-0.5deg); }
+            80% { transform: translateX(6px) rotate(0.5deg); }
+        }
+
         .panel-grabadora {
             display: none;
             opacity: 0;
@@ -867,6 +879,58 @@
         const listaEmojis = ['🚀', '🐱', '🌟', '🎮', '🔥', '⚡', '🤖', '👑', '🍕', '🎸', '🦄', '💎', '🍀', '🎯', '🐉'];
         let usuarioActual = { nombre: '', emoji: '' };
 
+        const PREFS_DEFAULT = {
+            atmosfera: '1',
+            sonido: '1',
+            temaColor: '0',
+            fondo: '#1a1a2e'
+        };
+
+        function obtenerPreferenciasVisuales() {
+            try {
+                const guardadas = JSON.parse(localStorage.getItem('memoria_prefs_visuales_v1'));
+                return Object.assign({}, PREFS_DEFAULT, guardadas || {});
+            } catch (e) {
+                return Object.assign({}, PREFS_DEFAULT);
+            }
+        }
+
+        function guardarPreferenciaVisual(clave, valor) {
+            const prefs = obtenerPreferenciasVisuales();
+            prefs[clave] = String(valor);
+            localStorage.setItem('memoria_prefs_visuales_v1', JSON.stringify(prefs));
+        }
+
+        function aplicarPreferenciasVisualesAlCargar() {
+            const prefs = obtenerPreferenciasVisuales();
+            const selAtmos = document.getElementById('selector-atmosfera');
+            const selSonido = document.getElementById('selector-sonido');
+            const selTema = document.getElementById('selector-color-bloques');
+            const selFondo = document.getElementById('selector-fondo-oscuro');
+
+            if (selAtmos) selAtmos.value = prefs.atmosfera;
+            if (selSonido) selSonido.value = prefs.sonido;
+            if (selTema) selTema.value = prefs.temaColor;
+            if (selFondo) selFondo.value = prefs.fondo;
+
+            document.documentElement.style.setProperty('--bg-color', prefs.fondo);
+            document.body.style.backgroundColor = prefs.fondo;
+            actualizarColoresTablero(false);
+        }
+
+        function activarVibracionError() {
+            const tableroCont = document.getElementById('tablero-contenedor');
+            if (tableroCont) {
+                tableroCont.classList.remove('vibrar-error');
+                void tableroCont.offsetWidth;
+                tableroCont.classList.add('vibrar-error');
+                setTimeout(() => tableroCont.classList.remove('vibrar-error'), 380);
+            }
+            if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+                navigator.vibrate([70, 40, 90]);
+            }
+        }
+
         // ==========================================
         // CONFETI LIGERO (NIVELES 5 Y 10)
         // ==========================================
@@ -1109,6 +1173,7 @@
                 });
             }
 
+            aplicarPreferenciasVisualesAlCargar();
             verificarLogrosDeNotas();
             iniciarAtmosfera();
             verificarProgresoEstetico();
@@ -1173,6 +1238,7 @@
         function aplicarFondoOscuro(select) {
             if (modoJuego === 'hacker' || !select) return;
             const colorElegido = select.value;
+            guardarPreferenciaVisual('fondo', colorElegido);
             document.documentElement.style.setProperty('--bg-color', colorElegido);
             document.body.style.backgroundColor = colorElegido;
         }
@@ -1228,10 +1294,13 @@
 
         function cambiarAtmosfera() {
             const selector = document.getElementById('selector-atmosfera');
-            if (selector && !progresoEstetico.atmosferas.includes(selector.value)) {
-                progresoEstetico.atmosferas.push(selector.value);
-                localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
-                verificarProgresoEstetico();
+            if (selector) {
+                guardarPreferenciaVisual('atmosfera', selector.value);
+                if (!progresoEstetico.atmosferas.includes(selector.value)) {
+                    progresoEstetico.atmosferas.push(selector.value);
+                    localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
+                    verificarProgresoEstetico();
+                }
             }
             iniciarAtmosfera();
         }
@@ -1317,10 +1386,13 @@
         }
 
         function cambiarSonidoSeleccionado(select) {
-            if (select && !progresoEstetico.sonidos.includes(select.value)) {
-                progresoEstetico.sonidos.push(select.value);
-                localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
-                verificarProgresoEstetico();
+            if (select) {
+                guardarPreferenciaVisual('sonido', select.value);
+                if (!progresoEstetico.sonidos.includes(select.value)) {
+                    progresoEstetico.sonidos.push(select.value);
+                    localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
+                    verificarProgresoEstetico();
+                }
             }
             reproducirSonido(0, false, false);
         }
@@ -1383,8 +1455,12 @@
             ['#2ed573', '#7bed9f', '#ffa502', '#eccc68', '#26de81', '#20bf6b', '#fed330', '#f7b731', '#a3cb38']
         ];
 
-        function actualizarColoresTablero() {
-            const temaIdx = parseInt(document.getElementById('selector-color-bloques').value, 10);
+        function actualizarColoresTablero(guardar = true) {
+            const selTema = document.getElementById('selector-color-bloques');
+            const temaIdx = parseInt(selTema.value, 10);
+            if (guardar && selTema) {
+                guardarPreferenciaVisual('temaColor', selTema.value);
+            }
             const paleta = temasColores[temaIdx] || temasColores[0];
             for (let i = 0; i < totalBloques; i++) {
                 const bloque = document.getElementById(`bloque-${i}`);
@@ -1621,6 +1697,7 @@
 
                 if (tiempoRestante <= 0) {
                     detenerBarraContrarreloj();
+                    activarVibracionError();
                     registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
                     finalizarPartida(false, "⏰ ¡Se acabó el tiempo!");
                 }
@@ -1711,6 +1788,7 @@
                 }
             } else {
                 reproducirSonido(indice, true, false);
+                activarVibracionError();
                 registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
                 finalizarPartida(false, `❌ ¡Fallaste en el nivel ${nivel}!`);
             }
@@ -1909,10 +1987,14 @@
             localStorage.removeItem('memoria_logros_v1');
             localStorage.removeItem('memoria_estetico_v1');
             localStorage.removeItem('memoria_dias_jugados_v1');
+            localStorage.removeItem('memoria_prefs_visuales_v1');
 
             totalNotasTocadas = 0;
             logrosDesbloqueados = {};
             progresoEstetico = { sonidos: ['1'], atmosferas: ['1'] };
+
+            aplicarPreferenciasVisualesAlCargar();
+            iniciarAtmosfera();
 
             cerrarConfirmacionBorrar();
             abrirEstadisticas();
