@@ -653,8 +653,9 @@
         <div class="modal-contenido" style="text-align: center;">
             <h2 style="margin-top: 0;">👋 ¡Bienvenido al Juego de Memoria!</h2>
             <p style="color: var(--subtext-color); font-size: 0.9rem; margin-bottom: 10px;">Ingresa tu nombre de usuario para comenzar:</p>
-            <input type="text" id="input-nombre-usuario" placeholder="Ej. AlexGamer" maxlength="16" style="width: 80%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.35); color: white; font-size: 1rem; text-align: center; outline: none; margin-bottom: 8px;">
-            <div style="color: #ff4757; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px;">⚠️ No Podras Cambiarlo Despues</div>
+            <input type="text" id="input-nombre-usuario" placeholder="Escribe tu nombre aquí..." maxlength="16" style="width: 80%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.35); color: white; font-size: 1rem; text-align: center; outline: none; margin-bottom: 8px;">
+            <div id="aviso-nombre-obligatorio" style="color: #ff4757; font-size: 0.82rem; font-weight: bold; margin-bottom: 12px; min-height: 18px;">⚠️ Debes escribir un nombre para continuar</div>
+            <div style="color: #ffa502; font-size: 0.78rem; font-weight: bold; margin-bottom: 15px;">⚠️ No podrás cambiarlo después</div>
             <br>
             <button class="btn-mini" type="button" onclick="guardarUsuario()" style="padding: 10px 25px; font-size: 0.95rem; background-color: #2ed573; color: white; border: none; border-radius: 20px;">¡Empezar a Jugar!</button>
         </div>
@@ -663,7 +664,7 @@
     <!-- Barra Superior Limpia -->
     <div class="barra-superior">
         <div class="grupo-controles">
-            <div id="badge-usuario" class="badge-modo" style="background-color: rgba(46, 213, 115, 0.2); color: #2ed573; border-color: rgba(46, 213, 115, 0.4);">👤 Jugador</div>
+            <div id="badge-usuario" class="badge-modo" style="background-color: rgba(46, 213, 115, 0.2); color: #2ed573; border-color: rgba(46, 213, 115, 0.4);">👤 Sin nombre</div>
         </div>
 
         <div class="grupo-controles">
@@ -678,7 +679,7 @@
     <div class="modal-overlay" id="modal-logros">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2>🏆 Logros (<span id="contador-logros">0/9</span>)</h2>
+                <h2>🏆 Logros (<span id="contador-logros">0/12</span>)</h2>
                 <button class="btn-cerrar-x" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
             </div>
             <div class="lista-logros" id="lista-logros"></div>
@@ -925,6 +926,9 @@
             { id: 'bajo_presion', icono: '⏱️', nombre: 'Bajo Presión', desc: 'Gana el modo Contrarreloj llegando hasta el nivel 8.' },
             { id: 'estetico', icono: '🎨', nombre: 'Estético', desc: 'Prueba todos los sonidos y atmósferas.' },
             { id: 'jugador_frecuente', icono: '🌟', nombre: 'Jugador Frecuente', desc: 'Juega el juego 2 días seguidos.' },
+            { id: 'compositor', icono: '🎵', nombre: 'Compositor', desc: 'Graba y reproduce una melodía en el Modo Libre.' },
+            { id: 'gran_compositor', icono: '🎼', nombre: 'Gran Compositor', desc: 'Graba una melodía de 15 notas o más en el Modo Libre.' },
+            { id: 'mil_notas', icono: '🎹', nombre: 'Mil Notas', desc: 'Toca 1,000 notas en total entre tus partidas.' },
             { id: 'cien_por_ciento', icono: '👑', nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
         ];
 
@@ -1049,13 +1053,37 @@
             const guardado = localStorage.getItem('memoria_usuario_v1');
             const modalUsuario = document.getElementById('modal-usuario');
             const badgeUsuario = document.getElementById('badge-usuario');
+            const inputNombre = document.getElementById('input-nombre-usuario');
 
             if (guardado) {
-                usuarioActual = JSON.parse(guardado);
-                if (modalUsuario) modalUsuario.classList.remove('activo');
-                if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
+                const parsed = JSON.parse(guardado);
+                if (parsed && parsed.nombre && parsed.nombre.trim().length > 0) {
+                    usuarioActual = parsed;
+                    if (modalUsuario) {
+                        modalUsuario.classList.remove('activo');
+                        modalUsuario.style.display = 'none';
+                    }
+                    if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
+                } else {
+                    if (modalUsuario) modalUsuario.classList.add('activo');
+                    if (inputNombre) inputNombre.focus();
+                }
             } else {
                 if (modalUsuario) modalUsuario.classList.add('activo');
+                if (inputNombre) inputNombre.focus();
+            }
+
+            if (inputNombre) {
+                inputNombre.addEventListener('input', () => {
+                    const aviso = document.getElementById('aviso-nombre-obligatorio');
+                    if (aviso) {
+                        aviso.textContent = inputNombre.value.trim().length > 0 ? '' : '⚠️ Debes escribir un nombre para continuar';
+                    }
+                });
+            }
+
+            if (totalNotasTocadas >= 1000) {
+                desbloquearLogro('mil_notas');
             }
 
             iniciarAtmosfera();
@@ -1066,12 +1094,21 @@
             const input = document.getElementById('input-nombre-usuario');
             const modalUsuario = document.getElementById('modal-usuario');
             const badgeUsuario = document.getElementById('badge-usuario');
+            const aviso = document.getElementById('aviso-nombre-obligatorio');
 
-            let nombreVal = input ? input.value.trim() : '';
+            const nombreVal = input ? input.value.trim() : '';
             if (!nombreVal) {
-                nombreVal = "Jugador";
+                if (aviso) {
+                    aviso.textContent = '⚠️ ¡Tienes que escribir un nombre! No puede quedar vacío.';
+                }
+                if (input) {
+                    input.focus();
+                    input.style.borderColor = '#ff4757';
+                }
+                return;
             }
 
+            if (input) input.style.borderColor = 'rgba(255,255,255,0.25)';
             const emojiAleatorio = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
             usuarioActual = { nombre: nombreVal, emoji: emojiAleatorio };
 
@@ -1189,7 +1226,6 @@
             }
 
             atmosParticles = [];
-            // Hojas: cantidad normal (16); Nieve y Brillitos: un poco más sin saturar (26)
             const count = tipo === 1 ? 16 : 26;
             const coloresHojas = ['#2ed573', '#26de81', '#20bf6b', '#4cd137'];
             const coloresBrillitos = ['#ffd700', '#fffa65', '#ffaf40', '#ffffff'];
@@ -1219,7 +1255,6 @@
                 ctxAtmos.globalAlpha = tipo === 3 ? (0.45 + Math.abs(Math.sin(p.angle)) * 0.5) : 0.65;
 
                 if (tipo === 1) {
-                    // Hoja normal alargada con inclinación suave
                     ctxAtmos.save();
                     ctxAtmos.translate(p.x, p.y);
                     ctxAtmos.rotate(Math.sin(p.angle) * 0.45);
@@ -1271,6 +1306,9 @@
                 totalNotasTocadas++;
                 localStorage.setItem('memoria_total_notas_v1', totalNotasTocadas);
                 registrarNotaEstadistica(modoJuego, tamanoCuadricula);
+                if (totalNotasTocadas >= 1000) {
+                    desbloquearLogro('mil_notas');
+                }
             }
 
             if (estaSilenciado) return;
@@ -1399,7 +1437,12 @@
                 btnReproducir.classList.remove('visible');
             }
 
-            document.getElementById('btn-jugar').disabled = false;
+            const btnJugar = document.getElementById('btn-jugar');
+            if (btnJugar) {
+                btnJugar.disabled = false;
+                btnJugar.style.display = modoJuego === 'libre' ? 'none' : 'inline-block';
+            }
+
             setControlesPartidaActivos(false);
             document.getElementById('mensaje').textContent = 'Presiona "Jugar" para empezar';
         }
@@ -1675,6 +1718,9 @@
                 btn.textContent = '🔴 Grabar Melodía';
                 if (notasGrabadas.length > 0) {
                     btnReproducir.classList.add('visible');
+                    if (notasGrabadas.length >= 15) {
+                        desbloquearLogro('gran_compositor');
+                    }
                 }
                 document.getElementById('mensaje').textContent = `✅ Melodía guardada (${notasGrabadas.length} notas)`;
             }
@@ -1684,6 +1730,10 @@
             if (notasGrabadas.length === 0) {
                 document.getElementById('mensaje').textContent = "⚠️ Primero graba una melodía";
                 return;
+            }
+            desbloquearLogro('compositor');
+            if (notasGrabadas.length >= 15) {
+                desbloquearLogro('gran_compositor');
             }
             document.getElementById('mensaje').textContent = "▶️ Reproduciendo melodía...";
             notasGrabadas.forEach(n => {
