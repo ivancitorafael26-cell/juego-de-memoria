@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego de Memoria</title>
+    <title>Juego de Memoria - Update 1.2</title>
     <!-- Logo / Favicon -->
     <link rel="icon" type="image/png" href="logo.png">
     
@@ -39,8 +40,8 @@
             position: relative;
         }
 
-        /* Canvas de Lluvia Binaria y Atmósfera */
-        #matrix-canvas, #atmosfera-canvas {
+        /* Canvas de Lluvia Binaria, Atmósfera y Confeti */
+        #matrix-canvas, #atmosfera-canvas, #confeti-canvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -61,6 +62,10 @@
 
         #atmosfera-canvas {
             z-index: 2;
+        }
+
+        #confeti-canvas {
+            z-index: 1500;
         }
 
         .barra-superior, .app-contenedor, .modal-overlay {
@@ -136,6 +141,7 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .btn-mini {
@@ -178,6 +184,55 @@
             justify-content: center;
         }
 
+        /* Notificación flotante de Logro Desbloqueado */
+        .toast-logro {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(22, 33, 62, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid #ffd700;
+            border-radius: 16px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.35);
+            z-index: 2000;
+            transform: translateY(150%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast-logro.mostrar {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-logro-icono {
+            font-size: 1.8rem;
+        }
+
+        .toast-logro-texto {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toast-logro-titulo {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffd700;
+            font-weight: 800;
+        }
+
+        .toast-logro-nombre {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
         .app-contenedor {
             display: flex;
             flex-direction: column;
@@ -187,12 +242,34 @@
             box-sizing: border-box;
         }
 
-        h1 {
+        .titulo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
             margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            margin: 0;
             font-size: 1.8rem;
             letter-spacing: 1px;
             text-align: center;
+        }
+
+        .badge-version {
+            background: linear-gradient(135deg, #3742fa, #5352ed);
+            color: #ffffff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 12px rgba(55, 66, 250, 0.35);
+            text-transform: uppercase;
         }
 
         .contenedor-info-partida {
@@ -290,7 +367,8 @@
         .btn-grabadora:hover { transform: scale(1.05); }
         #btn-grabar { background-color: #ff4757; color: white; }
         #btn-grabar.grabando { background-color: #c0392b; animation: pulse 1s infinite; }
-        #btn-reproducir { background-color: #2ed573; color: white; }
+        #btn-reproducir { background-color: #2ed573; color: white; display: none; }
+        #btn-reproducir.visible { display: inline-block; }
 
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -521,76 +599,80 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
-        .grid-modos-stats {
+        .selector-fondo-oscuro {
+            display: none;
+            margin-top: 4px;
+        }
+
+        .selector-fondo-oscuro.visible {
+            display: block;
+        }
+
+        /* Estilos de tarjetas de Logros */
+        .lista-logros {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
-        .card-modo-stat {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 10px 12px;
-            backdrop-filter: blur(4px);
-        }
-
-        .card-modo-stat h3 {
-            margin: 0 0 8px 0;
-            font-size: 0.95rem;
-            color: var(--subtext-color);
-            font-weight: 700;
-        }
-
-        .grid-dificultades {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-        }
-
-        .item-dif {
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 8px;
-            padding: 6px 4px;
-            text-align: center;
-            font-size: 0.75rem;
-        }
-
-        .item-dif .dif-titulo {
-            font-weight: 700;
-            margin-bottom: 4px;
-            color: var(--text-color);
-            font-size: 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            padding-bottom: 2px;
-        }
-
-        .item-dif div {
-            line-height: 1.3;
-        }
-
-        .item-dif span {
-            font-weight: 600;
-            color: var(--subtext-color);
-        }
-
-        .grid-extremo-stat {
+        .item-logro {
             display: flex;
-            justify-content: space-around;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            font-size: 0.8rem;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.55;
+            filter: grayscale(85%);
+            transition: all 0.3s ease;
         }
 
-        .grid-extremo-stat div {
-            line-height: 1.3;
+        .item-logro.desbloqueado {
+            opacity: 1;
+            filter: grayscale(0%);
+            background: rgba(255, 215, 0, 0.14);
+            border-color: rgba(255, 215, 0, 0.55);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15);
         }
 
-        .grid-extremo-stat span {
-            font-weight: 600;
+        .logro-icono {
+            font-size: 1.7rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .logro-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .logro-nombre {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            margin-bottom: 2px;
+        }
+
+        .item-logro.desbloqueado .logro-nombre {
+            color: #ffd700;
+        }
+
+        .logro-desc {
+            font-size: 0.78rem;
             color: var(--subtext-color);
+            line-height: 1.25;
+        }
+
+        .logro-estado {
+            font-size: 1.1rem;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -598,6 +680,16 @@
 
     <canvas id="matrix-canvas"></canvas>
     <canvas id="atmosfera-canvas"></canvas>
+    <canvas id="confeti-canvas"></canvas>
+
+    <!-- Notificación Toast de Logro Desbloqueado -->
+    <div class="toast-logro" id="toast-logro">
+        <div class="toast-logro-icono" id="toast-logro-icono">🏆</div>
+        <div class="toast-logro-texto">
+            <span class="toast-logro-titulo">¡Logro Desbloqueado!</span>
+            <span class="toast-logro-nombre" id="toast-logro-nombre">Nombre del logro</span>
+        </div>
+    </div>
 
     <!-- Modal de Nombre de Usuario (Primera Vez / Nuevo Dispositivo) -->
     <div class="modal-overlay" id="modal-usuario">
@@ -618,13 +710,25 @@
         </div>
 
         <div class="grupo-controles">
+            <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
             <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;">⚙️ Configuración</button>
         </div>
     </div>
 
-    <!-- Modal de Configuración (Solo se cierra con la X) -->
+    <!-- Modal de Logros (Solo se cierra con la X) -->
+    <div class="modal-overlay" id="modal-logros">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>🏆 Logros (<span id="contador-logros">0/9</span>)</h2>
+                <button class="btn-cerrar-x" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
+            </div>
+            <div class="lista-logros" id="lista-logros"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Configuración con Emojis -->
     <div class="modal-overlay" id="modal-configuracion">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -635,65 +739,74 @@
             <div class="grupo-opcion-config">
                 <label>🟢 Dificultad</label>
                 <select id="selector-dificultad" class="btn-mini" onchange="cambiarDificultad(this)">
-                    <option value="2">Fácil (2x2)</option>
-                    <option value="3">Medio (3x3)</option>
-                    <option value="4">Difícil (4x4)</option>
+                    <option value="2">🟢 Fácil (2x2)</option>
+                    <option value="3">🟡 Medio (3x3)</option>
+                    <option value="4">🔴 Difícil (4x4)</option>
                 </select>
             </div>
 
             <div class="grupo-opcion-config">
                 <label>🎮 Modo de Juego</label>
                 <select id="selector-modo" class="btn-mini" onchange="cambiarModoJuego(this)">
-                    <option value="normal">Normal</option>
-                    <option value="invertido">Invertido</option>
-                    <option value="relampago">Relámpago</option>
-                    <option value="contrarreloj">Contrarreloj</option>
-                    <option value="libre">Libre (5x5)</option>
-                    <option value="extremo">Extremo</option>
-                    <option value="hacker">Hacker</option>
+                    <option value="normal">▶️ Normal</option>
+                    <option value="invertido">🔄 Invertido</option>
+                    <option value="relampago">⚡ Relámpago</option>
+                    <option value="contrarreloj">⏱️ Contrarreloj</option>
+                    <option value="libre">🎵 Libre (5x5)</option>
+                    <option value="extremo">🔥 Extremo</option>
+                    <option value="hacker">💻 Hacker</option>
                 </select>
             </div>
 
             <div class="grupo-opcion-config">
                 <label>🍃 Efectos Atmosféricos</label>
                 <select id="selector-atmosfera" class="btn-mini" onchange="cambiarAtmosfera()">
-                    <option value="0">Ninguno</option>
-                    <option value="1" selected>Hojas</option>
-                    <option value="2">Nieve</option>
-                    <option value="3">Brillitos</option>
+                    <option value="0">❌ Ninguno</option>
+                    <option value="1" selected>🍃 Hojas</option>
+                    <option value="2">❄️ Nieve</option>
+                    <option value="3">✨ Brillitos</option>
                 </select>
             </div>
 
             <div class="grupo-opcion-config">
                 <label>🎹 Instrumento / Sonido</label>
-                <select id="selector-sonido" class="btn-mini" onchange="reproducirSonido(0, false)">
-                    <option value="1" selected>Campanas</option>
-                    <option value="3">Retro</option>
-                    <option value="5">Guitarra</option>
-                    <option value="7">Láser</option>
-                    <option value="8">Arcade</option>
+                <select id="selector-sonido" class="btn-mini" onchange="cambiarSonidoSeleccionado(this)">
+                    <option value="1" selected>🔔 Campanas</option>
+                    <option value="3">🕹️ Retro</option>
+                    <option value="5">🎸 Guitarra</option>
+                    <option value="7">⚡ Láser</option>
+                    <option value="8">👾 Arcade</option>
                 </select>
             </div>
 
             <div class="grupo-opcion-config">
                 <label>🎨 Tema de Colores</label>
                 <select id="selector-color-bloques" class="btn-mini" onchange="actualizarColoresTablero()">
-                    <option value="0">Neón</option>
-                    <option value="1">Pastel</option>
-                    <option value="2">Atardecer</option>
-                    <option value="3">Océano</option>
-                    <option value="4">Bosque</option>
+                    <option value="0">🌈 Neón</option>
+                    <option value="1">🧁 Pastel</option>
+                    <option value="2">🌅 Atardecer</option>
+                    <option value="3">🌊 Océano</option>
+                    <option value="4">🌲 Bosque</option>
                 </select>
             </div>
 
             <div class="grupo-opcion-config" style="margin-bottom: 0;">
                 <label>🖼️ Fondo de Pantalla</label>
-                <button class="btn-mini" type="button" onclick="cambiarFondo()">Cambiar Color de Fondo</button>
+                <button class="btn-mini" type="button" onclick="toggleListaFondo()">🖼️ Cambiar Color de Fondo</button>
+                <select id="selector-fondo-oscuro" class="btn-mini selector-fondo-oscuro" onchange="aplicarFondoOscuro(this)">
+                    <option value="#1a1a2e">🌌 Azul Noche (Por defecto)</option>
+                    <option value="#450a0a">🟥 Rojo Oscuro</option>
+                    <option value="#431407">🟧 Naranja Oscuro</option>
+                    <option value="#422006">🟨 Amarillo Oscuro</option>
+                    <option value="#052e16">🟩 Verde Oscuro</option>
+                    <option value="#172554">🟦 Azul Oscuro</option>
+                    <option value="#2e1065">🟪 Morado Oscuro</option>
+                </select>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Estadísticas (Solo se cierra con la X) -->
+    <!-- Modal de Estadísticas -->
     <div class="modal-overlay" id="modal-estadisticas">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -702,15 +815,33 @@
             </div>
             <div id="cuerpo-estadisticas"></div>
             <div style="margin-top: 15px;">
-                <button class="btn-mini" type="button" onclick="reiniciarEstadisticas()" style="width: 100%; background-color: rgba(255, 71, 87, 0.7); color: white; padding: 9px;">🗑️ Borrar Datos</button>
+                <button class="btn-mini" type="button" onclick="abrirConfirmacionBorrar()" style="width: 100%; background-color: rgba(255, 71, 87, 0.7); color: white; padding: 9px;">🗑️ Borrar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Advertencia al Borrar Datos -->
+    <div class="modal-overlay" id="modal-confirmar-borrar" style="z-index: 1200;">
+        <div class="modal-contenido" style="text-align: center; max-width: 360px;">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">⚠️</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #ff4757;">Advertencia</h2>
+            <p style="color: #ffffff; font-size: 0.95rem; font-weight: 600; margin-bottom: 20px; line-height: 1.4;">
+                Vas a borrar tus datos de notas y logros
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-mini" type="button" onclick="cerrarConfirmacionBorrar()" style="flex: 1; padding: 10px; background-color: rgba(255, 255, 255, 0.15);">Cancelar</button>
+                <button class="btn-mini" type="button" onclick="confirmarBorradoDatos()" style="flex: 1; padding: 10px; background-color: #ff4757; color: white; border: none;">Sí, borrar</button>
             </div>
         </div>
     </div>
 
     <div class="app-contenedor" id="app-contenedor">
-        <h1 id="titulo-principal">Juego de Memoria</h1>
+        <div class="titulo-wrapper">
+            <h1 id="titulo-principal">Juego de Memoria</h1>
+            <span class="badge-version">Update 1.2</span>
+        </div>
         <div class="contenedor-info-partida">
-            <div class="badge-modo" id="badge-modo">Modo = Normal</div>
+            <div class="badge-modo" id="badge-modo">Modo = ▶️ Normal</div>
             <div class="badge-modo" id="cronometro-juego" style="display: none;">⏱️ 00:00</div>
         </div>
         <div id="mensaje">Presiona "Jugar" para empezar</div>
@@ -731,12 +862,12 @@
             <div class="tablero" id="tablero">
                 <div class="bloque" id="bloque-0" style="background-color: #ff4757; color: #ff4757;" onclick="manejarClicBloque(0)"></div>
                 <div class="bloque" id="bloque-1" style="background-color: #05d9e8; color: #05d9e8;" onclick="manejarClicBloque(1)"></div>
-                <div class="bloque" id="bloque-2" style="background-color: #d1f7ff; color: #d1f7ff;" onclick="manejarClicBloque(2)"></div>
-                <div class="bloque" id="bloque-3" style="background-color: #7700a6; color: #7700a6;" onclick="manejarClicBloque(3)"></div>
+                <div class="bloque" id="bloque-2" style="background-color: #2ed573; color: #2ed573;" onclick="manejarClicBloque(2)"></div>
+                <div class="bloque" id="bloque-3" style="background-color: #ffa502; color: #ffa502;" onclick="manejarClicBloque(3)"></div>
             </div>
         </div>
 
-        <button id="btn-jugar" type="button">Jugar</button>
+        <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar</button>
     </div>
 
     <script>
@@ -745,15 +876,18 @@
         let pasoUsuario = 0;
         let bloqueado = true;
         let nivel = 0;
+        const NIVEL_FINAL = 10;
         let audioCtx = null;
         let timeouts = [];
         let estaSilenciado = false;
+        let modoJuego = 'normal';
 
         let timerPartidaInterval = null;
         let segundosPartida = 0;
 
         let tamanoCuadricula = 2;
         let totalBloques = 4;
+        let totalNotasTocadas = parseInt(localStorage.getItem('memoria_total_notas_v1')) || 0;
 
         let temporizadorTurno = null;
         let intervaloProgreso = null;
@@ -769,6 +903,197 @@
         const listaEmojis = ['🚀', '🐱', '🌟', '🎮', '🔥', '⚡', '🤖', '👑', '🍕', '🎸', '🦄', '💎', '🍀', '🎯', '🐉'];
         let usuarioActual = { nombre: '', emoji: '' };
 
+        // ==========================================
+        // CONFETI DE CELEBRACIÓN (NIVELES 5 Y 10)
+        // ==========================================
+        const canvasConfeti = document.getElementById('confeti-canvas');
+        const ctxConfeti = canvasConfeti.getContext('2d');
+        let particulasConfeti = [];
+        let confetiAnimId = null;
+
+        function lanzarConfeti() {
+            canvasConfeti.width = window.innerWidth;
+            canvasConfeti.height = window.innerHeight;
+            particulasConfeti = [];
+
+            const colores = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ffd700', '#ff6b81', '#05d9e8', '#a29bfe'];
+            for (let i = 0; i < 120; i++) {
+                particulasConfeti.push({
+                    x: Math.random() * canvasConfeti.width,
+                    y: Math.random() * -canvasConfeti.height * 0.5,
+                    w: Math.random() * 10 + 6,
+                    h: Math.random() * 6 + 4,
+                    color: colores[Math.floor(Math.random() * colores.length)],
+                    speedY: Math.random() * 3.5 + 2.5,
+                    speedX: Math.random() * 4 - 2,
+                    rotation: Math.random() * 360,
+                    rotSpeed: Math.random() * 10 - 5
+                });
+            }
+
+            if (confetiAnimId) cancelAnimationFrame(confetiAnimId);
+            animarConfeti();
+        }
+
+        function animarConfeti() {
+            ctxConfeti.clearRect(0, 0, canvasConfeti.width, canvasConfeti.height);
+            let activas = 0;
+
+            particulasConfeti.forEach(p => {
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.rotation += p.rotSpeed;
+
+                if (p.y < canvasConfeti.height + 30) {
+                    activas++;
+                    ctxConfeti.save();
+                    ctxConfeti.translate(p.x, p.y);
+                    ctxConfeti.rotate((p.rotation * Math.PI) / 180);
+                    ctxConfeti.fillStyle = p.color;
+                    ctxConfeti.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctxConfeti.restore();
+                }
+            });
+
+            if (activas > 0) {
+                confetiAnimId = requestAnimationFrame(animarConfeti);
+            } else {
+                ctxConfeti.clearRect(0, 0, canvasConfeti.width, canvasConfeti.height);
+            }
+        }
+
+        // ==========================================
+        // SISTEMA DE LOGROS
+        // ==========================================
+        const DEFINICION_LOGROS = [
+            { id: 'primeros_pasos', icono: '🥉', nombre: 'Primeros Pasos', desc: 'Supera el nivel 3 en modo Normal.' },
+            { id: 'cerebro_titanio', icono: '🥈', nombre: 'Cerebro de Titanio', desc: 'Supera el nivel 6 en modo Normal.' },
+            { id: 'memoria_fotografica', icono: '🥇', nombre: 'Memoria Fotográfica', desc: 'Llega al nivel 8 en cualquier modo.' },
+            { id: 'hacker_maestro', icono: '💻', nombre: 'Hacker Maestro', desc: 'Llega al nivel 6 en modo Hacker.' },
+            { id: 'mete_al_reves', icono: '🔄', nombre: 'Mete al Revés', desc: 'Supera el nivel 6 en modo Invertido.' },
+            { id: 'bajo_presion', icono: '⏱️', nombre: 'Bajo Presión', desc: 'Gana el modo Contrarreloj llegando hasta el nivel 8.' },
+            { id: 'estetico', icono: '🎨', nombre: 'Estético', desc: 'Prueba todos los sonidos y atmósferas.' },
+            { id: 'jugador_frecuente', icono: '🌟', nombre: 'Jugador Frecuente', desc: 'Juega el juego 2 días seguidos.' },
+            { id: 'cien_por_ciento', icono: '👑', nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
+        ];
+
+        let logrosDesbloqueados = JSON.parse(localStorage.getItem('memoria_logros_v1')) || {};
+        let progresoEstetico = JSON.parse(localStorage.getItem('memoria_estetico_v1')) || {
+            sonidos: ['1'],
+            atmosferas: ['1']
+        };
+
+        let colaToasts = [];
+        let mostrandoToast = false;
+
+        function desbloquearLogro(id) {
+            if (logrosDesbloqueados[id]) return;
+            logrosDesbloqueados[id] = true;
+            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+
+            const info = DEFINICION_LOGROS.find(l => l.id === id);
+            if (info) {
+                colaToasts.push(info);
+                procesarColaToasts();
+            }
+
+            if (id !== 'cien_por_ciento') {
+                const otros = DEFINICION_LOGROS.filter(l => l.id !== 'cien_por_ciento');
+                const todosCompletos = otros.every(l => logrosDesbloqueados[l.id]);
+                if (todosCompletos) {
+                    setTimeout(() => desbloquearLogro('cien_por_ciento'), 600);
+                }
+            }
+        }
+
+        function procesarColaToasts() {
+            if (mostrandoToast || colaToasts.length === 0) return;
+            mostrandoToast = true;
+
+            const logro = colaToasts.shift();
+            const toast = document.getElementById('toast-logro');
+            document.getElementById('toast-logro-icono').textContent = logro.icono;
+            document.getElementById('toast-logro-nombre').textContent = logro.nombre;
+
+            toast.classList.add('mostrar');
+            setTimeout(() => {
+                toast.classList.remove('mostrar');
+                setTimeout(() => {
+                    mostrandoToast = false;
+                    procesarColaToasts();
+                }, 450);
+            }, 3200);
+        }
+
+        function verificarProgresoEstetico() {
+            const todosSonidos = ['1', '3', '5', '7', '8'].every(s => progresoEstetico.sonidos.includes(s));
+            const todasAtmosferas = ['0', '1', '2', '3'].every(a => progresoEstetico.atmosferas.includes(a));
+            if (todosSonidos && todasAtmosferas) {
+                desbloquearLogro('estetico');
+            }
+        }
+
+        function registrarDiaJugado() {
+            const hoy = new Date();
+            const hoyStr = `${hoy.getFullYear()}-${hoy.getMonth() + 1}-${hoy.getDate()}`;
+            const datosDias = JSON.parse(localStorage.getItem('memoria_dias_jugados_v1')) || { ultimoDia: '', racha: 0 };
+
+            if (datosDias.ultimoDia === hoyStr) return;
+
+            const ayer = new Date(hoy);
+            ayer.setDate(hoy.getDate() - 1);
+            const ayerStr = `${ayer.getFullYear()}-${ayer.getMonth() + 1}-${ayer.getDate()}`;
+
+            if (datosDias.ultimoDia === ayerStr) {
+                datosDias.racha += 1;
+            } else {
+                datosDias.racha = 1;
+            }
+
+            datosDias.ultimoDia = hoyStr;
+            localStorage.setItem('memoria_dias_jugados_v1', JSON.stringify(datosDias));
+
+            if (datosDias.racha >= 2) {
+                desbloquearLogro('jugador_frecuente');
+            }
+        }
+
+        function abrirLogros() {
+            const modal = document.getElementById('modal-logros');
+            const lista = document.getElementById('lista-logros');
+            const contador = document.getElementById('contador-logros');
+
+            let totalDesbloqueados = 0;
+            lista.innerHTML = '';
+
+            DEFINICION_LOGROS.forEach(logro => {
+                const desb = !!logrosDesbloqueados[logro.id];
+                if (desb) totalDesbloqueados++;
+
+                const div = document.createElement('div');
+                div.className = `item-logro ${desb ? 'desbloqueado' : ''}`;
+                div.innerHTML = `
+                    <div class="logro-icono">${logro.icono}</div>
+                    <div class="logro-info">
+                        <div class="logro-nombre">${logro.nombre}</div>
+                        <div class="logro-desc">${logro.desc}</div>
+                    </div>
+                    <div class="logro-estado">${desb ? '✅' : '🔒'}</div>
+                `;
+                lista.appendChild(div);
+            });
+
+            contador.textContent = `${totalDesbloqueados}/${DEFINICION_LOGROS.length}`;
+            modal.classList.add('activo');
+        }
+
+        function cerrarLogros() {
+            document.getElementById('modal-logros').classList.remove('activo');
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN Y USUARIO
+        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const guardado = localStorage.getItem('memoria_usuario_v1');
             const modalUsuario = document.getElementById('modal-usuario');
@@ -781,6 +1106,9 @@
             } else {
                 if (modalUsuario) modalUsuario.classList.add('activo');
             }
+
+            iniciarAtmosfera();
+            verificarProgresoEstetico();
         });
 
         function guardarUsuario() {
@@ -815,9 +1143,31 @@
             if (modal) modal.classList.remove('activo');
         }
 
-        const fondosOscuros = ['#1a1a2e', '#1e1b4b', '#064e3b', '#31102f', '#18181b', '#2e0854', '#581c87'];
-        let indiceFondo = 0;
+        function setControlesPartidaActivos(enPartida) {
+            const btnStats = document.getElementById('btn-estadisticas-top');
+            const btnConfig = document.getElementById('btn-config');
+            if (btnStats) btnStats.disabled = enPartida;
+            if (btnConfig) btnConfig.disabled = enPartida;
+        }
 
+        function toggleListaFondo() {
+            if (modoJuego === 'hacker') return;
+            const selectorFondo = document.getElementById('selector-fondo-oscuro');
+            if (selectorFondo) {
+                selectorFondo.classList.toggle('visible');
+            }
+        }
+
+        function aplicarFondoOscuro(select) {
+            if (modoJuego === 'hacker' || !select) return;
+            const colorElegido = select.value;
+            document.documentElement.style.setProperty('--bg-color', colorElegido);
+            document.body.style.backgroundColor = colorElegido;
+        }
+
+        // ==========================================
+        // MATRIZ HACKER Y ATMÓSFERAS
+        // ==========================================
         const canvasMatrix = document.getElementById('matrix-canvas');
         const ctxMatrix = canvasMatrix.getContext('2d');
         let matrixInterval = null;
@@ -867,6 +1217,16 @@
         let atmosParticles = [];
         let atmosAnimId = null;
 
+        function cambiarAtmosfera() {
+            const selector = document.getElementById('selector-atmosfera');
+            if (selector && !progresoEstetico.atmosferas.includes(selector.value)) {
+                progresoEstetico.atmosferas.push(selector.value);
+                localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
+                verificarProgresoEstetico();
+            }
+            iniciarAtmosfera();
+        }
+
         function iniciarAtmosfera() {
             canvasAtmos.width = window.innerWidth;
             canvasAtmos.height = window.innerHeight;
@@ -892,10 +1252,8 @@
                     size: Math.random() * 8 + 5,
                     speedY: tipo === 1 ? (Math.random() * 1.2 + 0.4) : (tipo === 2 ? (Math.random() * 2 + 1) : (Math.random() * 0.8 - 0.4)),
                     speedX: tipo === 1 ? (Math.random() * 1.5 - 0.75) : (tipo === 2 ? (Math.random() * 0.5 - 0.25) : (Math.random() * 1.5 - 0.75)),
-                    rotation: Math.random() * 360,
-                    rotSpeed: Math.random() * 2 - 1,
-                    opacity: Math.random() * 0.6 + 0.3,
-                    color: tipo === 1 ? coloresHojas[Math.floor(Math.random() * coloresHojas.length)] : (tipo === 2 ? '#ffffff' : coloresBrillitos[Math.floor(Math.random() * coloresBrillitos.length)])
+                    color: tipo === 1 ? coloresHojas[i % coloresHojas.length] : (tipo === 2 ? '#ffffff' : coloresBrillitos[i % coloresBrillitos.length]),
+                    angle: Math.random() * Math.PI * 2
                 });
             }
 
@@ -905,1017 +1263,604 @@
 
         function animarAtmosfera(tipo) {
             ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
-
             atmosParticles.forEach(p => {
-                p.y += p.speedY;
-                p.x += p.speedX + Math.sin(p.y * 0.02) * 0.5;
-                p.rotation += p.rotSpeed;
-
-                if (p.y > canvasAtmos.height + 20) {
-                    p.y = -20;
-                    p.x = Math.random() * canvasAtmos.width;
-                }
-                if (p.x > canvasAtmos.width + 20) p.x = -20;
-                if (p.x < -20) p.x = canvasAtmos.width + 20;
-
                 ctxAtmos.save();
                 ctxAtmos.translate(p.x, p.y);
-                ctxAtmos.rotate((p.rotation * Math.PI) / 180);
-                ctxAtmos.globalAlpha = p.opacity;
+                ctxAtmos.rotate(p.angle);
+                ctxAtmos.fillStyle = p.color;
+                ctxAtmos.globalAlpha = tipo === 3 ? (0.4 + Math.abs(Math.sin(p.angle)) * 0.6) : 0.65;
 
                 if (tipo === 1) {
-                    ctxAtmos.fillStyle = p.color;
                     ctxAtmos.beginPath();
-                    ctxAtmos.ellipse(0, 0, p.size, p.size / 2.2, Math.PI / 4, 0, Math.PI * 2);
+                    ctxAtmos.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
                     ctxAtmos.fill();
-                } else if (tipo === 2) {
-                    ctxAtmos.fillStyle = p.color;
+                } else {
                     ctxAtmos.beginPath();
                     ctxAtmos.arc(0, 0, p.size / 2, 0, Math.PI * 2);
                     ctxAtmos.fill();
-                } else if (tipo === 3) {
-                    let grad = ctxAtmos.createRadialGradient(0, 0, 0, 0, 0, p.size);
-                    grad.addColorStop(0, p.color);
-                    grad.addColorStop(1, 'transparent');
-                    ctxAtmos.fillStyle = grad;
-                    ctxAtmos.beginPath();
-                    ctxAtmos.arc(0, 0, p.size, 0, Math.PI * 2);
-                    ctxAtmos.fill();
                 }
-
                 ctxAtmos.restore();
+
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.angle += 0.02;
+
+                if (p.y > canvasAtmos.height + 15) {
+                    p.y = -15;
+                    p.x = Math.random() * canvasAtmos.width;
+                }
+                if (p.x > canvasAtmos.width + 15) p.x = -15;
+                if (p.x < -15) p.x = canvasAtmos.width + 15;
             });
 
             atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
         }
 
-        function cambiarAtmosfera() {
-            iniciarAtmosfera();
-        }
-
-        window.addEventListener('resize', () => {
-            if (document.body.classList.contains('modo-hacker')) {
-                canvasMatrix.width = window.innerWidth;
-                canvasMatrix.height = window.innerHeight;
-            }
-            canvasAtmos.width = window.innerWidth;
-            canvasAtmos.height = window.innerHeight;
-        });
-
-        function dispararConfetti() {
-            const contenedor = document.createElement('div');
-            contenedor.style.position = 'fixed';
-            contenedor.style.top = '0';
-            contenedor.style.left = '0';
-            contenedor.style.width = '100vw';
-            contenedor.style.height = '100vh';
-            contenedor.style.pointerEvents = 'none';
-            contenedor.style.zIndex = '9999';
-            document.body.appendChild(contenedor);
-
-            const colores = ['#ff4757', '#2ed573', '#ffa502', '#3742fa', '#ff6b81', '#70a1ff', '#eccc68', '#00ff00'];
-            for (let i = 0; i < 70; i++) {
-                const particula = document.createElement('div');
-                particula.style.position = 'absolute';
-                particula.style.width = `${Math.random() * 10 + 6}px`;
-                particula.style.height = `${Math.random() * 10 + 6}px`;
-                particula.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
-                particula.style.top = '50%';
-                particula.style.left = '50%';
-                particula.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-                particula.style.opacity = '1';
-                contenedor.appendChild(particula);
-
-                const angulo = Math.random() * Math.PI * 2;
-                const velocidad = Math.random() * 180 + 60;
-                const destX = Math.cos(angulo) * velocidad;
-                const destY = Math.sin(angulo) * velocidad - 80;
-
-                particula.animate([
-                    { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1 },
-                    { transform: `translate(${destX}px, ${destY + 180}px) scale(0.3) rotate(${Math.random() * 360}deg)`, opacity: 0 }
-                ], {
-                    duration: 1800 + Math.random() * 800,
-                    easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
-                });
-            }
-
-            setTimeout(() => {
-                contenedor.remove();
-            }, 2600);
-        }
-
-        function mostrarBannerNivel(nivelAlcanzado) {
-            const esHacker = document.body.classList.contains('modo-hacker');
-            const banner = document.createElement('div');
-            banner.textContent = `🎉 ¡Llegaste al nivel ${nivelAlcanzado}! 🎉`;
-            banner.style.position = 'fixed';
-            banner.style.top = '18%';
-            banner.style.left = '50%';
-            banner.style.transform = 'translate(-50%, -50%) scale(0.4)';
-            banner.style.backgroundColor = esHacker ? 'rgba(0, 20, 0, 0.95)' : 'rgba(22, 33, 62, 0.95)';
-            banner.style.color = esHacker ? '#00ff00' : '#ffbe0b';
-            banner.style.border = `2px solid ${esHacker ? '#00ff00' : '#ffbe0b'}`;
-            banner.style.padding = '14px 28px';
-            banner.style.borderRadius = '35px';
-            banner.style.fontSize = '1.3rem';
-            banner.style.fontWeight = 'bold';
-            banner.style.zIndex = '10000';
-            banner.style.boxShadow = esHacker ? '0 0 25px rgba(0, 255, 0, 0.6)' : '0 10px 30px rgba(0,0,0,0.6)';
-            banner.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            document.body.appendChild(banner);
-
-            setTimeout(() => {
-                banner.style.transform = 'translate(-50%, -50%) scale(1)';
-            }, 50);
-
-            setTimeout(() => {
-                banner.style.transform = 'translate(-50%, -50%) scale(0.4)';
-                banner.style.opacity = '0';
-                setTimeout(() => banner.remove(), 400);
-            }, 2200);
-
-            dispararConfetti();
-        }
-
-        let estadisticasBase = {
-            normal: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
-            invertido: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
-            relampago: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
-            contrarreloj: { '2': { nivel: 0, derrotas: 0, notas: 0 }, '3': { nivel: 0, derrotas: 0, notas: 0 }, '4': { nivel: 0, derrotas: 0, notas: 0 } },
-            extremo: { nivel: 0, derrotas: 0, notas: 0 },
-            hacker: { nivel: 0, derrotas: 0, notas: 0 }
-        };
-
-        let estadisticas = (() => {
-            try {
-                let guardado = JSON.parse(localStorage.getItem('memoria_stats_v14'));
-                if (!guardado) return JSON.parse(JSON.stringify(estadisticasBase));
-                for (let m in estadisticasBase) {
-                    if (!guardado[m]) guardado[m] = estadisticasBase[m];
-                    if (m !== 'extremo' && m !== 'hacker') {
-                        for (let d in estadisticasBase[m]) {
-                            if (!guardado[m][d]) guardado[m][d] = estadisticasBase[m][d];
-                        }
-                    }
-                }
-                return guardado;
-            } catch (e) {
-                return JSON.parse(JSON.stringify(estadisticasBase));
-            }
-        })();
-
-        function guardarStats() {
-            try {
-                localStorage.setItem('memoria_stats_v14', JSON.stringify(estadisticas));
-            } catch (e) {}
-        }
-
+        // ==========================================
+        // SONIDOS Y AUDIO
+        // ==========================================
         function toggleSilenciar() {
             estaSilenciado = !estaSilenciado;
-            const btn = document.getElementById('btn-silenciar');
-            if (btn) btn.textContent = estaSilenciado ? '🔇' : '🔊';
+            document.getElementById('btn-silenciar').textContent = estaSilenciado ? '🔇' : '🔊';
         }
 
-        const escalaNotas = [
-            261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25,
-            783.99, 880.00, 1046.50, 1174.66, 1318.51, 1567.98, 1760.00, 2093.00,
-            2349.32, 2637.02, 2793.83, 3135.96, 3520.00, 3951.07, 4186.01, 4698.63, 5274.04
-        ];
-
-        const temas25Colores = [
-            ['#ff4757','#05d9e8','#d1f7ff','#7700a6','#fe00fe','#defe47','#00ff9f','#00b8ff','#ff5500','#bd00ff','#ffbe0b','#fb5607','#ff006e','#8338ec','#3a86ff','#06d6a0','#ff0055','#00f2fe','#4facfe','#00f2fe','#fa709a','#fee140','#30cfd0','#330867','#f77062'],
-            ['#ffadad','#ffd6a5','#fdffb6','#caffbf','#9bf6ff','#a0c4ff','#bdb2ff','#ffc6ff','#f4978e','#f8ad9d','#fbc4ab','#ffdab9','#b8e0d2','#d6eadf','#eac4d5','#95b8d1','#ffccd5','#cbf3f0','#2ec4b6','#ffbf69','#ff9f1c','#c77dff','#e0aaff','#90dbf4','#8ecae6'],
-            ['#590d22','#800f2f','#a4133c','#c9184a','#ff4d6d','#ff758f','#ff8fa3','#ffb3c1','#ff5400','#ff6d00','#ff8500','#ff9100','#ff9e00','#ffb703','#fb8500','#e85d04','#faa307','#ffba08','#d00000','#9d0208','#6a040f','#370617','#ff70a6','#ff9770','#ffd670'],
-            ['#03045e','#023e8a','#0077b6','#0096c7','#00b4d8','#48cae4','#90e0ef','#ade8f4','#006466','#065a60','#0b525b','#144552','#1b3a4b','#212f45','#272640','#312244','#1d3557','#457b9d','#a8dadc','#f1faee','#e63946','#1d3557','#457b9d','#1d3557','#00b4d8'],
-            ['#1b4332','#2d6a4f','#40916c','#52b788','#74c69d','#95d5b2','#b7e4c7','#d8f3dc','#386641','#6a994e','#a7c957','#f2e8cf','#bc4749','#9b2226','#ca6702','#ee9b00','#386641','#6a994e','#a7c957','#f2e8cf','#52b788','#74c69d','#40916c','#2d6a4f','#1b4332']
-        ];
-
-        function obtenerTemaActual() {
-            const selectTema = document.getElementById('selector-color-bloques');
-            const idx = selectTema ? parseInt(selectTema.value, 10) : 0;
-            return temas25Colores[idx] || temas25Colores[0];
+        function cambiarSonidoSeleccionado(select) {
+            if (select && !progresoEstetico.sonidos.includes(select.value)) {
+                progresoEstetico.sonidos.push(select.value);
+                localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
+                verificarProgresoEstetico();
+            }
+            reproducirSonido(0, false, false);
         }
 
-        function construirTablero() {
-            const tablero = document.getElementById('tablero');
-            if (!tablero) return;
-            tablero.innerHTML = '';
-
-            const selectorModo = document.getElementById('selector-modo');
-            const selectorDif = document.getElementById('selector-dificultad');
-            const modo = selectorModo ? selectorModo.value : 'normal';
-
-            if (modo === 'libre') {
-                tamanoCuadricula = 5;
-            } else if (modo === 'extremo') {
-                if (nivel <= 3) tamanoCuadricula = 2;
-                else if (nivel <= 6) tamanoCuadricula = 3;
-                else if (nivel <= 9) tamanoCuadricula = 4;
-                else tamanoCuadricula = 5;
-
-                if (selectorDif) {
-                    if (tamanoCuadricula === 2) selectorDif.value = "2";
-                    else if (tamanoCuadricula === 3) selectorDif.value = "3";
-                    else selectorDif.value = "4";
-                }
-            } else if (modo === 'hacker') {
-                tamanoCuadricula = 2;
-                if (selectorDif) selectorDif.value = "2";
-            } else {
-                tamanoCuadricula = selectorDif ? parseInt(selectorDif.value, 10) : 2;
+        function reproducirSonido(indice, esError = false, contarNota = true) {
+            if (!esError && contarNota && modoJuego !== 'libre') {
+                totalNotasTocadas++;
+                localStorage.setItem('memoria_total_notas_v1', totalNotasTocadas);
+                registrarNotaEstadistica(modoJuego, tamanoCuadricula);
             }
 
-            let medida = 120;
-            let gap = 10;
-            if (tamanoCuadricula === 3) { medida = 90; gap = 8; }
-            if (tamanoCuadricula === 4) { medida = 68; gap = 6; }
-            if (tamanoCuadricula === 5) { medida = 52; gap = 5; }
+            if (estaSilenciado) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            tablero.style.gridTemplateColumns = `repeat(${tamanoCuadricula}, ${medida}px)`;
-            tablero.style.gridTemplateRows = `repeat(${tamanoCuadricula}, ${medida}px)`;
-            tablero.style.gap = `${gap}px`;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const tipoSonido = parseInt(document.getElementById('selector-sonido').value, 10);
 
-            totalBloques = tamanoCuadricula * tamanoCuadricula;
-            const temaColores = obtenerTemaActual();
-
-            for (let i = 0; i < totalBloques; i++) {
-                const div = document.createElement('div');
-                div.className = 'bloque';
-                div.id = `bloque-${i}`;
-                div.style.animationDelay = `${i * 0.04}s`;
-                if (modo !== 'hacker') {
-                    const col = temaColores[i % temaColores.length];
-                    div.style.backgroundColor = col;
-                    div.style.color = col;
-                }
-                div.setAttribute('onclick', `manejarClicBloque(${i})`);
-                tablero.appendChild(div);
+            if (esError) {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(75, audioCtx.currentTime + 0.45);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.45);
+                return;
             }
+
+            const frecuencias = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 1174.66];
+            osc.frequency.value = frecuencias[indice % frecuencias.length];
+
+            if (tipoSonido === 3) osc.type = 'sawtooth';
+            else if (tipoSonido === 5) osc.type = 'triangle';
+            else if (tipoSonido === 7) osc.type = 'square';
+            else if (tipoSonido === 8) osc.type = 'square';
+            else osc.type = 'sine';
+
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
         }
+
+        // ==========================================
+        // TEMAS, DIFICULTAD Y MODOS DE JUEGO
+        // ==========================================
+        const temasColores = [
+            ['#ff4757', '#05d9e8', '#2ed573', '#ffa502', '#7700a6', '#ff6b81', '#1e90ff', '#32ff7e', '#fffa65'],
+            ['#ffb3ba', '#bae1ff', '#baffc9', '#ffffba', '#ffdfba', '#e0bbe4', '#957dad', '#d291bc', '#fec8d8'],
+            ['#ff5e57', '#ff9f43', '#feca57', '#ff6b6b', '#ee5253', '#ff9ff3', '#f368e0', '#ff793f', '#ffb142'],
+            ['#00a8ff', '#0097e6', '#4cd137', '#487eb0', '#00d2d3', '#54a0ff', '#2e86de', '#1dd1a1', '#10ac84'],
+            ['#2ed573', '#7bed9f', '#ffa502', '#eccc68', '#26de81', '#20bf6b', '#fed330', '#f7b731', '#a3cb38']
+        ];
 
         function actualizarColoresTablero() {
-            const selectorModo = document.getElementById('selector-modo');
-            if (selectorModo && selectorModo.value === 'hacker') return;
-
-            const temaColores = obtenerTemaActual();
+            const temaIdx = parseInt(document.getElementById('selector-color-bloques').value, 10);
+            const paleta = temasColores[temaIdx] || temasColores[0];
             for (let i = 0; i < totalBloques; i++) {
                 const bloque = document.getElementById(`bloque-${i}`);
                 if (bloque) {
-                    const col = temaColores[i % temaColores.length];
-                    bloque.style.backgroundColor = col;
-                    bloque.style.color = col;
+                    const color = paleta[i % paleta.length];
+                    bloque.style.backgroundColor = color;
+                    bloque.style.color = color;
                 }
-            }
-        }
-
-        function actualizarBadgeModo(nombreModo) {
-            const badge = document.getElementById('badge-modo');
-            if (badge) badge.textContent = `Modo = ${nombreModo}`;
-        }
-
-        function abrirEstadisticas() {
-            const modal = document.getElementById('modal-estadisticas');
-            const cuerpo = document.getElementById('cuerpo-estadisticas');
-            if (!modal || !cuerpo) return;
-
-            const nombresModos = {
-                normal: '➡️ Normal',
-                invertido: '🔄 Invertido',
-                relampago: '⚡ Relámpago',
-                contrarreloj: '⏱️ Contrarreloj',
-                extremo: '💀 Extremo',
-                hacker: '💻 Hacker'
-            };
-
-            const nombresDif = { '2': '🟢 Fácil', '3': '🟡 Medio', '4': '🔴 Difícil' };
-
-            let totalNotasGlobal = 0;
-            for (let modoKey in estadisticas) {
-                if (modoKey === 'extremo' || modoKey === 'hacker') {
-                    totalNotasGlobal += (estadisticas[modoKey].notas || 0);
-                } else {
-                    for (let difKey in estadisticas[modoKey]) {
-                        totalNotasGlobal += (estadisticas[modoKey][difKey].notas || 0);
-                    }
-                }
-            }
-
-            let html = `
-                <div style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px; text-align: center; margin-bottom: 12px;">
-                    <div style="font-size: 0.85rem; color: var(--subtext-color); font-weight: 600;">🎵 Total de notas tocadas</div>
-                    <div style="font-size: 1.4rem; font-weight: bold; color: var(--text-color); margin-top: 3px;">${totalNotasGlobal}</div>
-                </div>
-                <div class="grid-modos-stats">
-            `;
-
-            const ordenModos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'extremo', 'hacker'];
-
-            ordenModos.forEach(modoKey => {
-                if (!estadisticas[modoKey]) return;
-                html += `<div class="card-modo-stat">`;
-                html += `<h3>Modo = ${nombresModos[modoKey]}</h3>`;
-
-                if (modoKey === 'extremo' || modoKey === 'hacker') {
-                    const st = estadisticas[modoKey] || { nivel: 0, derrotas: 0, notas: 0 };
-                    html += `
-                        <div class="grid-extremo-stat">
-                            <div>Récord: <span>${st.nivel || 0}</span></div>
-                            <div>Derrotas: <span>${st.derrotas || 0}</span></div>
-                            <div>Notas: <span>${st.notas || 0}</span></div>
-                        </div>
-                    `;
-                } else {
-                    html += `<div class="grid-dificultades">`;
-                    for (let difKey in estadisticas[modoKey]) {
-                        const st = estadisticas[modoKey][difKey] || { nivel: 0, derrotas: 0, notas: 0 };
-                        html += `<div class="item-dif">`;
-                        html += `<div class="dif-titulo">${nombresDif[difKey]}</div>`;
-                        html += `Récord: <span>${st.nivel || 0}</span><br>`;
-                        html += `Derrotas: <span>${st.derrotas || 0}</span><br>`;
-                        html += `Notas: <span>${st.notas || 0}</span>`;
-                        html += `</div>`;
-                    }
-                    html += `</div>`;
-                }
-                html += `</div>`;
-            });
-
-            html += `</div>`;
-
-            cuerpo.innerHTML = html;
-            modal.classList.add('activo');
-        }
-
-        function cerrarEstadisticas() {
-            const modal = document.getElementById('modal-estadisticas');
-            if (modal) modal.classList.remove('activo');
-        }
-
-        function reiniciarEstadisticas() {
-            if (confirm("¿Estás seguro de borrar todas tus estadísticas guardadas?")) {
-                localStorage.removeItem('memoria_stats_v14');
-                estadisticas = JSON.parse(JSON.stringify(estadisticasBase));
-                guardarStats();
-                abrirEstadisticas();
-            }
-        }
-
-        function iniciarCronometroPartida() {
-            segundosPartida = 0;
-            const cronoEl = document.getElementById('cronometro-juego');
-            if (cronoEl) {
-                cronoEl.style.display = 'inline-block';
-                cronoEl.textContent = '⏱️ 00:00';
-            }
-            if (timerPartidaInterval) clearInterval(timerPartidaInterval);
-            timerPartidaInterval = setInterval(() => {
-                const selectorModo = document.getElementById('selector-modo');
-                const modo = selectorModo ? selectorModo.value : 'normal';
-                if (modo === 'libre') return;
-
-                segundosPartida++;
-                const m = Math.floor(segundosPartida / 60).toString().padStart(2, '0');
-                const s = (segundosPartida % 60).toString().padStart(2, '0');
-                if (cronoEl) cronoEl.textContent = `⏱️ ${m}:${s}`;
-            }, 1000);
-        }
-
-        function detenerCronometroPartida() {
-            if (timerPartidaInterval) {
-                clearInterval(timerPartidaInterval);
-                timerPartidaInterval = null;
             }
         }
 
         function cambiarDificultad(select) {
-            limpiarTimeouts();
-            detenerContadorTiempo();
-            detenerCronometroPartida();
-            quitarBrilloTotal();
             tamanoCuadricula = parseInt(select.value, 10);
+            construirTablero(tamanoCuadricula);
+        }
+
+        function construirTablero(dimension) {
+            tamanoCuadricula = dimension;
+            totalBloques = dimension * dimension;
+            const tablero = document.getElementById('tablero');
+            const sizePx = dimension === 5 ? 60 : (dimension === 4 ? 75 : (dimension === 3 ? 95 : 120));
+            tablero.style.gridTemplateColumns = `repeat(${dimension}, ${sizePx}px)`;
+            tablero.style.gridTemplateRows = `repeat(${dimension}, ${sizePx}px)`;
+            tablero.innerHTML = '';
+
+            const temaIdx = parseInt(document.getElementById('selector-color-bloques').value, 10);
+            const paleta = temasColores[temaIdx] || temasColores[0];
+
+            for (let i = 0; i < totalBloques; i++) {
+                const color = paleta[i % paleta.length];
+                const div = document.createElement('div');
+                div.className = 'bloque';
+                div.id = `bloque-${i}`;
+                div.style.backgroundColor = color;
+                div.style.color = color;
+                div.onclick = () => manejarClicBloque(i);
+                tablero.appendChild(div);
+            }
+        }
+
+        function obtenerDimensionExtremoPorNivel(niv) {
+            if (niv >= 7) return 4;
+            if (niv >= 4) return 3;
+            return 2;
+        }
+
+        function resetearEstadoAlCambiarModo() {
+            limpiarTimers();
+            detenerBarraContrarreloj();
             secuencia = [];
             secuenciaObjetivo = [];
+            pasoUsuario = 0;
             nivel = 0;
             bloqueado = true;
-            const cronoEl = document.getElementById('cronometro-juego');
-            if (cronoEl) cronoEl.style.display = 'none';
+            segundosPartida = 0;
 
-            const btn = document.getElementById('btn-jugar');
-            const msg = document.getElementById('mensaje');
-            if (btn) {
-                btn.textContent = "Jugar";
-                btn.disabled = false;
+            const crono = document.getElementById('cronometro-juego');
+            if (crono) {
+                crono.style.display = 'none';
+                crono.textContent = '⏱️ 00:00';
             }
-            if (msg) msg.textContent = 'Presiona "Jugar" para empezar';
-            construirTablero();
+
+            esGrabando = false;
+            notasGrabadas = [];
+            const btnGrabar = document.getElementById('btn-grabar');
+            const btnReproducir = document.getElementById('btn-reproducir');
+            if (btnGrabar) {
+                btnGrabar.classList.remove('grabando');
+                btnGrabar.textContent = '🔴 Grabar Melodía';
+            }
+            if (btnReproducir) {
+                btnReproducir.classList.remove('visible');
+            }
+
+            document.getElementById('btn-jugar').disabled = false;
+            setControlesPartidaActivos(false);
+            document.getElementById('mensaje').textContent = 'Presiona "Jugar" para empezar';
         }
 
         function cambiarModoJuego(select) {
-            const modo = select.value;
+            modoJuego = select.value;
+            const nombreModo = select.options[select.selectedIndex].text;
+            document.getElementById('badge-modo').textContent = `Modo = ${nombreModo}`;
+
+            resetearEstadoAlCambiarModo();
+
             const panelGrabadora = document.getElementById('panel-grabadora');
-            const contenedorTiempo = document.getElementById('contenedor-tiempo');
-            const selectDif = document.getElementById('selector-dificultad');
-            const selectTema = document.getElementById('selector-color-bloques');
-            const btnJugar = document.getElementById('btn-jugar');
-            const mensaje = document.getElementById('mensaje');
-            const cronoEl = document.getElementById('cronometro-juego');
+            const contTiempo = document.getElementById('contenedor-tiempo');
+            const difSelect = document.getElementById('selector-dificultad');
 
-            if (modo !== 'extremo' && modo !== 'hacker') {
-                indiceFondo = 0;
-                document.body.style.backgroundColor = fondosOscuros[0];
-                if (selectTema) selectTema.value = "0";
-            }
+            panelGrabadora.classList.toggle('activo', modoJuego === 'libre');
+            contTiempo.classList.toggle('activo', modoJuego === 'contrarreloj');
 
-            limpiarTimeouts();
-            detenerContadorTiempo();
-            detenerCronometroPartida();
-            if (cronoEl) cronoEl.style.display = 'none';
-            nivel = 0;
-            secuencia = [];
-            secuenciaObjetivo = [];
-
-            const textoModo = select.options[select.selectedIndex].text;
-            actualizarBadgeModo(textoModo);
-
-            if (btnJugar) {
-                btnJugar.textContent = "Jugar";
-                btnJugar.disabled = false;
-            }
-
-            if (selectTema) selectTema.disabled = false;
-            if (selectDif) selectDif.disabled = false;
-
-            if (modo === 'libre') {
-                if (panelGrabadora) panelGrabadora.classList.add('activo');
-                if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
-                if (selectDif) selectDif.disabled = true;
-                if (btnJugar) btnJugar.style.display = 'none';
-                if (mensaje) mensaje.textContent = '🎹 Modo Libre (5x5) — ¡Toca cuando quieras!';
-                bloqueado = false;
-            } else if (modo === 'extremo') {
-                if (panelGrabadora) panelGrabadora.classList.remove('activo');
-                if (contenedorTiempo) panelGrabadora.classList.remove('activo');
-                if (selectDif) {
-                    selectDif.value = "2";
-                    selectDif.disabled = true;
-                }
-                if (btnJugar) btnJugar.style.display = 'inline-block';
-                if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
-                bloqueado = true;
-            } else if (modo === 'hacker') {
-                if (panelGrabadora) panelGrabadora.classList.remove('activo');
-                if (contenedorTiempo) panelGrabadora.classList.remove('activo');
-                if (selectDif) {
-                    selectDif.value = "2";
-                    selectDif.disabled = true;
-                }
-                if (selectTema) selectTema.disabled = true;
-                if (btnJugar) btnJugar.style.display = 'inline-block';
-                if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
-                bloqueado = true;
-            } else {
-                if (panelGrabadora) panelGrabadora.classList.remove('activo');
-                if (btnJugar) btnJugar.style.display = 'inline-block';
-                if (mensaje) mensaje.textContent = 'Presiona "Jugar" para empezar';
-                bloqueado = true;
-                if (modo === 'contrarreloj') {
-                    if (contenedorTiempo) contenedorTiempo.classList.add('activo');
-                } else {
-                    if (contenedorTiempo) contenedorTiempo.classList.remove('activo');
-                }
-            }
-
-            if (modo === 'hacker') {
+            if (modoJuego === 'hacker') {
                 document.body.classList.add('modo-hacker');
                 iniciarMatrizHacker();
             } else {
                 document.body.classList.remove('modo-hacker');
                 detenerMatrizHacker();
+                const selectorFondo = document.getElementById('selector-fondo-oscuro');
+                const colorActual = selectorFondo ? selectorFondo.value : '#1a1a2e';
+                document.documentElement.style.setProperty('--bg-color', colorActual);
+                document.body.style.backgroundColor = colorActual;
             }
 
-            construirTablero();
-        }
-
-        function cambiarFondo() {
-            const selectorModo = document.getElementById('selector-modo');
-            if (selectorModo && selectorModo.value === 'hacker') return;
-
-            indiceFondo = (indiceFondo + 1) % fondosOscuros.length;
-            document.body.style.backgroundColor = fondosOscuros[indiceFondo];
-        }
-
-        function limpiarTimeouts() {
-            timeouts.forEach(t => clearTimeout(t));
-            timeouts = [];
-        }
-
-        function detenerContadorTiempo() {
-            if (temporizadorTurno) clearTimeout(temporizadorTurno);
-            if (intervaloProgreso) clearInterval(intervaloProgreso);
-            const barra = document.getElementById('barra-progreso-tiempo');
-            if (barra) {
-                barra.classList.remove('vibrando-alerta');
-                barra.style.width = '100%';
-                barra.style.backgroundColor = '#2ed573';
+            if (modoJuego === 'libre') {
+                difSelect.disabled = true;
+                construirTablero(5);
+                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+            } else if (modoJuego === 'extremo') {
+                difSelect.disabled = true;
+                construirTablero(2);
+            } else if (modoJuego === 'hacker') {
+                difSelect.disabled = true;
+                construirTablero(2);
+            } else {
+                difSelect.disabled = false;
+                construirTablero(parseInt(difSelect.value, 10));
             }
         }
 
-        function iniciarContadorContrarreloj() {
-            detenerContadorTiempo();
-            const modo = document.getElementById('selector-modo').value;
-            if (modo !== 'contrarreloj') return;
+        // ==========================================
+        // LÓGICA PRINCIPAL DE PARTIDA, CONFETI Y FINAL NIVEL 10
+        // ==========================================
+        function iniciarJuego() {
+            if (modoJuego === 'libre') {
+                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+                return;
+            }
 
+            registrarDiaJugado();
+
+            limpiarTimers();
+            secuencia = [];
+            nivel = 0;
+            bloqueado = true;
+            document.getElementById('btn-jugar').disabled = true;
+            setControlesPartidaActivos(true);
+
+            if (modoJuego === 'extremo') {
+                construirTablero(2);
+            }
+
+            segundosPartida = 0;
+            const crono = document.getElementById('cronometro-juego');
+            crono.style.display = 'inline-block';
+            crono.textContent = '⏱️ 00:00';
+            timerPartidaInterval = setInterval(() => {
+                segundosPartida++;
+                const min = String(Math.floor(segundosPartida / 60)).padStart(2, '0');
+                const seg = String(segundosPartida % 60).padStart(2, '0');
+                crono.textContent = `⏱️ ${min}:${seg}`;
+            }, 1000);
+
+            siguienteNivel();
+        }
+
+        function siguienteNivel() {
+            nivel++;
+            pasoUsuario = 0;
+
+            if (modoJuego === 'extremo') {
+                const dimDeseada = obtenerDimensionExtremoPorNivel(nivel);
+                if (tamanoCuadricula !== dimDeseada) {
+                    construirTablero(dimDeseada);
+                }
+            }
+
+            if (nivel >= 8) {
+                desbloquearLogro('memoria_fotografica');
+            }
+            if (modoJuego === 'hacker' && nivel >= 6) {
+                desbloquearLogro('hacker_maestro');
+            }
+
+            const prefijoExtremo = (modoJuego === 'extremo') ? ` (${tamanoCuadricula}x${tamanoCuadricula})` : '';
+            document.getElementById('mensaje').textContent = `Nivel ${nivel}/${NIVEL_FINAL}${prefijoExtremo} — Observa la secuencia`;
+            const nuevoBloque = Math.floor(Math.random() * totalBloques);
+            secuencia.push(nuevoBloque);
+
+            secuenciaObjetivo = (modoJuego === 'invertido') ? [...secuencia].reverse() : [...secuencia];
+
+            const velocidad = modoJuego === 'relampago' ? 260 : (modoJuego === 'extremo' ? 350 : 580);
+            reproducirSecuencia(velocidad);
+        }
+
+        function reproducirSecuencia(velocidad) {
+            bloqueado = true;
+            let i = 0;
+            const intervalo = setInterval(() => {
+                if (i < secuencia.length) {
+                    iluminarBloque(secuencia[i], velocidad * 0.55, false);
+                    i++;
+                } else {
+                    clearInterval(intervalo);
+                    bloqueado = false;
+                    document.getElementById('mensaje').textContent = modoJuego === 'invertido'
+                        ? "🔄 ¡Tu turno! Repite AL REVÉS"
+                        : "👉 ¡Tu turno!";
+
+                    if (modoJuego === 'contrarreloj') {
+                        iniciarBarraContrarreloj();
+                    }
+                }
+            }, velocidad);
+            timeouts.push(intervalo);
+        }
+
+        function iniciarBarraContrarreloj() {
+            detenerBarraContrarreloj();
             tiempoRestante = TIEMPO_MAXIMO;
             const barra = document.getElementById('barra-progreso-tiempo');
+            barra.style.width = '100%';
+            barra.classList.remove('vibrando-alerta');
 
             intervaloProgreso = setInterval(() => {
-                tiempoRestante -= 50;
-                let porcentaje = (tiempoRestante / TIEMPO_MAXIMO) * 100;
-                if (porcentaje < 0) porcentaje = 0;
-                if (barra) barra.style.width = `${porcentaje}%`;
+                tiempoRestante -= 100;
+                const porcentaje = Math.max(0, (tiempoRestante / TIEMPO_MAXIMO) * 100);
+                barra.style.width = `${porcentaje}%`;
 
-                if (tiempoRestante <= 2000) {
-                    if (barra) barra.classList.add('vibrando-alerta');
-                } else {
-                    if (barra) {
-                        barra.classList.remove('vibrando-alerta');
-                        barra.style.backgroundColor = '#2ed573';
-                    }
+                if (porcentaje <= 30) {
+                    barra.classList.add('vibrando-alerta');
                 }
-            }, 50);
 
-            temporizadorTurno = setTimeout(() => {
-                perderPartidaPorTiempo();
-            }, TIEMPO_MAXIMO);
+                if (tiempoRestante <= 0) {
+                    detenerBarraContrarreloj();
+                    registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
+                    finalizarPartida(false, "⏰ ¡Se acabó el tiempo!");
+                }
+            }, 100);
         }
 
-        function perderPartidaPorTiempo() {
-            bloqueado = true;
-            limpiarTimeouts();
-            detenerContadorTiempo();
-            detenerCronometroPartida();
-            reproducirSonido(0, true);
-
-            const modo = document.getElementById('selector-modo').value;
-            const dif = document.getElementById('selector-dificultad').value;
-
-            if (modo === 'extremo' || modo === 'hacker') {
-                if (estadisticas[modo]) {
-                    estadisticas[modo].derrotas = (estadisticas[modo].derrotas || 0) + 1;
-                    guardarStats();
-                }
-            } else {
-                if (estadisticas[modo] && estadisticas[modo][dif]) {
-                    estadisticas[modo][dif].derrotas = (estadisticas[modo][dif].derrotas || 0) + 1;
-                    guardarStats();
-                }
+        function detenerBarraContrarreloj() {
+            if (intervaloProgreso) {
+                clearInterval(intervaloProgreso);
+                intervaloProgreso = null;
             }
-
-            const mensaje = document.getElementById('mensaje');
-            if (mensaje) mensaje.textContent = `⏱️ ¡Se acabó el tiempo! Llegaste al nivel ${nivel}.`;
-            secuencia = [];
-            secuenciaObjetivo = [];
-
-            const selectDif = document.getElementById('selector-dificultad');
-            const selectModo = document.getElementById('selector-modo');
-            if (selectDif && modo !== 'extremo' && modo !== 'hacker') selectDif.disabled = false;
-            if (selectModo) selectModo.disabled = false;
-
-            const btnStats = document.getElementById('btn-estadisticas-top');
-            const btnConfig = document.getElementById('btn-config');
-            if (btnStats) btnStats.disabled = false;
-            if (btnConfig) btnConfig.disabled = false;
-
-            const btn = document.getElementById('btn-jugar');
-            if (btn) {
-                btn.textContent = "Volver a jugar";
-                btn.disabled = false;
-            }
+            const barra = document.getElementById('barra-progreso-tiempo');
+            if (barra) barra.classList.remove('vibrando-alerta');
         }
 
-        function quitarBrilloTotal() {
-            const bloques = document.querySelectorAll('.bloque');
-            bloques.forEach(b => {
-                b.classList.remove('brillar');
-            });
-        }
-
-        function inicializarAudio() {
-            try {
-                if (!audioCtx) {
-                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                    if (AudioContextClass) audioCtx = new AudioContextClass();
-                }
-                if (audioCtx && audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-            } catch (e) {}
-        }
-
-        function reproducirSonido(indice, esError = false) {
-            if (estaSilenciado) return;
-            try {
-                inicializarAudio();
-                if (!audioCtx) return;
-
-                const selectorSonido = document.getElementById('selector-sonido');
-                const selectorModo = document.getElementById('selector-modo');
-
-                let tipoSonido = selectorSonido ? parseInt(selectorSonido.value, 10) : 1;
-                const modo = selectorModo ? selectorModo.value : 'normal';
-
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                const freq = escalaNotas[indice % escalaNotas.length];
-
-                let volumenAlto = 0.6;
-                let duracionSonido = 0.35;
-
-                if (modo === 'extremo') {
-                    duracionSonido = 0.1;
-                } else if (modo === 'relampago') {
-                    duracionSonido = 0.2;
-                }
-
-                if (esError) {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.5 * volumenAlto, audioCtx.currentTime + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.41);
-                    return;
-                }
-
-                switch (tipoSonido) {
-                    case 1: osc.type = 'triangle'; osc.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime); break;
-                    case 3: osc.type = 'square'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
-                    case 5: osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime); break;
-                    case 7: 
-                        osc.type = 'sawtooth'; 
-                        osc.frequency.setValueAtTime(freq * 2, audioCtx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + duracionSonido); 
-                        break;
-                    case 8: osc.type = 'square'; osc.frequency.setValueAtTime(freq * 1.25, audioCtx.currentTime); break;
-                    default: osc.type = 'triangle'; osc.frequency.setValueAtTime(freq * 1.5, audioCtx.currentTime); break;
-                }
-
-                gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.5 * volumenAlto, audioCtx.currentTime + 0.02);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duracionSonido);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duracionSonido + 0.01);
-            } catch (e) {}
-        }
-
-        function crearChispasBloque(bloqueEl) {
-            if (!bloqueEl) return;
-            const rect = bloqueEl.getBoundingClientRect();
-            const centroX = rect.left + rect.width / 2;
-            const centroY = rect.top + rect.height / 2;
-            const color = bloqueEl.style.backgroundColor || '#ffffff';
-
-            const contenedor = document.createElement('div');
-            contenedor.style.position = 'fixed';
-            contenedor.style.top = '0';
-            contenedor.style.left = '0';
-            contenedor.style.width = '100vw';
-            contenedor.style.height = '100vh';
-            contenedor.style.pointerEvents = 'none';
-            contenedor.style.zIndex = '9999';
-            document.body.appendChild(contenedor);
-
-            for (let i = 0; i < 10; i++) {
-                const chispa = document.createElement('div');
-                chispa.style.position = 'absolute';
-                chispa.style.width = `${Math.random() * 6 + 4}px`;
-                chispa.style.height = `${Math.random() * 6 + 4}px`;
-                chispa.style.backgroundColor = color;
-                chispa.style.left = `${centroX}px`;
-                chispa.style.top = `${centroY}px`;
-                chispa.style.borderRadius = '50%';
-                chispa.style.boxShadow = `0 0 8px ${color}`;
-                contenedor.appendChild(chispa);
-
-                const angulo = Math.random() * Math.PI * 2;
-                const velocidad = Math.random() * 70 + 25;
-                const destX = Math.cos(angulo) * velocidad;
-                const destY = Math.sin(angulo) * velocidad;
-
-                chispa.animate([
-                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${destX}px, ${destY}px) scale(0)`, opacity: 0 }
-                ], {
-                    duration: 500 + Math.random() * 300,
-                    easing: 'ease-out'
-                });
-            }
-
-            setTimeout(() => contenedor.remove(), 800);
-        }
-
-        function activarBloque(id) {
-            const bloque = document.getElementById(`bloque-${id}`);
+        function iluminarBloque(indice, duracion = 260, contarNota = true) {
+            const bloque = document.getElementById(`bloque-${indice}`);
             if (!bloque) return;
-
             bloque.classList.add('brillar');
-            reproducirSonido(id, false);
-            crearChispasBloque(bloque);
-
-            const selectorModo = document.getElementById('selector-modo');
-            const modo = selectorModo ? selectorModo.value : 'normal';
-            let tiempoBrillo = 220;
-            if (modo === 'extremo') tiempoBrillo = 90;
-            else if (modo === 'relampago') tiempoBrillo = 150;
-
-            const t = setTimeout(() => {
-                if (bloque) {
-                    bloque.classList.remove('brillar');
-                }
-            }, tiempoBrillo);
-            timeouts.push(t);
+            reproducirSonido(indice, false, contarNota);
+            setTimeout(() => bloque.classList.remove('brillar'), duracion);
         }
 
-        function iniciarJuego() {
-            inicializarAudio();
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            limpiarTimeouts();
-            detenerContadorTiempo();
-            quitarBrilloTotal();
-            secuencia = [];
-            secuenciaObjetivo = [];
-            nivel = 0;
-
-            const selectDif = document.getElementById('selector-dificultad');
-            const selectModo = document.getElementById('selector-modo');
-            const btnJugar = document.getElementById('btn-jugar');
-            const btnStats = document.getElementById('btn-estadisticas-top');
-            const btnConfig = document.getElementById('btn-config');
-
-            if (selectDif && selectModo.value !== 'extremo' && selectModo.value !== 'hacker') selectDif.disabled = true;
-            if (selectModo) selectModo.disabled = true;
-            if (btnJugar) btnJugar.disabled = true;
-            if (btnStats) btnStats.disabled = true;
-            if (btnConfig) btnConfig.disabled = true;
-
-            const modo = selectModo ? selectModo.value : 'normal';
-            const contenedorTiempo = document.getElementById('contenedor-tiempo');
-            if (modo === 'contrarreloj' && contenedorTiempo) {
-                contenedorTiempo.classList.add('activo');
-            }
-
-            iniciarCronometroPartida();
-            siguienteRonda();
-        }
-
-        function siguienteRonda() {
-            bloqueado = true;
-            detenerContadorTiempo();
-            pasoUsuario = 0;
-            nivel++;
-
-            const selectorModo = document.getElementById('selector-modo');
-            const modo = selectorModo ? selectorModo.value : 'normal';
-            const dif = document.getElementById('selector-dificultad').value;
-            const mensaje = document.getElementById('mensaje');
-
-            if (modo === 'extremo' || modo === 'hacker') {
-                if (estadisticas[modo]) {
-                    if (nivel > (estadisticas[modo].nivel || 0)) {
-                        estadisticas[modo].nivel = nivel;
-                        guardarStats();
-                    }
-                }
-            } else {
-                if (estadisticas[modo] && estadisticas[modo][dif]) {
-                    if (nivel > (estadisticas[modo][dif].nivel || 0)) {
-                        estadisticas[modo][dif].nivel = nivel;
-                        guardarStats();
-                    }
-                }
-            }
-
-            let velocidadPaso = 650;
-            if (modo === 'relampago') velocidadPaso = 350;
-            if (modo === 'extremo') velocidadPaso = 250;
-
-            if (modo === 'extremo') {
-                let nuevoTamano = 2;
-                if (nivel <= 3) nuevoTamano = 2;
-                else if (nivel <= 6) nuevoTamano = 3;
-                else if (nivel <= 9) nuevoTamano = 4;
-                else nuevoTamano = 5;
-
-                if (nuevoTamano !== tamanoCuadricula) {
-                    tamanoCuadricula = nuevoTamano;
-                    construirTablero();
-                }
-
-                indiceFondo = (indiceFondo + 1) % fondosOscuros.length;
-                document.body.style.backgroundColor = fondosOscuros[indiceFondo];
-
-                let etapaNombre = "Fácil (2x2)";
-                if (nivel > 3 && nivel <= 6) etapaNombre = "Medio (3x3)";
-                else if (nivel > 6 && nivel <= 9) etapaNombre = "Difícil (4x4)";
-                else if (nivel > 9) etapaNombre = "Extremo Total (5x5)";
-
-                if (mensaje) mensaje.textContent = `💀 Nivel ${nivel} [${etapaNombre}] — ¡Atento!`;
-            } else if (modo === 'hacker') {
-                if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} (Hacker 2x2) — Sistema comprometido`;
-            } else if (modo === 'relampago') {
-                if (mensaje) mensaje.textContent = `⚡ Nivel ${nivel} (Relámpago) — ¡Rápido!`;
-            } else if (modo === 'contrarreloj') {
-                if (mensaje) mensaje.textContent = `⏱️ Nivel ${nivel} (Contrarreloj) — Observa...`;
-            } else {
-                if (mensaje) mensaje.textContent = `Nivel ${nivel} — Observa...`;
-            }
-
-            const siguienteBloque = Math.floor(Math.random() * totalBloques);
-            secuencia.push(siguienteBloque);
-
-            if (modo === 'invertido') {
-                secuenciaObjetivo = [...secuencia].reverse();
-            } else {
-                secuenciaObjetivo = [...secuencia];
-            }
-
-            secuencia.forEach((idBloque, index) => {
-                const t = setTimeout(() => {
-                    activarBloque(idBloque);
-                }, (index + 1) * velocidadPaso);
-                timeouts.push(t);
-            });
-
-            const tTurno = setTimeout(() => {
-                bloqueado = false;
-                if (modo === 'invertido') {
-                    if (mensaje) mensaje.textContent = `Nivel ${nivel} — ¡Tu turno (Al revés)!`;
-                } else if (modo === 'extremo') {
-                    if (mensaje) mensaje.textContent = `💀 Nivel ${nivel} — ¡Tu turno!`;
-                } else if (modo === 'hacker') {
-                    if (mensaje) mensaje.textContent = `💻 Nivel ${nivel} — ¡Tu turno hacker!`;
-                } else if (modo === 'relampago') {
-                    if (mensaje) mensaje.textContent = `⚡ ¡Tu turno (Rápido)!`;
-                } else if (modo === 'contrarreloj') {
-                    if (mensaje) mensaje.textContent = `⏱️ ¡Tu turno! (Tienes 6 segundos)`;
-                    iniciarContadorContrarreloj();
-                } else {
-                    if (mensaje) mensaje.textContent = `Nivel ${nivel} — ¡Tu turno!`;
-                }
-            }, (secuencia.length + 1) * velocidadPaso);
-            timeouts.push(tTurno);
-        }
-
-        function manejarClicBloque(id) {
-            const selectorModo = document.getElementById('selector-modo');
-            const modo = selectorModo ? selectorModo.value : 'normal';
-            const dif = document.getElementById('selector-dificultad').value;
-
-            if (modo === 'libre') {
-                activarBloque(id);
+        function manejarClicBloque(indice) {
+            if (modoJuego === 'libre') {
+                iluminarBloque(indice, 220, false);
                 if (esGrabando) {
-                    const tiempoActual = Date.now() - tiempoInicioGrabacion;
-                    notasGrabadas.push({ id: id, tiempo: tiempoActual });
+                    notasGrabadas.push({ bloque: indice, tiempo: Date.now() - tiempoInicioGrabacion });
                 }
                 return;
             }
 
             if (bloqueado) return;
+            iluminarBloque(indice, 220, true);
 
-            if (modo === 'extremo' || modo === 'hacker') {
-                if (estadisticas[modo]) {
-                    estadisticas[modo].notas = (estadisticas[modo].notas || 0) + 1;
-                    guardarStats();
-                }
-            } else {
-                if (estadisticas[modo] && estadisticas[modo][dif]) {
-                    estadisticas[modo][dif].notas = (estadisticas[modo][dif].notas || 0) + 1;
-                    guardarStats();
-                }
-            }
-
-            activarBloque(id);
-
-            if (id === secuenciaObjetivo[pasoUsuario]) {
+            if (indice === secuenciaObjetivo[pasoUsuario]) {
                 pasoUsuario++;
                 if (pasoUsuario === secuenciaObjetivo.length) {
                     bloqueado = true;
-                    detenerContadorTiempo();
-                    const mensaje = document.getElementById('mensaje');
-                    if (mensaje) mensaje.textContent = "¡Excelente!";
+                    detenerBarraContrarreloj();
+                    guardarRecordEstadistica(modoJuego, tamanoCuadricula, nivel);
 
-                    if (nivel % 5 === 0) {
-                        mostrarBannerNivel(nivel);
+                    if (modoJuego === 'normal' && nivel >= 3) {
+                        desbloquearLogro('primeros_pasos');
+                    }
+                    if (modoJuego === 'normal' && nivel >= 6) {
+                        desbloquearLogro('cerebro_titanio');
+                    }
+                    if (modoJuego === 'invertido' && nivel >= 6) {
+                        desbloquearLogro('mete_al_reves');
+                    }
+                    if (modoJuego === 'contrarreloj' && nivel >= 8) {
+                        desbloquearLogro('bajo_presion');
                     }
 
-                    const tiempoEspera = (nivel % 5 === 0) ? 2000 : 900;
-                    const tSig = setTimeout(siguienteRonda, tiempoEspera);
-                    timeouts.push(tSig);
+                    if (nivel >= NIVEL_FINAL) {
+                        lanzarConfeti();
+                        finalizarPartida(true, `🏆 ¡Completaste el Nivel ${NIVEL_FINAL}! ¡Victoria!`);
+                        return;
+                    }
+
+                    // Celebración con confeti y pausa de unos segundos en nivel 5 en cualquier modo
+                    if (nivel === 5) {
+                        lanzarConfeti();
+                        document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} alcanzado! Celebrando...`;
+                        const pausaTimeout = setTimeout(() => {
+                            siguienteNivel();
+                        }, 2600);
+                        timeouts.push(pausaTimeout);
+                    } else {
+                        document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} superado!`;
+                        const nextTimeout = setTimeout(() => {
+                            siguienteNivel();
+                        }, 850);
+                        timeouts.push(nextTimeout);
+                    }
                 }
             } else {
-                bloqueado = true;
-                limpiarTimeouts();
-                detenerContadorTiempo();
-                detenerCronometroPartida();
-                quitarBrilloTotal();
-                reproducirSonido(0, true);
-
-                if (modo === 'extremo' || modo === 'hacker') {
-                    if (estadisticas[modo]) {
-                        estadisticas[modo].derrotas = (estadisticas[modo].derrotas || 0) + 1;
-                        guardarStats();
-                    }
-                } else {
-                    if (estadisticas[modo] && estadisticas[modo][dif]) {
-                        estadisticas[modo][dif].derrotas = (estadisticas[modo][dif].derrotas || 0) + 1;
-                        guardarStats();
-                    }
-                }
-
-                const mensaje = document.getElementById('mensaje');
-                if (mensaje) mensaje.textContent = `¡Te equivocaste! Llegaste al nivel ${nivel}.`;
-                secuencia = [];
-                secuenciaObjetivo = [];
-
-                const selectDif = document.getElementById('selector-dificultad');
-                const selectModo = document.getElementById('selector-modo');
-                if (selectDif && modo !== 'extremo' && modo !== 'hacker') selectDif.disabled = false;
-                if (selectModo) selectModo.disabled = false;
-
-                const btnStats = document.getElementById('btn-estadisticas-top');
-                const btnConfig = document.getElementById('btn-config');
-                if (btnStats) btnStats.disabled = false;
-                if (btnConfig) btnConfig.disabled = false;
-
-                const btn = document.getElementById('btn-jugar');
-                if (btn) {
-                    btn.textContent = "Volver a jugar";
-                    btn.disabled = false;
-                }
+                reproducirSonido(indice, true, false);
+                registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
+                finalizarPartida(false, `❌ ¡Fallaste en el nivel ${nivel}!`);
             }
         }
 
+        function finalizarPartida(victoria, textoMensaje) {
+            bloqueado = true;
+            limpiarTimers();
+            detenerBarraContrarreloj();
+            document.getElementById('mensaje').textContent = textoMensaje;
+            document.getElementById('btn-jugar').disabled = false;
+            setControlesPartidaActivos(false);
+        }
+
+        function limpiarTimers() {
+            if (timerPartidaInterval) {
+                clearInterval(timerPartidaInterval);
+                timerPartidaInterval = null;
+            }
+            timeouts.forEach(t => {
+                clearInterval(t);
+                clearTimeout(t);
+            });
+            timeouts = [];
+        }
+
+        // ==========================================
+        // GRABADORA MODO LIBRE
+        // ==========================================
         function toggleGrabar() {
-            const btnGrabar = document.getElementById('btn-grabar');
-            const mensaje = document.getElementById('mensaje');
+            const btn = document.getElementById('btn-grabar');
+            const btnReproducir = document.getElementById('btn-reproducir');
             if (!esGrabando) {
                 esGrabando = true;
                 notasGrabadas = [];
                 tiempoInicioGrabacion = Date.now();
-                if (btnGrabar) {
-                    btnGrabar.textContent = "⏹️ Detener";
-                    btnGrabar.classList.add('grabando');
-                }
-                if (mensaje) mensaje.textContent = "🔴 Grabando melodía...";
+                btn.classList.add('grabando');
+                btn.textContent = '⏹️ Detener';
+                btnReproducir.classList.remove('visible');
+                document.getElementById('mensaje').textContent = "🔴 Grabando melodía...";
             } else {
                 esGrabando = false;
-                if (btnGrabar) {
-                    btnGrabar.textContent = "🔴 Grabar Melodía";
-                    btnGrabar.classList.remove('grabando');
+                btn.classList.remove('grabando');
+                btn.textContent = '🔴 Grabar Melodía';
+                if (notasGrabadas.length > 0) {
+                    btnReproducir.classList.add('visible');
                 }
-                if (mensaje) mensaje.textContent = `✅ ¡Grabación guardada (${notasGrabadas.length} notas)!`;
+                document.getElementById('mensaje').textContent = `✅ Melodía guardada (${notasGrabadas.length} notas)`;
             }
         }
 
         function reproducirGrabacion() {
-            if (notasGrabadas.length === 0 || esReproduciendo) return;
-            esReproduciendo = true;
-            const mensaje = document.getElementById('mensaje');
-            if (mensaje) mensaje.textContent = "▶️ Reproduciendo melodía...";
-
-            timeoutsGrabacion.forEach(t => clearTimeout(t));
-            timeoutsGrabacion = [];
-
-            notasGrabadas.forEach((nota) => {
-                const t = setTimeout(() => {
-                    activarBloque(nota.id);
-                }, nota.tiempo);
-                timeoutsGrabacion.push(t);
+            if (notasGrabadas.length === 0) {
+                document.getElementById('mensaje').textContent = "⚠️ Primero graba una melodía";
+                return;
+            }
+            document.getElementById('mensaje').textContent = "▶️ Reproduciendo melodía...";
+            notasGrabadas.forEach(n => {
+                setTimeout(() => iluminarBloque(n.bloque, 220, false), n.tiempo);
             });
-
-            const tiempoTotal = notasGrabadas[notasGrabadas.length - 1].tiempo + 500;
-            const tFin = setTimeout(() => {
-                esReproduciendo = false;
-                if (mensaje) mensaje.textContent = "🎹 Modo Libre (5x5) — Reproducción finalizada";
-            }, tiempoTotal);
-            timeoutsGrabacion.push(tFin);
         }
 
-        construirTablero();
-        iniciarAtmosfera();
-        const btnJugarEl = document.getElementById('btn-jugar');
-        if (btnJugarEl) {
-            btnJugarEl.addEventListener('click', iniciarJuego);
+        // ==========================================
+        // ESTADÍSTICAS Y CONFIRMACIÓN DE BORRADO
+        // ==========================================
+        function obtenerDatosStats() {
+            return JSON.parse(localStorage.getItem('memoria_stats_v3')) || {};
+        }
+
+        function guardarRecordEstadistica(modo, dif, niv) {
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${Number(dif)}`;
+            if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
+            if (niv > stats[clave].record) {
+                stats[clave].record = niv;
+                localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            }
+        }
+
+        function registrarDerrotaEstadistica(modo, dif) {
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${Number(dif)}`;
+            if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
+            stats[clave].derrotas++;
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+        }
+
+        function registrarNotaEstadistica(modo, dif) {
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${Number(dif)}`;
+            if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
+            stats[clave].notas++;
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+        }
+
+        function abrirEstadisticas() {
+            const stats = obtenerDatosStats();
+            const cuerpo = document.getElementById('cuerpo-estadisticas');
+
+            const modosDef = [
+                { id: 'normal', nombre: '▶️ Normal', usaDif: true },
+                { id: 'invertido', nombre: '🔄 Invertido', usaDif: true },
+                { id: 'relampago', nombre: '⚡ Relámpago', usaDif: true },
+                { id: 'contrarreloj', nombre: '⏱️ Contrarreloj', usaDif: true },
+                { id: 'extremo', nombre: '🔥 Extremo', usaDif: true },
+                { id: 'hacker', nombre: '💻 Hacker', usaDif: false, difFija: 2 }
+            ];
+
+            let html = `
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px; text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 0.85rem; color: var(--subtext-color); margin-bottom: 4px;">🎵 Total de notas tocadas</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">${totalNotasTocadas}</div>
+                </div>
+            `;
+            html += '<div style="display: flex; flex-direction: column; gap: 14px;">';
+
+            modosDef.forEach(m => {
+                html += `
+                    <div style="background: rgba(22, 33, 62, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px;">
+                        <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-align: center; margin-bottom: 10px;">Modo = ${m.nombre}</div>
+                `;
+
+                if (m.usaDif) {
+                    const difs = [
+                        { val: 2, label: '🟢 Fácil' },
+                        { val: 3, label: '🟡 Medio' },
+                        { val: 4, label: '🔴 Difícil' }
+                    ];
+                    html += `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">`;
+                    difs.forEach(d => {
+                        const dat = stats[`${m.id}_${d.val}`] || { record: 0, derrotas: 0, notas: 0 };
+                        html += `
+                            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 0.75rem;">
+                                <div style="font-weight: 600; margin-bottom: 6px; color: #ffffff;">${d.label}</div>
+                                <div style="color: var(--subtext-color); margin-bottom: 2px;">Récord: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
+                                <div style="color: var(--subtext-color); margin-bottom: 2px;">Derrotas: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
+                                <div style="color: var(--subtext-color);">Notas: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                } else {
+                    const dat = stats[`${m.id}_${m.difFija}`] || { record: 0, derrotas: 0, notas: 0 };
+                    html += `
+                        <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; text-align: center; font-size: 0.82rem;">
+                            <div style="color: var(--subtext-color);">Récord: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
+                            <div style="color: var(--subtext-color);">Derrotas: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
+                            <div style="color: var(--subtext-color);">Notas: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+            });
+
+            html += `</div>`;
+            cuerpo.innerHTML = html;
+            document.getElementById('modal-estadisticas').classList.add('activo');
+        }
+
+        function cerrarEstadisticas() {
+            document.getElementById('modal-estadisticas').classList.remove('activo');
+        }
+
+        function abrirConfirmacionBorrar() {
+            document.getElementById('modal-confirmar-borrar').classList.add('activo');
+        }
+
+        function cerrarConfirmacionBorrar() {
+            document.getElementById('modal-confirmar-borrar').classList.remove('activo');
+        }
+
+        function confirmarBorradoDatos() {
+            localStorage.removeItem('memoria_stats_v3');
+            localStorage.removeItem('memoria_total_notas_v1');
+            localStorage.removeItem('memoria_logros_v1');
+            localStorage.removeItem('memoria_estetico_v1');
+            localStorage.removeItem('memoria_dias_jugados_v1');
+
+            totalNotasTocadas = 0;
+            logrosDesbloqueados = {};
+            progresoEstetico = { sonidos: ['1'], atmosferas: ['1'] };
+
+            cerrarConfirmacionBorrar();
+            abrirEstadisticas();
         }
     </script>
 </body>
