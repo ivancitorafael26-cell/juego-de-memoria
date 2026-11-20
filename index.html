@@ -679,7 +679,7 @@
     <div class="modal-overlay" id="modal-logros">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2>🏆 Logros (<span id="contador-logros">0/18</span>)</h2>
+                <h2>🏆 Logros (<span id="contador-logros">0/19</span>)</h2>
                 <button class="btn-cerrar-x" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
             </div>
             <div class="lista-logros" id="lista-logros"></div>
@@ -937,6 +937,7 @@
             { id: 'cien_notas', icono: '🎵', nombre: 'Cien Notas', desc: 'Llega a 100 notas tocadas en total.' },
             { id: 'quinientas_notas', icono: '🎶', nombre: 'Quinientas Notas', desc: 'Llega a 500 notas tocadas en total.' },
             { id: 'mil_notas', icono: '🎹', nombre: 'Mil Notas', desc: 'Toca 1,000 notas en total entre tus partidas.' },
+            { id: 'cinco_mil_notas', icono: '🏅', nombre: 'Cinco Mil Notas', desc: 'Toca 5,000 notas en total entre tus partidas.' },
             { id: 'tecla_loca', icono: '🎹', nombre: 'Tecla Loca', desc: 'Toca 25 bloques en el Modo Libre sin estar grabando.' },
             { id: 'repeticion', icono: '🔁', nombre: 'Repetición', desc: 'Reproduce tu misma melodía grabada 2 veces seguidas.' },
             { id: 'modo_matrix', icono: '💻', nombre: 'Modo Matrix', desc: 'Activa el modo Hacker y toca al menos 10 bloques.' },
@@ -957,6 +958,7 @@
             if (totalNotasTocadas >= 100) desbloquearLogro('cien_notas');
             if (totalNotasTocadas >= 500) desbloquearLogro('quinientas_notas');
             if (totalNotasTocadas >= 1000) desbloquearLogro('mil_notas');
+            if (totalNotasTocadas >= 5000) desbloquearLogro('cinco_mil_notas');
         }
 
         function comprobarLogroCurioso() {
