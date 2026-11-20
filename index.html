@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,11 +14,11 @@
             --subtext-color: #a2a8d3;
             --btn-bg: #ffffff;
             --btn-text: #1a1a2e;
-            --control-bg: rgba(22, 33, 62, 0.45);
-            --control-hover: rgba(31, 48, 94, 0.65);
+            --control-bg: rgba(22, 33, 62, 0.75);
+            --control-hover: rgba(31, 48, 94, 0.9);
             --control-text: #ffffff;
-            --badge-bg: rgba(255, 255, 255, 0.08);
-            --modal-bg: rgba(22, 33, 62, 0.45);
+            --badge-bg: rgba(255, 255, 255, 0.1);
+            --modal-bg: rgba(22, 33, 62, 0.88);
         }
 
         body {
@@ -34,7 +33,7 @@
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
-            transition: background-color 0.4s ease, color 0.3s ease;
+            transition: background-color 0.25s ease, color 0.2s ease;
             box-sizing: border-box;
             overflow-x: hidden;
             position: relative;
@@ -81,27 +80,26 @@
         body.modo-hacker .barra-superior {
             background-color: #000000 !important;
             border-bottom: 2px solid #00ff00 !important;
-            box-shadow: 0 4px 20px rgba(0, 255, 0, 0.25) !important;
+            box-shadow: 0 4px 16px rgba(0, 255, 0, 0.2) !important;
         }
 
         body.modo-hacker .btn-mini, body.modo-hacker select {
             background-color: #0b0f0b !important;
             color: #00ff00 !important;
             border: 1px solid #00ff00 !important;
-            backdrop-filter: none !important;
         }
 
         body.modo-hacker .btn-mini:hover:not(:disabled) {
             background-color: #00ff00 !important;
             color: #000000 !important;
-            box-shadow: 0 0 12px #00ff00 !important;
+            box-shadow: 0 0 10px #00ff00 !important;
         }
 
         body.modo-hacker h1, 
         body.modo-hacker #mensaje, 
         body.modo-hacker .badge-modo {
             color: #00ff00 !important;
-            text-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
+            text-shadow: 0 0 6px rgba(0, 255, 0, 0.6);
         }
 
         body.modo-hacker .bloque {
@@ -113,28 +111,26 @@
 
         body.modo-hacker .bloque.brillar {
             background-color: #00ff00 !important;
-            box-shadow: 0 0 35px #00ff00, inset 0 0 15px #ffffff !important;
-            filter: brightness(1.5);
+            box-shadow: 0 0 28px #00ff00 !important;
+            filter: brightness(1.35);
         }
 
-        /* Barra Superior con Glassmorphism translúcido */
+        /* Barra Superior optimizada */
         .barra-superior {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: rgba(26, 26, 46, 0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(26, 26, 46, 0.78);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
             padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
             z-index: 100;
             box-sizing: border-box;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.25s ease;
         }
 
         .grupo-controles {
@@ -146,8 +142,6 @@
 
         .btn-mini {
             background-color: var(--control-bg);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
             color: var(--control-text);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
@@ -156,8 +150,8 @@
             font-weight: 600;
             cursor: pointer;
             outline: none;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
         }
 
         .btn-mini:disabled {
@@ -170,7 +164,6 @@
             background-color: var(--control-hover);
             border-color: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
         }
 
         #btn-silenciar {
@@ -189,20 +182,18 @@
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: rgba(22, 33, 62, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(22, 33, 62, 0.95);
             border: 2px solid #ffd700;
             border-radius: 16px;
             padding: 12px 18px;
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.35);
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.3);
             z-index: 2000;
             transform: translateY(150%);
             opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.35s ease, opacity 0.35s ease;
         }
 
         .toast-logro.mostrar {
@@ -268,7 +259,7 @@
             font-weight: 800;
             letter-spacing: 0.5px;
             border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 4px 12px rgba(55, 66, 250, 0.35);
+            box-shadow: 0 3px 10px rgba(55, 66, 250, 0.3);
             text-transform: uppercase;
         }
 
@@ -283,8 +274,6 @@
 
         .badge-modo {
             background-color: var(--badge-bg);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             padding: 6px 14px;
             border-radius: 20px;
@@ -313,7 +302,7 @@
             overflow: hidden;
             display: none;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease;
         }
 
         .contenedor-tiempo.activo {
@@ -325,19 +314,17 @@
             width: 100%;
             height: 100%;
             background-color: #2ed573;
-            transition: width 0.1s linear, background-color 0.3s;
+            transition: width 0.1s linear, background-color 0.25s;
         }
 
         .vibrando-alerta {
-            animation: vibrar-rojo 0.15s infinite alternate;
+            animation: vibrar-rojo 0.18s infinite alternate;
         }
 
         @keyframes vibrar-rojo {
             0% { transform: translate(0, 0) scale(1); background-color: #ff4757; }
-            25% { transform: translate(-2px, 2px) scale(1.01); background-color: #ff3838; }
-            50% { transform: translate(2px, -2px) scale(1); background-color: #ff4757; }
-            75% { transform: translate(-1px, -1px) scale(1.01); background-color: #e84118; }
-            100% { transform: translate(1px, 1px) scale(1); background-color: #ff4757; }
+            50% { transform: translate(2px, -2px) scale(1.01); background-color: #ff3838; }
+            100% { transform: translate(-1px, 1px) scale(1); background-color: #ff4757; }
         }
 
         .panel-grabadora {
@@ -347,7 +334,7 @@
             gap: 8px;
             margin-bottom: 12px;
             align-items: center;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease;
         }
 
         .panel-grabadora.activo {
@@ -362,9 +349,9 @@
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
+            transition: transform 0.12s ease, background-color 0.2s ease;
         }
-        .btn-grabadora:hover { transform: scale(1.05); }
+        .btn-grabadora:hover { transform: scale(1.04); }
         #btn-grabar { background-color: #ff4757; color: white; }
         #btn-grabar.grabando { background-color: #c0392b; animation: pulse 1s infinite; }
         #btn-reproducir { background-color: #2ed573; color: white; display: none; }
@@ -372,7 +359,7 @@
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.04); }
             100% { transform: scale(1); }
         }
 
@@ -392,7 +379,7 @@
         }
 
         @keyframes aparecerBloque {
-            from { transform: scale(0.3); opacity: 0; }
+            from { transform: scale(0.5); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
@@ -404,41 +391,21 @@
             position: relative;
             z-index: 2;
             border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 2px 5px rgba(255, 255, 255, 0.35);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease, filter 0.2s ease;
-            animation: aparecerBloque 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
-        }
-
-        .bloque::after {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background-color: currentColor;
-            border-radius: 22px;
-            z-index: -1;
-            opacity: 0;
-            filter: blur(14px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            transform: scale(0.85);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+            animation: aparecerBloque 0.25s ease backwards;
+            will-change: transform, filter;
         }
 
         .bloque:active {
-            transform: scale(0.92);
+            transform: scale(0.93);
         }
 
         .bloque.brillar {
-            transform: scale(1.08);
-            box-shadow: 0 0 40px currentColor, inset 0 0 15px rgba(255, 255, 255, 0.9);
-            filter: brightness(1.4);
+            transform: scale(1.07);
+            box-shadow: 0 0 28px currentColor, inset 0 0 12px rgba(255, 255, 255, 0.85);
+            filter: brightness(1.35);
             z-index: 10;
-        }
-
-        .bloque.brillar::after {
-            opacity: 1;
-            transform: scale(1.3);
         }
 
         #btn-jugar {
@@ -450,15 +417,14 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.28);
+            transition: transform 0.15s ease, opacity 0.2s ease;
             margin-bottom: 20px;
         }
 
         #btn-jugar:hover:not(:disabled) {
-            transform: translateY(-3px) scale(1.03);
+            transform: translateY(-2px) scale(1.02);
             opacity: 0.95;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         #btn-jugar:disabled {
@@ -467,23 +433,21 @@
             transform: none;
         }
 
-        /* Modales con Glassmorphism translúcido */
+        /* Modales optimizados sin blur pesado */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.65);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.22s ease;
         }
 
         .modal-overlay.activo {
@@ -494,8 +458,6 @@
         .modal-contenido {
             position: relative;
             background-color: var(--modal-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             color: var(--text-color);
             padding: 24px;
             border-radius: 22px;
@@ -503,13 +465,13 @@
             max-width: 450px;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
             box-sizing: border-box;
-            animation: aparecerModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: aparecerModal 0.22s ease;
         }
 
         @keyframes aparecerModal {
-            from { transform: scale(0.85); opacity: 0; }
+            from { transform: scale(0.92); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
 
@@ -549,15 +511,13 @@
             justify-content: center;
             cursor: pointer;
             padding: 0;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 2px 10px rgba(255, 71, 87, 0.25);
+            transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
         }
 
         .btn-cerrar-x:hover {
             background-color: #ff4757;
             color: #ffffff;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 4px 14px rgba(255, 71, 87, 0.5);
+            transform: translateY(-50%) scale(1.08);
         }
 
         .btn-cerrar-x:active {
@@ -581,9 +541,7 @@
             width: 100%;
             padding: 10px 12px;
             border-radius: 12px;
-            background-color: rgba(22, 33, 62, 0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background-color: rgba(22, 33, 62, 0.72);
             color: var(--control-text);
             border: 1px solid rgba(255, 255, 255, 0.2);
             font-size: 0.9rem;
@@ -591,11 +549,11 @@
             cursor: pointer;
             outline: none;
             box-sizing: border-box;
-            transition: background-color 0.2s, border-color 0.2s;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
 
         .grupo-opcion-config select:hover, .grupo-opcion-config button:hover {
-            background-color: rgba(31, 48, 94, 0.7);
+            background-color: rgba(31, 48, 94, 0.88);
             border-color: rgba(255, 255, 255, 0.4);
         }
 
@@ -625,7 +583,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             opacity: 0.55;
             filter: grayscale(85%);
-            transition: all 0.3s ease;
+            transition: opacity 0.25s ease, background-color 0.25s ease;
         }
 
         .item-logro.desbloqueado {
@@ -633,7 +591,6 @@
             filter: grayscale(0%);
             background: rgba(255, 215, 0, 0.14);
             border-color: rgba(255, 215, 0, 0.55);
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15);
         }
 
         .logro-icono {
@@ -703,7 +660,7 @@
         </div>
     </div>
 
-    <!-- Barra Superior Limpia con Glassmorphism translúcido -->
+    <!-- Barra Superior Limpia -->
     <div class="barra-superior">
         <div class="grupo-controles">
             <div id="badge-usuario" class="badge-modo" style="background-color: rgba(46, 213, 115, 0.2); color: #2ed573; border-color: rgba(46, 213, 115, 0.4);">👤 Jugador</div>
@@ -904,7 +861,7 @@
         let usuarioActual = { nombre: '', emoji: '' };
 
         // ==========================================
-        // CONFETI DE CELEBRACIÓN (NIVELES 5 Y 10)
+        // CONFETI LIGERO (NIVELES 5 Y 10)
         // ==========================================
         const canvasConfeti = document.getElementById('confeti-canvas');
         const ctxConfeti = canvasConfeti.getContext('2d');
@@ -917,17 +874,15 @@
             particulasConfeti = [];
 
             const colores = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ffd700', '#ff6b81', '#05d9e8', '#a29bfe'];
-            for (let i = 0; i < 120; i++) {
+            for (let i = 0; i < 65; i++) {
                 particulasConfeti.push({
                     x: Math.random() * canvasConfeti.width,
                     y: Math.random() * -canvasConfeti.height * 0.5,
-                    w: Math.random() * 10 + 6,
+                    w: Math.random() * 9 + 5,
                     h: Math.random() * 6 + 4,
                     color: colores[Math.floor(Math.random() * colores.length)],
                     speedY: Math.random() * 3.5 + 2.5,
-                    speedX: Math.random() * 4 - 2,
-                    rotation: Math.random() * 360,
-                    rotSpeed: Math.random() * 10 - 5
+                    speedX: Math.random() * 4 - 2
                 });
             }
 
@@ -939,21 +894,17 @@
             ctxConfeti.clearRect(0, 0, canvasConfeti.width, canvasConfeti.height);
             let activas = 0;
 
-            particulasConfeti.forEach(p => {
+            for (let i = 0; i < particulasConfeti.length; i++) {
+                const p = particulasConfeti[i];
                 p.y += p.speedY;
                 p.x += p.speedX;
-                p.rotation += p.rotSpeed;
 
                 if (p.y < canvasConfeti.height + 30) {
                     activas++;
-                    ctxConfeti.save();
-                    ctxConfeti.translate(p.x, p.y);
-                    ctxConfeti.rotate((p.rotation * Math.PI) / 180);
                     ctxConfeti.fillStyle = p.color;
-                    ctxConfeti.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-                    ctxConfeti.restore();
+                    ctxConfeti.fillRect(p.x, p.y, p.w, p.h);
                 }
-            });
+            }
 
             if (activas > 0) {
                 confetiAnimId = requestAnimationFrame(animarConfeti);
@@ -1021,8 +972,8 @@
                 setTimeout(() => {
                     mostrandoToast = false;
                     procesarColaToasts();
-                }, 450);
-            }, 3200);
+                }, 400);
+            }, 3000);
         }
 
         function verificarProgresoEstetico() {
@@ -1166,7 +1117,7 @@
         }
 
         // ==========================================
-        // MATRIZ HACKER Y ATMÓSFERAS
+        // MATRIZ HACKER Y ATMÓSFERAS EQUILIBRADAS
         // ==========================================
         const canvasMatrix = document.getElementById('matrix-canvas');
         const ctxMatrix = canvasMatrix.getContext('2d');
@@ -1175,16 +1126,13 @@
         function iniciarMatrizHacker() {
             canvasMatrix.width = window.innerWidth;
             canvasMatrix.height = window.innerHeight;
-            const fontSize = 16;
+            const fontSize = 18;
             const columns = Math.floor(canvasMatrix.width / fontSize);
-            const drops = [];
-            for (let i = 0; i < columns; i++) {
-                drops[i] = 1;
-            }
+            const drops = new Array(columns).fill(1);
 
             if (matrixInterval) clearInterval(matrixInterval);
             matrixInterval = setInterval(() => {
-                ctxMatrix.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctxMatrix.fillStyle = 'rgba(0, 0, 0, 0.12)';
                 ctxMatrix.fillRect(0, 0, canvasMatrix.width, canvasMatrix.height);
 
                 ctxMatrix.fillStyle = '#00ff00';
@@ -1194,12 +1142,12 @@
                     const text = Math.random() > 0.5 ? '1' : '0';
                     ctxMatrix.fillText(text, i * fontSize, drops[i] * fontSize);
 
-                    if (drops[i] * fontSize > canvasMatrix.height && Math.random() > 0.975) {
+                    if (drops[i] * fontSize > canvasMatrix.height && Math.random() > 0.97) {
                         drops[i] = 0;
                     }
                     drops[i]++;
                 }
-            }, 50);
+            }, 80);
         }
 
         function detenerMatrizHacker() {
@@ -1241,17 +1189,18 @@
             }
 
             atmosParticles = [];
-            const count = (tipo === 1) ? 18 : 35; 
-            const coloresHojas = ['#2ed573', '#26de81', '#20bf6b', '#4cd137', '#44bd32'];
-            const coloresBrillitos = ['#ffd700', '#fffa65', '#ffaf40', '#ffffff', '#7efff5'];
+            // Hojas: cantidad normal (16); Nieve y Brillitos: un poco más sin saturar (26)
+            const count = tipo === 1 ? 16 : 26;
+            const coloresHojas = ['#2ed573', '#26de81', '#20bf6b', '#4cd137'];
+            const coloresBrillitos = ['#ffd700', '#fffa65', '#ffaf40', '#ffffff'];
 
             for (let i = 0; i < count; i++) {
                 atmosParticles.push({
                     x: Math.random() * canvasAtmos.width,
                     y: Math.random() * canvasAtmos.height,
-                    size: Math.random() * 8 + 5,
-                    speedY: tipo === 1 ? (Math.random() * 1.2 + 0.4) : (tipo === 2 ? (Math.random() * 2 + 1) : (Math.random() * 0.8 - 0.4)),
-                    speedX: tipo === 1 ? (Math.random() * 1.5 - 0.75) : (tipo === 2 ? (Math.random() * 0.5 - 0.25) : (Math.random() * 1.5 - 0.75)),
+                    size: tipo === 1 ? (Math.random() * 7 + 6) : (Math.random() * 5.5 + 3.5),
+                    speedY: tipo === 1 ? (Math.random() * 1.15 + 0.45) : (tipo === 2 ? (Math.random() * 1.7 + 0.85) : (Math.random() * 0.65 - 0.32)),
+                    speedX: tipo === 1 ? (Math.random() * 1.3 - 0.65) : (tipo === 2 ? (Math.random() * 0.45 - 0.22) : (Math.random() * 1.1 - 0.55)),
                     color: tipo === 1 ? coloresHojas[i % coloresHojas.length] : (tipo === 2 ? '#ffffff' : coloresBrillitos[i % coloresBrillitos.length]),
                     angle: Math.random() * Math.PI * 2
                 });
@@ -1263,27 +1212,30 @@
 
         function animarAtmosfera(tipo) {
             ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
-            atmosParticles.forEach(p => {
-                ctxAtmos.save();
-                ctxAtmos.translate(p.x, p.y);
-                ctxAtmos.rotate(p.angle);
+
+            for (let i = 0; i < atmosParticles.length; i++) {
+                const p = atmosParticles[i];
                 ctxAtmos.fillStyle = p.color;
-                ctxAtmos.globalAlpha = tipo === 3 ? (0.4 + Math.abs(Math.sin(p.angle)) * 0.6) : 0.65;
+                ctxAtmos.globalAlpha = tipo === 3 ? (0.45 + Math.abs(Math.sin(p.angle)) * 0.5) : 0.65;
 
                 if (tipo === 1) {
+                    // Hoja normal alargada con inclinación suave
+                    ctxAtmos.save();
+                    ctxAtmos.translate(p.x, p.y);
+                    ctxAtmos.rotate(Math.sin(p.angle) * 0.45);
                     ctxAtmos.beginPath();
-                    ctxAtmos.ellipse(0, 0, p.size, p.size / 2, 0, 0, Math.PI * 2);
+                    ctxAtmos.ellipse(0, 0, p.size * 1.25, p.size * 0.55, 0, 0, Math.PI * 2);
                     ctxAtmos.fill();
+                    ctxAtmos.restore();
                 } else {
                     ctxAtmos.beginPath();
-                    ctxAtmos.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    ctxAtmos.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
                     ctxAtmos.fill();
                 }
-                ctxAtmos.restore();
 
                 p.y += p.speedY;
                 p.x += p.speedX;
-                p.angle += 0.02;
+                p.angle += 0.03;
 
                 if (p.y > canvasAtmos.height + 15) {
                     p.y = -15;
@@ -1291,8 +1243,9 @@
                 }
                 if (p.x > canvasAtmos.width + 15) p.x = -15;
                 if (p.x < -15) p.x = canvasAtmos.width + 15;
-            });
+            }
 
+            ctxAtmos.globalAlpha = 1;
             atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
         }
 
@@ -1659,7 +1612,6 @@
                         return;
                     }
 
-                    // Celebración con confeti y pausa de unos segundos en nivel 5 en cualquier modo
                     if (nivel === 5) {
                         lanzarConfeti();
                         document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} alcanzado! Celebrando...`;
