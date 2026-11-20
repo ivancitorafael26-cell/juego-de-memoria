@@ -358,14 +358,14 @@
             flex-wrap: wrap;
         }
 
-        /* Panel lateral de Grabadora, Velocidad y Códigos Numéricos (Modo Libre) */
+        /* Panel lateral: Grabar / Detener, Oír y Velocidad */
         .panel-grabadora {
             display: none;
             opacity: 0;
             flex-direction: column;
             gap: 10px;
             align-items: stretch;
-            width: 270px;
+            width: 240px;
             background: rgba(22, 33, 62, 0.72);
             border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 18px;
@@ -381,7 +381,7 @@
 
         .fila-libre {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
@@ -389,8 +389,8 @@
         }
 
         .btn-grabadora {
-            padding: 8px 12px;
-            font-size: 0.78rem;
+            padding: 8px 14px;
+            font-size: 0.8rem;
             font-weight: bold;
             border: none;
             border-radius: 14px;
@@ -403,69 +403,18 @@
         #btn-grabar.grabando { background-color: #c0392b; animation: pulse 1s infinite; }
         #btn-reproducir { background-color: #2ed573; color: white; display: none; flex: 1; }
         #btn-reproducir.visible { display: inline-block; }
-        #btn-tocar-codigo { background-color: #3742fa; color: white; }
-        #btn-copiar-codigo { background-color: rgba(255, 215, 0, 0.22); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.45); padding: 5px 9px; font-size: 0.72rem; }
 
         .select-velocidad-libre {
-            padding: 7px 9px;
+            width: 100%;
+            padding: 8px 10px;
             border-radius: 12px;
             background-color: rgba(0, 0, 0, 0.35);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
             outline: none;
-        }
-
-        .caja-codigo-melodia {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 8px;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 9px;
-            box-sizing: border-box;
-        }
-
-        .cabecera-codigo {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .codigo-generado-texto {
-            font-size: 0.76rem;
-            color: #ffd700;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            word-break: break-all;
-            text-align: left;
-            flex: 1;
-        }
-
-        .input-codigo-melodia {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 7px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.35);
-            color: #ffffff;
-            font-size: 0.82rem;
-            font-weight: 600;
-            text-align: center;
-            outline: none;
-            letter-spacing: 0.5px;
-        }
-
-        .input-codigo-melodia::placeholder {
-            color: rgba(255, 255, 255, 0.45);
-            font-weight: 400;
         }
 
         @keyframes pulse {
@@ -963,27 +912,18 @@
                 </div>
             </div>
 
-            <!-- Panel Lateral: Grabadora, Velocidad y Códigos Cortos (Modo Libre) -->
+            <!-- Panel Lateral: Grabar / Detener, Oír y Velocidad -->
             <div class="panel-grabadora" id="panel-grabadora">
                 <div class="fila-libre">
                     <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
                     <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Oír</button>
-                    <select class="select-velocidad-libre" id="selector-velocidad-libre" title="Velocidad de reproducción">
-                        <option value="0.75">0.75x</option>
-                        <option value="1" selected>1x</option>
-                        <option value="1.5">1.5x</option>
-                        <option value="2">2x</option>
-                    </select>
                 </div>
-
-                <div class="caja-codigo-melodia">
-                    <div class="cabecera-codigo">
-                        <div class="codigo-generado-texto" id="codigo-melodia-actual">Código: --</div>
-                        <button class="btn-grabadora" id="btn-copiar-codigo" type="button" onclick="copiarCodigoMelodia()">📋 Copiar</button>
-                    </div>
-                    <input type="text" class="input-codigo-melodia" id="input-codigo-melodia" placeholder="Escribe código (ej: 000612)">
-                    <button class="btn-grabadora" id="btn-tocar-codigo" type="button" onclick="reproducirCodigoMelodia()" style="width: 100%;">🎵 Tocar código</button>
-                </div>
+                <select class="select-velocidad-libre" id="selector-velocidad-libre" title="Velocidad de reproducción">
+                    <option value="0.75">0.75x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
             </div>
         </div>
 
@@ -1030,7 +970,6 @@
         let esGrabando = false;
         let esReproduciendo = false;
         let notasGrabadas = [];
-        const MAX_NOTAS_CODIGO = 12;
         let tiempoInicioGrabacion = 0;
         let timeoutsGrabacion = [];
 
@@ -1719,8 +1658,6 @@
             repeticionesConsecutivas = 0;
             const btnGrabar = document.getElementById('btn-grabar');
             const btnReproducir = document.getElementById('btn-reproducir');
-            const txtCodigo = document.getElementById('codigo-melodia-actual');
-            const inputCodigo = document.getElementById('input-codigo-melodia');
             if (btnGrabar) {
                 btnGrabar.classList.remove('grabando');
                 btnGrabar.textContent = '🔴 Grabar';
@@ -1728,8 +1665,6 @@
             if (btnReproducir) {
                 btnReproducir.classList.remove('visible');
             }
-            if (txtCodigo) txtCodigo.textContent = 'Código: --';
-            if (inputCodigo) inputCodigo.value = '';
 
             const btnJugar = document.getElementById('btn-jugar');
             if (btnJugar) {
@@ -2028,7 +1963,7 @@
         }
 
         // ==========================================
-        // GRABADORA, VELOCIDAD Y CÓDIGOS CORTOS (MODO LIBRE)
+        // GRABADORA Y VELOCIDAD (MODO LIBRE)
         // ==========================================
         function limpiarTimersGrabacion() {
             timeoutsGrabacion.forEach(t => clearTimeout(t));
@@ -2042,62 +1977,9 @@
             return (Number.isFinite(val) && val > 0) ? val : 1;
         }
 
-        function generarCodigoCorto(listaNotas) {
-            const recortadas = listaNotas.slice(0, MAX_NOTAS_CODIGO);
-            return recortadas.map(n => String(n.bloque).padStart(2, '0')).join('');
-        }
-
-        function parsearCodigoMelodia(textoCodigo) {
-            if (!textoCodigo) return null;
-            const limpio = textoCodigo.replace(/\D/g, '');
-            if (limpio.length === 0 || limpio.length % 2 !== 0) return null;
-
-            const indices = [];
-            for (let i = 0; i < limpio.length; i += 2) {
-                const num = parseInt(limpio.slice(i, i + 2), 10);
-                if (num < 0 || num >= totalBloques) return null;
-                indices.push(num);
-            }
-            return indices;
-        }
-
-        function copiarCodigoMelodia() {
-            const txtCodigo = document.getElementById('codigo-melodia-actual');
-            const inputCodigo = document.getElementById('input-codigo-melodia');
-            const valor = (inputCodigo && inputCodigo.value.trim())
-                ? inputCodigo.value.trim()
-                : (txtCodigo && txtCodigo.textContent.startsWith('Código: ') && !txtCodigo.textContent.endsWith('--')
-                    ? txtCodigo.textContent.replace('Código: ', '').trim()
-                    : '');
-
-            if (!valor) {
-                document.getElementById('mensaje').textContent = '⚠️ No hay código para copiar';
-                return;
-            }
-
-            const btnCopiar = document.getElementById('btn-copiar-codigo');
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(valor).then(() => {
-                    if (btnCopiar) {
-                        btnCopiar.textContent = '✅ Copiado';
-                        setTimeout(() => { btnCopiar.textContent = '📋 Copiar'; }, 1400);
-                    }
-                }).catch(() => {});
-            } else if (inputCodigo) {
-                inputCodigo.select();
-                document.execCommand('copy');
-                if (btnCopiar) {
-                    btnCopiar.textContent = '✅ Copiado';
-                    setTimeout(() => { btnCopiar.textContent = '📋 Copiar'; }, 1400);
-                }
-            }
-        }
-
         function toggleGrabar() {
             const btn = document.getElementById('btn-grabar');
             const btnReproducir = document.getElementById('btn-reproducir');
-            const txtCodigo = document.getElementById('codigo-melodia-actual');
-            const inputCodigo = document.getElementById('input-codigo-melodia');
 
             if (!esGrabando) {
                 limpiarTimersGrabacion();
@@ -2107,28 +1989,18 @@
                 btn.classList.add('grabando');
                 btn.textContent = '⏹️ Detener';
                 btnReproducir.classList.remove('visible');
-                if (txtCodigo) txtCodigo.textContent = 'Grabando...';
                 document.getElementById('mensaje').textContent = "🔴 Grabando melodía...";
             } else {
                 esGrabando = false;
                 btn.classList.remove('grabando');
                 btn.textContent = '🔴 Grabar';
                 if (notasGrabadas.length > 0) {
-                    const codigoCorto = generarCodigoCorto(notasGrabadas);
                     firmaUltimaGrabacion = notasGrabadas.map(n => n.bloque).join(',');
                     repeticionesConsecutivas = 0;
                     btnReproducir.classList.add('visible');
-                    if (txtCodigo) {
-                        txtCodigo.textContent = notasGrabadas.length > MAX_NOTAS_CODIGO
-                            ? `Código (${MAX_NOTAS_CODIGO} max): ${codigoCorto}`
-                            : `Código: ${codigoCorto}`;
-                    }
-                    if (inputCodigo) inputCodigo.value = codigoCorto;
                     if (notasGrabadas.length >= 15) {
                         desbloquearLogro('gran_compositor');
                     }
-                } else if (txtCodigo) {
-                    txtCodigo.textContent = 'Código: --';
                 }
                 document.getElementById('mensaje').textContent = `✅ Melodía guardada (${notasGrabadas.length} notas)`;
             }
@@ -2160,7 +2032,7 @@
 
             const vel = obtenerVelocidadLibre();
             const duracionBrillo = Math.max(110, Math.round(220 / vel));
-            document.getElementById('mensaje').textContent = `▶️ Reproduciendo (${vel}x)...`;
+            document.getElementById('mensaje').textContent = `▶️ Oyendo (${vel}x)...`;
 
             let maxDelay = 0;
             notasGrabadas.forEach(n => {
@@ -2174,38 +2046,6 @@
                 esReproduciendo = false;
                 document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
             }, maxDelay + duracionBrillo + 60);
-            timeoutsGrabacion.push(finTimeout);
-        }
-
-        function reproducirCodigoMelodia() {
-            const input = document.getElementById('input-codigo-melodia');
-            const texto = input ? input.value : '';
-            const bloquesCodigo = parsearCodigoMelodia(texto);
-
-            if (!bloquesCodigo) {
-                activarVibracionError();
-                document.getElementById('mensaje').textContent = `⚠️ Usa pares de 00 a ${String(totalBloques - 1).padStart(2, '0')} (ej: 000612)`;
-                return;
-            }
-
-            limpiarTimersGrabacion();
-            esReproduciendo = true;
-
-            const vel = obtenerVelocidadLibre();
-            const pasoMs = Math.max(140, Math.round(340 / vel));
-            const duracionBrillo = Math.max(100, Math.round(210 / vel));
-
-            document.getElementById('mensaje').textContent = `🎵 Tocando código (${vel}x)...`;
-
-            bloquesCodigo.forEach((idxBloque, i) => {
-                const t = setTimeout(() => iluminarBloque(idxBloque, duracionBrillo, false), i * pasoMs);
-                timeoutsGrabacion.push(t);
-            });
-
-            const finTimeout = setTimeout(() => {
-                esReproduciendo = false;
-                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
-            }, bloquesCodigo.length * pasoMs + duracionBrillo + 60);
             timeoutsGrabacion.push(finTimeout);
         }
 
