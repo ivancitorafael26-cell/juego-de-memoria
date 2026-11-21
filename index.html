@@ -33,10 +33,30 @@
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
-            transition: background-color 0.25s ease, color 0.2s ease;
+            transition: background-color 0.25s ease, color 0.2s ease, box-shadow 0.4s ease;
             box-sizing: border-box;
             overflow-x: hidden;
             position: relative;
+        }
+
+        /* Brillo suave en el fondo a partir del nivel 7 */
+        body.brillo-nivel-alto::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 3;
+            background: radial-gradient(circle at 50% 55%, rgba(116, 125, 255, 0.14), rgba(46, 213, 115, 0.06) 45%, transparent 72%);
+            animation: respirarBrilloAlto 3.2s ease-in-out infinite alternate;
+        }
+
+        body.modo-hacker.brillo-nivel-alto::after {
+            background: radial-gradient(circle at 50% 55%, rgba(0, 255, 0, 0.14), transparent 70%);
+        }
+
+        @keyframes respirarBrilloAlto {
+            0% { opacity: 0.65; }
+            100% { opacity: 1; }
         }
 
         /* Canvas de Lluvia Binaria, Atmósfera y Confeti */
@@ -476,7 +496,7 @@
         }
 
         #btn-jugar {
-            padding: 12px 36px;
+            padding: 12px 32px;
             font-size: 1.05rem;
             font-weight: bold;
             color: var(--btn-text);
@@ -497,6 +517,29 @@
             opacity: 0.4;
             cursor: not-allowed;
             transform: none;
+        }
+
+        #btn-terminar-partida {
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #ffffff;
+            background: linear-gradient(135deg, #ff4757, #d63031);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 18px rgba(255, 71, 87, 0.35);
+            transition: transform 0.15s ease, opacity 0.2s ease, background-color 0.2s ease;
+            display: none;
+        }
+
+        #btn-terminar-partida.visible {
+            display: inline-block;
+        }
+
+        #btn-terminar-partida:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            filter: brightness(1.08);
         }
 
         #btn-comodin-repetir {
@@ -725,6 +768,92 @@
             font-size: 1.1rem;
             flex-shrink: 0;
         }
+
+        /* Tabla de Clasificación Global */
+        .barra-filtro-global {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .barra-filtro-global select {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.35);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .lista-ranking {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .fila-ranking {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fila-ranking.top-1 {
+            border-color: rgba(255, 215, 0, 0.65);
+            background: rgba(255, 215, 0, 0.12);
+        }
+
+        .fila-ranking.top-2 {
+            border-color: rgba(210, 218, 226, 0.55);
+            background: rgba(210, 218, 226, 0.08);
+        }
+
+        .fila-ranking.top-3 {
+            border-color: rgba(255, 165, 2, 0.55);
+            background: rgba(255, 165, 2, 0.08);
+        }
+
+        .ranking-pos {
+            font-weight: 800;
+            font-size: 0.95rem;
+            min-width: 34px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .ranking-jugador {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ranking-nombre {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ranking-meta {
+            font-size: 0.73rem;
+            color: var(--subtext-color);
+        }
+
+        .ranking-puntaje {
+            font-weight: 800;
+            font-size: 0.92rem;
+            color: #2ed573;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
@@ -762,10 +891,36 @@
         </div>
 
         <div class="grupo-controles">
+            <button class="btn-mini" id="btn-global-top" type="button" onclick="abrirClasificacionGlobal()" style="background-color: rgba(46, 213, 115, 0.65); color: white;" title="Clasificación Global">🌍 Global</button>
             <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
             <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;">⚙️ Configuración</button>
+        </div>
+    </div>
+
+    <!-- Modal de Clasificación Global -->
+    <div class="modal-overlay" id="modal-global">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>🌍 Clasificación Global</h2>
+                <button class="btn-cerrar-x" type="button" onclick="cerrarClasificacionGlobal()" title="Cerrar">✕</button>
+            </div>
+            <div class="barra-filtro-global">
+                <select id="filtro-modo-global" onchange="renderizarClasificacionGlobal()">
+                    <option value="todos">🌐 Todos los modos</option>
+                    <option value="normal">▶️ Normal</option>
+                    <option value="invertido">🔄 Invertido</option>
+                    <option value="relampago">⚡ Relámpago</option>
+                    <option value="contrarreloj">⏱️ Contrarreloj</option>
+                    <option value="extremo">🔥 Extremo</option>
+                    <option value="hacker">💻 Hacker</option>
+                </select>
+                <button class="btn-mini" type="button" onclick="cargarYMostrarGlobal(true)">🔄 Actualizar</button>
+            </div>
+            <div class="lista-ranking" id="lista-ranking-global">
+                <div style="text-align: center; color: var(--subtext-color); padding: 16px;">Cargando clasificación...</div>
+            </div>
         </div>
     </div>
 
@@ -929,11 +1084,147 @@
 
         <div class="acciones-partida">
             <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar</button>
+            <button id="btn-terminar-partida" type="button" onclick="terminarPartidaManualmente()">🛑 Terminar partida</button>
             <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir (1)</button>
         </div>
     </div>
 
     <script>
+        const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
+        let cacheClasificacionGlobal = [];
+        let ultimoRecordEnviado = { clave: '', record: 0 };
+
+        const ETIQUETAS_MODO = {
+            normal: '▶️ Normal',
+            invertido: '🔄 Invertido',
+            relampago: '⚡ Relámpago',
+            contrarreloj: '⏱️ Contrarreloj',
+            extremo: '🔥 Extremo',
+            hacker: '💻 Hacker'
+        };
+
+        const ETIQUETAS_DIF = {
+            2: 'Fácil',
+            3: 'Medio',
+            4: 'Difícil'
+        };
+
+        function escaparTextoHTML(texto) {
+            return String(texto || '').replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+
+        async function publicarRecordGlobal(record, modo, dif) {
+            if (!usuarioActual || !usuarioActual.nombre || modo === 'libre') return;
+            const nivelNum = Number(record);
+            if (!Number.isFinite(nivelNum) || nivelNum < 1 || nivelNum > NIVEL_FINAL) return;
+
+            const claveJugador = `${usuarioActual.nombre.trim().toLowerCase()}_${modo}_${Number(dif)}`;
+            if (ultimoRecordEnviado.clave === claveJugador && nivelNum <= ultimoRecordEnviado.record) {
+                return;
+            }
+
+            const entrada = {
+                nombre: usuarioActual.nombre.trim().slice(0, 20),
+                emoji: usuarioActual.emoji || '🎮',
+                record: nivelNum,
+                modo: String(modo),
+                dificultad: Number(dif),
+                fecha: Date.now()
+            };
+
+            try {
+                const res = await fetch(`${URL_RANKING}.json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(entrada)
+                });
+                if (res.ok) {
+                    ultimoRecordEnviado = { clave: claveJugador, record: nivelNum };
+                }
+            } catch (err) {
+                console.error('No se pudo publicar el récord global:', err);
+            }
+        }
+
+        async function obtenerClasificacionGlobal() {
+            try {
+                const res = await fetch(`${URL_RANKING}.json`);
+                if (!res.ok) throw new Error('Respuesta no válida');
+                const data = await res.json();
+                if (!data || typeof data !== 'object') return [];
+
+                return Object.values(data)
+                    .filter(item => item && typeof item.nombre === 'string' && typeof item.record === 'number')
+                    .sort((a, b) => b.record - a.record || (a.fecha || 0) - (b.fecha || 0));
+            } catch (err) {
+                console.error('Error al cargar clasificación global:', err);
+                return null;
+            }
+        }
+
+        function abrirClasificacionGlobal() {
+            document.getElementById('modal-global').classList.add('activo');
+            cargarYMostrarGlobal(false);
+        }
+
+        function cerrarClasificacionGlobal() {
+            document.getElementById('modal-global').classList.remove('activo');
+        }
+
+        async function cargarYMostrarGlobal(forzarMensaje = false) {
+            const lista = document.getElementById('lista-ranking-global');
+            if (!lista) return;
+            if (forzarMensaje || cacheClasificacionGlobal.length === 0) {
+                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Cargando clasificación...</div>';
+            }
+
+            const datos = await obtenerClasificacionGlobal();
+            if (datos === null) {
+                lista.innerHTML = '<div style="text-align: center; color: #ff4757; padding: 16px;">⚠️ No se pudo conectar con la clasificación global.</div>';
+                return;
+            }
+
+            cacheClasificacionGlobal = datos;
+            renderizarClasificacionGlobal();
+        }
+
+        function renderizarClasificacionGlobal() {
+            const lista = document.getElementById('lista-ranking-global');
+            const filtro = document.getElementById('filtro-modo-global');
+            if (!lista) return;
+
+            const modoFiltro = filtro ? filtro.value : 'todos';
+            const filtrados = cacheClasificacionGlobal
+                .filter(item => modoFiltro === 'todos' || item.modo === modoFiltro)
+                .slice(0, 10);
+
+            if (filtrados.length === 0) {
+                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Aún no hay récords registrados aquí. ¡Sé el primero!</div>';
+                return;
+            }
+
+            lista.innerHTML = filtrados.map((item, idx) => {
+                const pos = idx + 1;
+                const medalla = pos === 1 ? '🥇' : (pos === 2 ? '🥈' : (pos === 3 ? '🥉' : `#${pos}`));
+                const claseTop = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
+                const modoTxt = ETIQUETAS_MODO[item.modo] || item.modo || 'Normal';
+                const difTxt = item.modo === 'hacker' || item.modo === 'extremo' ? '' : ` · ${ETIQUETAS_DIF[item.dificultad] || ''}`;
+
+                return `
+                    <div class="fila-ranking ${claseTop}">
+                        <div class="ranking-pos">${medalla}</div>
+                        <div class="ranking-jugador">
+                            <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}</div>
+                            <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
+                        </div>
+                        <div class="ranking-puntaje">Nivel ${Number(item.record)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         let secuencia = [];
         let secuenciaObjetivo = [];
         let pasoUsuario = 0;
@@ -948,6 +1239,7 @@
         const MODOS_CON_COMODIN = ['normal', 'invertido', 'relampago'];
         let comodinDisponibleEnPartida = false;
         let reproduciendoSecuenciaActual = false;
+        let partidaEnCurso = false;
 
         let timerPartidaInterval = null;
         let segundosPartida = 0;
@@ -980,7 +1272,9 @@
             atmosfera: '1',
             sonido: '1',
             temaColor: '0',
-            fondo: '#1a1a2e'
+            fondo: '#1a1a2e',
+            modo: 'normal',
+            dificultad: '2'
         };
 
         function obtenerPreferenciasVisuales() {
@@ -998,21 +1292,99 @@
             localStorage.setItem('memoria_prefs_visuales_v1', JSON.stringify(prefs));
         }
 
+        function actualizarBrilloNivelAlto() {
+            const activar = partidaEnCurso && modoJuego !== 'libre' && nivel >= 7;
+            document.body.classList.toggle('brillo-nivel-alto', activar);
+        }
+
+        function actualizarBotonesPartida() {
+            const btnJugar = document.getElementById('btn-jugar');
+            const btnTerminar = document.getElementById('btn-terminar-partida');
+
+            if (btnJugar) {
+                btnJugar.style.display = modoJuego === 'libre' || partidaEnCurso ? 'none' : 'inline-block';
+                btnJugar.textContent = haJugadoPartida ? 'Jugar de nuevo' : 'Jugar';
+                btnJugar.disabled = partidaEnCurso;
+            }
+
+            if (btnTerminar) {
+                btnTerminar.classList.toggle('visible', modoJuego !== 'libre' && partidaEnCurso);
+            }
+        }
+
+        function terminarPartidaManualmente() {
+            if (!partidaEnCurso || modoJuego === 'libre') return;
+
+            if (nivel >= 1) {
+                publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
+            }
+
+            limpiarTimers();
+            detenerBarraContrarreloj();
+
+            for (let i = 0; i < totalBloques; i++) {
+                const b = document.getElementById(`bloque-${i}`);
+                if (b) b.classList.remove('brillar');
+            }
+
+            secuencia = [];
+            secuenciaObjetivo = [];
+            pasoUsuario = 0;
+            nivel = 0;
+            bloqueado = true;
+            reproduciendoSecuenciaActual = false;
+            partidaEnCurso = false;
+            comodinDisponibleEnPartida = false;
+            segundosPartida = 0;
+
+            const crono = document.getElementById('cronometro-juego');
+            if (crono) {
+                crono.style.display = 'none';
+                crono.textContent = '⏱️ 00:00';
+            }
+
+            if (modoJuego === 'extremo') {
+                construirTablero(2);
+            }
+
+            actualizarBrilloNivelAlto();
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+            setControlesPartidaActivos(false);
+            document.getElementById('mensaje').textContent = '🛑 Partida terminada';
+        }
+
         function aplicarPreferenciasVisualesAlCargar() {
             const prefs = obtenerPreferenciasVisuales();
             const selAtmos = document.getElementById('selector-atmosfera');
             const selSonido = document.getElementById('selector-sonido');
             const selTema = document.getElementById('selector-color-bloques');
             const selFondo = document.getElementById('selector-fondo-oscuro');
+            const selDif = document.getElementById('selector-dificultad');
+            const selModo = document.getElementById('selector-modo');
 
             if (selAtmos) selAtmos.value = prefs.atmosfera;
             if (selSonido) selSonido.value = prefs.sonido;
             if (selTema) selTema.value = prefs.temaColor;
             if (selFondo) selFondo.value = prefs.fondo;
 
+            if (selDif && ['2', '3', '4'].includes(prefs.dificultad)) {
+                selDif.value = prefs.dificultad;
+                tamanoCuadricula = parseInt(prefs.dificultad, 10);
+            }
+
             document.documentElement.style.setProperty('--bg-color', prefs.fondo);
             document.body.style.backgroundColor = prefs.fondo;
             actualizarColoresTablero(false);
+
+            const modosValidos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker'];
+            const modoGuardado = modosValidos.includes(prefs.modo) ? prefs.modo : 'normal';
+            if (selModo) {
+                selModo.value = modoGuardado;
+                cambiarModoJuego(selModo, false);
+            } else {
+                construirTablero(tamanoCuadricula);
+            }
         }
 
         function activarVibracionError() {
@@ -1275,6 +1647,7 @@
             iniciarAtmosfera();
             verificarProgresoEstetico();
             actualizarBotonComodin();
+            actualizarBotonesPartida();
         });
 
         function guardarUsuario() {
@@ -1576,6 +1949,7 @@
 
         function cambiarDificultad(select) {
             tamanoCuadricula = parseInt(select.value, 10);
+            guardarPreferenciaVisual('dificultad', select.value);
             construirTablero(tamanoCuadricula);
         }
 
@@ -1640,10 +2014,13 @@
             nivel = 0;
             bloqueado = true;
             reproduciendoSecuenciaActual = false;
+            partidaEnCurso = false;
             comodinDisponibleEnPartida = false;
             segundosPartida = 0;
             toquesLibreSinGrabar = 0;
             toquesHacker = 0;
+
+            actualizarBrilloNivelAlto();
 
             const crono = document.getElementById('cronometro-juego');
             if (crono) {
@@ -1666,19 +2043,17 @@
                 btnReproducir.classList.remove('visible');
             }
 
-            const btnJugar = document.getElementById('btn-jugar');
-            if (btnJugar) {
-                btnJugar.disabled = false;
-                btnJugar.style.display = modoJuego === 'libre' ? 'none' : 'inline-block';
-            }
-
             actualizarBotonComodin();
+            actualizarBotonesPartida();
             setControlesPartidaActivos(false);
             document.getElementById('mensaje').textContent = 'Presiona "Jugar" para empezar';
         }
 
-        function cambiarModoJuego(select) {
+        function cambiarModoJuego(select, guardar = true) {
             modoJuego = select.value;
+            if (guardar) {
+                guardarPreferenciaVisual('modo', modoJuego);
+            }
             const nombreModo = select.options[select.selectedIndex].text;
             document.getElementById('badge-modo').textContent = `Modo = ${nombreModo}`;
 
@@ -1721,6 +2096,7 @@
                 construirTablero(parseInt(difSelect.value, 10));
             }
             actualizarBotonComodin();
+            actualizarBotonesPartida();
         }
 
         // ==========================================
@@ -1733,6 +2109,7 @@
             }
 
             haJugadoPartida = true;
+            partidaEnCurso = true;
             registrarDiaJugado();
 
             limpiarTimers();
@@ -1742,8 +2119,8 @@
             reproduciendoSecuenciaActual = false;
             comodinDisponibleEnPartida = MODOS_CON_COMODIN.includes(modoJuego);
             actualizarBotonComodin();
-
-            document.getElementById('btn-jugar').disabled = true;
+            actualizarBotonesPartida();
+            actualizarBrilloNivelAlto();
             setControlesPartidaActivos(true);
 
             if (modoJuego === 'extremo') {
@@ -1765,8 +2142,10 @@
         }
 
         function siguienteNivel() {
+            if (!partidaEnCurso) return;
             nivel++;
             pasoUsuario = 0;
+            actualizarBrilloNivelAlto();
 
             if (modoJuego === 'extremo') {
                 const dimDeseada = obtenerDimensionExtremoPorNivel(nivel);
@@ -1794,17 +2173,23 @@
         }
 
         function reproducirSecuencia(velocidad) {
+            if (!partidaEnCurso) return;
             bloqueado = true;
             reproduciendoSecuenciaActual = true;
             actualizarBotonComodin();
 
             let i = 0;
             const intervalo = setInterval(() => {
+                if (!partidaEnCurso) {
+                    clearInterval(intervalo);
+                    return;
+                }
                 if (i < secuencia.length) {
                     iluminarBloque(secuencia[i], velocidad * 0.55, false);
                     i++;
                 } else {
                     clearInterval(intervalo);
+                    if (!partidaEnCurso) return;
                     bloqueado = false;
                     reproduciendoSecuenciaActual = false;
                     actualizarBotonComodin();
@@ -1829,6 +2214,10 @@
             barra.classList.remove('vibrando-alerta');
 
             intervaloProgreso = setInterval(() => {
+                if (!partidaEnCurso) {
+                    detenerBarraContrarreloj();
+                    return;
+                }
                 tiempoRestante -= 100;
                 const porcentaje = Math.max(0, (tiempoRestante / TIEMPO_MAXIMO) * 100);
                 barra.style.width = `${porcentaje}%`;
@@ -1877,7 +2266,7 @@
                 return;
             }
 
-            if (bloqueado) return;
+            if (bloqueado || !partidaEnCurso) return;
             iluminarBloque(indice, 220, true);
 
             if (modoJuego === 'hacker') {
@@ -1895,6 +2284,7 @@
                     actualizarBotonComodin();
                     detenerBarraContrarreloj();
                     guardarRecordEstadistica(modoJuego, tamanoCuadricula, nivel);
+                    publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
 
                     if (modoJuego === 'normal' && nivel >= 3) {
                         desbloquearLogro('primeros_pasos');
@@ -1939,14 +2329,19 @@
         }
 
         function finalizarPartida(victoria, textoMensaje) {
+            if (nivel >= 1) {
+                publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
+            }
             bloqueado = true;
             reproduciendoSecuenciaActual = false;
+            partidaEnCurso = false;
             comodinDisponibleEnPartida = false;
+            actualizarBrilloNivelAlto();
             actualizarBotonComodin();
+            actualizarBotonesPartida();
             limpiarTimers();
             detenerBarraContrarreloj();
             document.getElementById('mensaje').textContent = textoMensaje;
-            document.getElementById('btn-jugar').disabled = false;
             setControlesPartidaActivos(false);
         }
 
@@ -2170,6 +2565,7 @@
             totalNotasTocadas = 0;
             logrosDesbloqueados = {};
             progresoEstetico = { sonidos: ['1'], atmosferas: ['1'] };
+            ultimoRecordEnviado = { clave: '', record: 0 };
 
             aplicarPreferenciasVisualesAlCargar();
             iniciarAtmosfera();
