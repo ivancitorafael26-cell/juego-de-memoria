@@ -181,6 +181,17 @@
             transform: translateY(-2px);
         }
 
+        #btn-confeti-admin-top {
+            display: none;
+            background: linear-gradient(135deg, #ff6b81, #ffa502);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        #btn-confeti-admin-top.visible {
+            display: inline-block;
+        }
+
         #btn-silenciar {
             width: 38px;
             height: 38px;
@@ -977,6 +988,7 @@
 
         <div class="grupo-controles">
             <button class="btn-mini" id="btn-global-top" type="button" onclick="abrirClasificacionGlobal()" style="background-color: rgba(46, 213, 115, 0.65); color: white;" title="Clasificación Global">🌍 Global</button>
+            <button class="btn-mini" id="btn-confeti-admin-top" type="button" onclick="lanzarConfeti()" title="Probar Confeti">🎉 Confeti</button>
             <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
@@ -1116,6 +1128,52 @@
             </div>
 
             <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🔁 Comodín Repetir</div>
+                <div class="admin-fila-input">
+                    <select id="admin-select-comodin-cant" class="admin-select" style="width: 115px;" onchange="sincronizarInputComodin()">
+                        <option value="1">1 uso</option>
+                        <option value="10">10 usos</option>
+                        <option value="100">100 usos</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                    <input type="number" id="admin-input-comodin-cant" class="admin-input" min="1" max="999" value="1" style="width: 90px;" placeholder="Cant.">
+                    <button class="btn-mini" type="button" onclick="adminRecargarComodin()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Recargar Comodín</button>
+                </div>
+            </div>
+
+            <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🎯 Entrar a un Nivel de Cualquier Modo</div>
+                <div class="admin-fila-input" style="margin-bottom: 8px;">
+                    <select id="admin-ir-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifIrNivel()">
+                        <option value="normal">▶️ Normal</option>
+                        <option value="invertido">🔄 Invertido</option>
+                        <option value="relampago">⚡ Relámpago</option>
+                        <option value="contrarreloj">⏱️ Contrarreloj</option>
+                        <option value="extremo">🔥 Extremo</option>
+                        <option value="hacker">💻 Hacker</option>
+                    </select>
+                    <select id="admin-ir-nivel" class="admin-select" style="width: 110px;">
+                        <option value="1">Nivel 1</option>
+                        <option value="2">Nivel 2</option>
+                        <option value="3">Nivel 3</option>
+                        <option value="4">Nivel 4</option>
+                        <option value="5">Nivel 5</option>
+                        <option value="6">Nivel 6</option>
+                        <option value="7">Nivel 7</option>
+                        <option value="8">Nivel 8</option>
+                        <option value="9">Nivel 9</option>
+                        <option value="10">Nivel 10</option>
+                    </select>
+                    <select id="admin-ir-dif" class="admin-select">
+                        <option value="2">🟢 Fácil</option>
+                        <option value="3">🟡 Medio</option>
+                        <option value="4">🔴 Difícil</option>
+                    </select>
+                </div>
+                <button class="btn-mini" type="button" onclick="adminEntrarANivel()" style="width: 100%; background-color: #3742fa; color: #ffffff; border: none;">🚀 Entrar al Nivel</button>
+            </div>
+
+            <div class="admin-seccion">
                 <div class="admin-seccion-titulo">🔐 Cambiar Contraseña de Admin</div>
                 <div class="admin-fila-input">
                     <input type="password" id="admin-input-nuevo-pin" class="admin-input" inputmode="numeric" maxlength="6" style="flex: 1; letter-spacing: 4px;" placeholder="Nuevo PIN (4 a 6 dígitos)">
@@ -1176,6 +1234,29 @@
                 <div class="admin-fila-input">
                     <input type="number" id="admin-input-record" class="admin-input" min="0" max="10" style="width: 115px;" placeholder="Nivel (0-10)">
                     <button class="btn-mini" type="button" onclick="adminGuardarEstadisticaModo()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Guardar Nivel</button>
+                </div>
+            </div>
+
+            <div class="admin-seccion">
+                <div class="admin-seccion-titulo">💀 Resetear Derrotas</div>
+                <div class="admin-fila-input" style="margin-bottom: 8px;">
+                    <select id="admin-reset-derrotas-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifResetDerrotas()">
+                        <option value="normal">▶️ Normal</option>
+                        <option value="invertido">🔄 Invertido</option>
+                        <option value="relampago">⚡ Relámpago</option>
+                        <option value="contrarreloj">⏱️ Contrarreloj</option>
+                        <option value="extremo">🔥 Extremo</option>
+                        <option value="hacker">💻 Hacker</option>
+                    </select>
+                    <select id="admin-reset-derrotas-dif" class="admin-select">
+                        <option value="2">🟢 Fácil</option>
+                        <option value="3">🟡 Medio</option>
+                        <option value="4">🔴 Difícil</option>
+                    </select>
+                </div>
+                <div class="admin-fila-input">
+                    <button class="btn-mini" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
+                    <button class="btn-mini" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
                 </div>
             </div>
 
@@ -1305,6 +1386,13 @@
             }[m]));
         }
 
+        function actualizarVisibilidadControlesAdmin() {
+            const btnConfeti = document.getElementById('btn-confeti-admin-top');
+            if (btnConfeti) {
+                btnConfeti.classList.toggle('visible', esAdminActivo);
+            }
+        }
+
         function abrirModalPinAdmin() {
             const input = document.getElementById('input-pin-admin');
             const err = document.getElementById('mensaje-error-pin');
@@ -1336,6 +1424,7 @@
             }
 
             esAdminActivo = true;
+            actualizarVisibilidadControlesAdmin();
             cerrarModalPinAdmin();
             cerrarConfiguracion();
             abrirPanelAdmin();
@@ -1357,10 +1446,177 @@
             alert('✅ Contraseña de administrador actualizada.');
         }
 
+        function sincronizarInputComodin() {
+            const sel = document.getElementById('admin-select-comodin-cant');
+            const inp = document.getElementById('admin-input-comodin-cant');
+            if (!sel || !inp) return;
+            if (sel.value !== 'custom') {
+                inp.value = sel.value;
+            }
+        }
+
+        function adminRecargarComodin() {
+            if (!esAdminActivo) return;
+            const inp = document.getElementById('admin-input-comodin-cant');
+            const cant = Math.max(1, Math.min(999, parseInt(inp ? inp.value : '1', 10) || 1));
+            comodinUsosRestantes = cant;
+            comodinDisponibleEnPartida = true;
+            actualizarBotonComodin();
+            alert(`✅ Comodín recargado con ${cant} uso(s).`);
+        }
+
+        function actualizarSelectDifIrNivel() {
+            const selModo = document.getElementById('admin-ir-modo');
+            const selDif = document.getElementById('admin-ir-dif');
+            if (!selModo || !selDif) return;
+            const esFijo = selModo.value === 'hacker' || selModo.value === 'extremo';
+            selDif.disabled = esFijo;
+        }
+
+        function adminEntrarANivel() {
+            if (!esAdminActivo) return;
+            const selModo = document.getElementById('admin-ir-modo');
+            const selNivel = document.getElementById('admin-ir-nivel');
+            const selDif = document.getElementById('admin-ir-dif');
+            if (!selModo || !selNivel || !selDif) return;
+
+            const modoElegido = selModo.value;
+            const nivelObjetivo = Math.max(1, Math.min(NIVEL_FINAL, parseInt(selNivel.value, 10) || 1));
+            const difElegida = modoElegido === 'hacker'
+                ? 2
+                : (modoElegido === 'extremo' ? obtenerDimensionExtremoPorNivel(nivelObjetivo) : parseInt(selDif.value, 10));
+
+            const selectorModoMain = document.getElementById('selector-modo');
+            const selectorDifMain = document.getElementById('selector-dificultad');
+
+            if (selectorDifMain && ['2', '3', '4'].includes(String(difElegida))) {
+                selectorDifMain.value = String(difElegida);
+                guardarPreferenciaVisual('dificultad', String(difElegida));
+            }
+
+            if (selectorModoMain) {
+                selectorModoMain.value = modoElegido;
+                cambiarModoJuego(selectorModoMain, true);
+            }
+
+            construirTablero(difElegida);
+
+            haJugadoPartida = true;
+            partidaEnCurso = true;
+            registrarDiaJugado();
+
+            limpiarTimers();
+            secuencia = [];
+            for (let i = 0; i < nivelObjetivo; i++) {
+                secuencia.push(Math.floor(Math.random() * totalBloques));
+            }
+            nivel = nivelObjetivo;
+            pasoUsuario = 0;
+            bloqueado = true;
+            reproduciendoSecuenciaActual = false;
+            comodinDisponibleEnPartida = MODOS_CON_COMODIN.includes(modoJuego);
+
+            actualizarBrilloNivelAlto();
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+            setControlesPartidaActivos(true);
+
+            segundosPartida = 0;
+            const crono = document.getElementById('cronometro-juego');
+            if (crono) {
+                crono.style.display = 'inline-block';
+                crono.textContent = '⏱️ 00:00';
+            }
+            timerPartidaInterval = setInterval(() => {
+                segundosPartida++;
+                const min = String(Math.floor(segundosPartida / 60)).padStart(2, '0');
+                const seg = String(segundosPartida % 60).padStart(2, '0');
+                if (crono) crono.textContent = `⏱️ ${min}:${seg}`;
+            }, 1000);
+
+            if (nivel >= 8) {
+                desbloquearLogro('memoria_fotografica');
+            }
+            if (modoJuego === 'hacker' && nivel >= 6) {
+                desbloquearLogro('hacker_maestro');
+            }
+
+            const prefijoExtremo = (modoJuego === 'extremo') ? ` (${tamanoCuadricula}x${tamanoCuadricula})` : '';
+            document.getElementById('mensaje').textContent = `Nivel ${nivel}/${NIVEL_FINAL}${prefijoExtremo} — Observa la secuencia`;
+            secuenciaObjetivo = (modoJuego === 'invertido') ? [...secuencia].reverse() : [...secuencia];
+
+            cerrarPanelAdmin();
+
+            const velocidad = modoJuego === 'relampago' ? 260 : (modoJuego === 'extremo' ? 350 : 580);
+            reproducirSecuencia(velocidad);
+        }
+
+        function actualizarSelectDifResetDerrotas() {
+            const selModo = document.getElementById('admin-reset-derrotas-modo');
+            const selDif = document.getElementById('admin-reset-derrotas-dif');
+            if (!selModo || !selDif) return;
+            selDif.disabled = selModo.value === 'hacker';
+        }
+
+        function adminResetearDerrotasModo() {
+            if (!esAdminActivo) return;
+            const selModo = document.getElementById('admin-reset-derrotas-modo');
+            const selDif = document.getElementById('admin-reset-derrotas-dif');
+            if (!selModo || !selDif) return;
+
+            const modo = selModo.value;
+            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${dif}`;
+            if (stats[clave]) {
+                stats[clave].derrotas = 0;
+                localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            }
+            alert(`✅ Derrotas reseteadas en ${ETIQUETAS_MODO[modo] || modo}.`);
+        }
+
+        function adminResetearTodasDerrotas() {
+            if (!esAdminActivo) return;
+            const stats = obtenerDatosStats();
+            Object.keys(stats).forEach(clave => {
+                if (stats[clave] && typeof stats[clave] === 'object') {
+                    stats[clave].derrotas = 0;
+                }
+            });
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            alert('✅ Todas las derrotas han sido reseteadas a 0.');
+        }
+
         function abrirPanelAdmin() {
             if (!esAdminActivo) return;
             const inputNuevoPin = document.getElementById('admin-input-nuevo-pin');
             if (inputNuevoPin) inputNuevoPin.value = '';
+
+            const selComodin = document.getElementById('admin-select-comodin-cant');
+            const inpComodin = document.getElementById('admin-input-comodin-cant');
+            if (selComodin && inpComodin) {
+                const actual = Math.max(1, comodinUsosRestantes || 1);
+                if ([1, 10, 100].includes(actual)) {
+                    selComodin.value = String(actual);
+                } else {
+                    selComodin.value = 'custom';
+                }
+                inpComodin.value = String(actual);
+            }
+
+            const irModo = document.getElementById('admin-ir-modo');
+            const irNivel = document.getElementById('admin-ir-nivel');
+            const irDif = document.getElementById('admin-ir-dif');
+            if (irModo) irModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
+            if (irNivel) irNivel.value = String(Math.max(1, Math.min(NIVEL_FINAL, nivel || 1)));
+            if (irDif) irDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
+            actualizarSelectDifIrNivel();
+
+            const resetModo = document.getElementById('admin-reset-derrotas-modo');
+            const resetDif = document.getElementById('admin-reset-derrotas-dif');
+            if (resetModo) resetModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
+            if (resetDif) resetDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
+            actualizarSelectDifResetDerrotas();
 
             const inputNombre = document.getElementById('admin-input-nombre');
             const selectEmoji = document.getElementById('admin-select-emoji');
@@ -1450,6 +1706,7 @@
 
         function desactivarModoAdmin() {
             esAdminActivo = false;
+            actualizarVisibilidadControlesAdmin();
             cerrarPanelAdmin();
             renderizarClasificacionGlobal();
         }
@@ -1752,6 +2009,7 @@
 
         const MODOS_CON_COMODIN = ['normal', 'invertido', 'relampago'];
         let comodinDisponibleEnPartida = false;
+        let comodinUsosRestantes = 1;
         let reproduciendoSecuenciaActual = false;
         let partidaEnCurso = false;
 
@@ -1849,6 +2107,7 @@
             reproduciendoSecuenciaActual = false;
             partidaEnCurso = false;
             comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = 0;
             segundosPartida = 0;
 
             const crono = document.getElementById('cronometro-juego');
@@ -2151,6 +2410,7 @@
             verificarLogrosDeNotas();
             iniciarAtmosfera();
             verificarProgresoEstetico();
+            actualizarVisibilidadControlesAdmin();
             actualizarBotonComodin();
             actualizarBotonesPartida();
         });
@@ -2483,15 +2743,20 @@
             const btn = document.getElementById('btn-comodin-repetir');
             if (!btn) return;
             const modoPermitido = MODOS_CON_COMODIN.includes(modoJuego);
+            const cantMostrar = Math.max(0, comodinUsosRestantes);
+            btn.textContent = `🔁 Repetir (${cantMostrar})`;
             btn.classList.toggle('visible', modoPermitido);
-            btn.disabled = !modoPermitido || !comodinDisponibleEnPartida || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0;
+            btn.disabled = !modoPermitido || !comodinDisponibleEnPartida || cantMostrar <= 0 || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0;
         }
 
         function usarComodinRepetir() {
             if (!MODOS_CON_COMODIN.includes(modoJuego)) return;
-            if (!comodinDisponibleEnPartida || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0) return;
+            if (!comodinDisponibleEnPartida || comodinUsosRestantes <= 0 || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0) return;
 
-            comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = Math.max(0, comodinUsosRestantes - 1);
+            if (comodinUsosRestantes <= 0) {
+                comodinDisponibleEnPartida = false;
+            }
             pasoUsuario = 0;
             actualizarBotonComodin();
 
@@ -2512,6 +2777,7 @@
             reproduciendoSecuenciaActual = false;
             partidaEnCurso = false;
             comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = 0;
             segundosPartida = 0;
             toquesLibreSinGrabar = 0;
             toquesHacker = 0;
@@ -2610,6 +2876,7 @@
             nivel = 0;
             bloqueado = true;
             reproduciendoSecuenciaActual = false;
+            comodinUsosRestantes = 1;
             comodinDisponibleEnPartida = MODOS_CON_COMODIN.includes(modoJuego);
             actualizarBotonComodin();
             actualizarBotonesPartida();
@@ -2828,6 +3095,7 @@
             reproduciendoSecuenciaActual = false;
             partidaEnCurso = false;
             comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = 0;
             actualizarBrilloNivelAlto();
             actualizarBotonComodin();
             actualizarBotonesPartida();
