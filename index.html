@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Juego de Memoria - Update 1.2</title>
-    <!-- Logo / Favicon -->
     <link rel="icon" type="image/png" href="logo.png">
     
     <style>
@@ -39,7 +38,6 @@
             position: relative;
         }
 
-        /* Brillo suave en el fondo a partir del nivel 7 */
         body.brillo-nivel-alto::after {
             content: '';
             position: fixed;
@@ -59,7 +57,6 @@
             100% { opacity: 1; }
         }
 
-        /* Canvas de Lluvia Binaria, Atmósfera y Confeti */
         #matrix-canvas, #atmosfera-canvas, #confeti-canvas {
             position: fixed;
             top: 0;
@@ -92,7 +89,6 @@
             z-index: 10;
         }
 
-        /* Estilos específicos para el Modo Hacker */
         body.modo-hacker {
             background-color: #000000 !important;
         }
@@ -135,7 +131,6 @@
             filter: brightness(1.35);
         }
 
-        /* Barra Superior optimizada */
         .barra-superior {
             position: fixed;
             top: 0;
@@ -197,7 +192,6 @@
             justify-content: center;
         }
 
-        /* Notificación flotante de Logro Desbloqueado */
         .toast-logro {
             position: fixed;
             bottom: 24px;
@@ -359,7 +353,6 @@
             80% { transform: translateX(6px) rotate(0.5deg); }
         }
 
-        /* Zona principal: tablero y panel lateral en Modo Libre */
         .zona-tablero-principal {
             display: flex;
             flex-direction: column;
@@ -378,7 +371,6 @@
             flex-wrap: wrap;
         }
 
-        /* Panel lateral: Grabar / Detener, Oír y Velocidad */
         .panel-grabadora {
             display: none;
             opacity: 0;
@@ -570,7 +562,6 @@
             transform: none;
         }
 
-        /* Modales optimizados sin blur pesado */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -731,7 +722,6 @@
             display: block;
         }
 
-        /* Estilos de tarjetas de Logros */
         .lista-logros {
             display: flex;
             flex-direction: column;
@@ -797,7 +787,6 @@
             flex-shrink: 0;
         }
 
-        /* Tabla de Clasificación Global */
         .barra-filtro-global {
             display: flex;
             gap: 8px;
@@ -901,7 +890,6 @@
             transform: scale(1.06);
         }
 
-        /* Panel de Administrador */
         .admin-seccion {
             background: rgba(0, 0, 0, 0.28);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -962,7 +950,6 @@
     <canvas id="atmosfera-canvas"></canvas>
     <canvas id="confeti-canvas"></canvas>
 
-    <!-- Notificación Toast de Logro Desbloqueado -->
     <div class="toast-logro" id="toast-logro">
         <div class="toast-logro-icono" id="toast-logro-icono">🏆</div>
         <div class="toast-logro-texto">
@@ -971,7 +958,6 @@
         </div>
     </div>
 
-    <!-- Modal de Nombre de Usuario (Primera Vez / Nuevo Dispositivo) -->
     <div class="modal-overlay" id="modal-usuario">
         <div class="modal-contenido" style="text-align: center;">
             <h2 style="margin-top: 0;">👋 ¡Bienvenido al Juego de Memoria!</h2>
@@ -984,7 +970,6 @@
         </div>
     </div>
 
-    <!-- Barra Superior Limpia -->
     <div class="barra-superior">
         <div class="grupo-controles">
             <div id="badge-usuario" class="badge-modo" style="background-color: rgba(46, 213, 115, 0.2); color: #2ed573; border-color: rgba(46, 213, 115, 0.4);">👤 Sin nombre</div>
@@ -999,7 +984,6 @@
         </div>
     </div>
 
-    <!-- Modal de Clasificación Global -->
     <div class="modal-overlay" id="modal-global">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -1023,7 +1007,6 @@
         </div>
     </div>
 
-    <!-- Modal de Logros (Solo se cierra con la X) -->
     <div class="modal-overlay" id="modal-logros">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -1034,7 +1017,6 @@
         </div>
     </div>
 
-    <!-- Modal de Configuración con Emojis y Botón ? de PIN -->
     <div class="modal-overlay" id="modal-configuracion">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -1113,7 +1095,6 @@
         </div>
     </div>
 
-    <!-- Modal de Contraseña -->
     <div class="modal-overlay" id="modal-pin-admin" style="z-index: 1250;">
         <div class="modal-contenido" style="text-align: center; max-width: 350px;">
             <div class="modal-header">
@@ -1127,7 +1108,6 @@
         </div>
     </div>
 
-    <!-- Modal Panel de Administrador -->
     <div class="modal-overlay" id="modal-panel-admin" style="z-index: 1260;">
         <div class="modal-contenido" style="max-width: 480px;">
             <div class="modal-header">
@@ -1214,7 +1194,6 @@
         </div>
     </div>
 
-    <!-- Modal de Estadísticas -->
     <div class="modal-overlay" id="modal-estadisticas">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -1228,7 +1207,6 @@
         </div>
     </div>
 
-    <!-- Modal de Advertencia al Borrar Datos -->
     <div class="modal-overlay" id="modal-confirmar-borrar" style="z-index: 1200;">
         <div class="modal-contenido" style="text-align: center; max-width: 360px;">
             <div style="font-size: 2.5rem; margin-bottom: 10px;">⚠️</div>
@@ -1268,7 +1246,6 @@
                 </div>
             </div>
 
-            <!-- Panel Lateral: Grabar / Detener, Oír y Velocidad -->
             <div class="panel-grabadora" id="panel-grabadora">
                 <div class="fila-libre">
                     <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
@@ -1909,9 +1886,6 @@
             }
         }
 
-        // ==========================================
-        // CONFETI LIGERO (NIVELES 5 Y 10)
-        // ==========================================
         const canvasConfeti = document.getElementById('confeti-canvas');
         const ctxConfeti = canvasConfeti.getContext('2d');
         let particulasConfeti = [];
@@ -1962,9 +1936,6 @@
             }
         }
 
-        // ==========================================
-        // SISTEMA DE LOGROS
-        // ==========================================
         const DEFINICION_LOGROS = [
             { id: 'primeros_pasos', icono: '🥉', nombre: 'Primeros Pasos', desc: 'Supera el nivel 3 en modo Normal.' },
             { id: 'cerebro_titanio', icono: '🥈', nombre: 'Cerebro de Titanio', desc: 'Supera el nivel 6 en modo Normal.' },
@@ -2115,9 +2086,6 @@
             document.getElementById('modal-logros').classList.remove('activo');
         }
 
-        // ==========================================
-        // INICIALIZACIÓN Y USUARIO
-        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const guardado = localStorage.getItem('memoria_usuario_v1');
             const modalUsuario = document.getElementById('modal-usuario');
@@ -2223,9 +2191,6 @@
             document.body.style.backgroundColor = colorElegido;
         }
 
-        // ==========================================
-        // MATRIZ HACKER Y ATMÓSFERAS EQUILIBRADAS
-        // ==========================================
         const canvasMatrix = document.getElementById('matrix-canvas');
         const ctxMatrix = canvasMatrix.getContext('2d');
         let matrixInterval = null;
@@ -2357,9 +2322,6 @@
             atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
         }
 
-        // ==========================================
-        // SONIDOS Y AUDIO
-        // ==========================================
         function toggleSilenciar() {
             estaSilenciado = !estaSilenciado;
             document.getElementById('btn-silenciar').textContent = estaSilenciado ? '🔇' : '🔊';
@@ -2428,9 +2390,6 @@
             osc.stop(audioCtx.currentTime + 0.35);
         }
 
-        // ==========================================
-        // TEMAS, DIFICULTAD Y MODOS DE JUEGO
-        // ==========================================
         const temasColores = [
             ['#ff4757', '#05d9e8', '#2ed573', '#ffa502', '#7700a6', '#ff6b81', '#1e90ff', '#32ff7e', '#fffa65'],
             ['#ffb3ba', '#bae1ff', '#baffc9', '#ffffba', '#ffdfba', '#e0bbe4', '#957dad', '#d291bc', '#fec8d8'],
@@ -2608,9 +2567,6 @@
             actualizarBotonesPartida();
         }
 
-        // ==========================================
-        // LÓGICA PRINCIPAL DE PARTIDA, CONFETI Y FINAL NIVEL 10
-        // ==========================================
         function iniciarJuego() {
             if (modoJuego === 'libre') {
                 document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
@@ -2865,9 +2821,6 @@
             timeouts = [];
         }
 
-        // ==========================================
-        // GRABADORA Y VELOCIDAD (MODO LIBRE)
-        // ==========================================
         function limpiarTimersGrabacion() {
             timeoutsGrabacion.forEach(t => clearTimeout(t));
             timeoutsGrabacion = [];
@@ -2952,9 +2905,6 @@
             timeoutsGrabacion.push(finTimeout);
         }
 
-        // ==========================================
-        // ESTADÍSTICAS Y CONFIRMACIÓN DE BORRADO
-        // ==========================================
         function obtenerDatosStats() {
             return JSON.parse(localStorage.getItem('memoria_stats_v3')) || {};
         }
