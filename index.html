@@ -1194,13 +1194,14 @@
             const filtro = document.getElementById('filtro-modo-global');
             if (!lista) return;
 
-            const modoFiltro = filtro ? filtro.value : 'todos';
+            const modoFiltro = filtro ? filtro.value : 'normal';
             const filtrados = cacheClasificacionGlobal
-                .filter(item => modoFiltro === 'todos' || item.modo === modoFiltro)
+                .filter(item => item.modo === modoFiltro)
+                .sort((a, b) => b.record - a.record || (a.fecha || 0) - (b.fecha || 0))
                 .slice(0, 10);
 
             if (filtrados.length === 0) {
-                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Aún no hay récords registrados aquí. ¡Sé el primero!</div>';
+                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Aún no hay récords registrados en este modo. ¡Sé el primero!</div>';
                 return;
             }
 
@@ -2283,7 +2284,6 @@
                     actualizarBotonComodin();
                     detenerBarraContrarreloj();
                     guardarRecordEstadistica(modoJuego, tamanoCuadricula, nivel);
-                    publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
 
                     if (modoJuego === 'normal' && nivel >= 3) {
                         desbloquearLogro('primeros_pasos');
