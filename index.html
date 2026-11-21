@@ -1335,24 +1335,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-fin-partida" style="z-index: 1220;">
-        <div class="modal-contenido" style="text-align: center; max-width: 380px;">
-            <div style="font-size: 2.3rem; margin-bottom: 8px;" id="fin-partida-icono">🏁</div>
-            <h2 style="margin: 0 0 8px 0; font-size: 1.25rem;" id="fin-partida-titulo">Partida Terminada</h2>
-            <p style="color: var(--subtext-color); font-size: 0.92rem; margin-bottom: 18px; line-height: 1.4;" id="fin-partida-detalle">
-                Nivel alcanzado: 0
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="btn-mini" id="btn-subir-global-fin" type="button" onclick="confirmarSubirRecordGlobalFinPartida()" style="padding: 11px 16px; background: linear-gradient(135deg, #2ed573, #20bf6b); color: #ffffff; border: none; font-size: 0.92rem;">
-                    🌍 Subir a Clasificación Global
-                </button>
-                <button class="btn-mini" type="button" onclick="guardarSoloLocalFinPartida()" style="padding: 11px 16px; background-color: rgba(255, 255, 255, 0.14); color: #ffffff; font-size: 0.92rem;">
-                    🔒 Guardar solo para mí
-                </button>
-            </div>
-        </div>
-    </div>
-
     <div class="app-contenedor" id="app-contenedor">
         <div class="titulo-wrapper">
             <h1 id="titulo-principal">Juego de Memoria</h1>
@@ -1360,6 +1342,7 @@
         </div>
         <div class="contenedor-info-partida">
             <div class="badge-modo" id="badge-modo">Modo = ▶️ Normal</div>
+            <div class="badge-modo" id="badge-racha" style="background-color: rgba(255, 165, 2, 0.16); color: #ffa502; border-color: rgba(255, 165, 2, 0.35);">🔥 Racha: 0 días</div>
             <div class="badge-modo" id="cronometro-juego" style="display: none;">⏱️ 00:00</div>
         </div>
         <div id="mensaje">Presiona "Jugar" para empezar</div>
@@ -1408,7 +1391,6 @@
 
         let cacheClasificacionGlobal = [];
         let ultimoRecordEnviado = { clave: '', record: 0 };
-        let recordPendienteGlobal = null;
 
         const ETIQUETAS_MODO = {
             normal: '▶️ Normal',
@@ -1815,62 +1797,6 @@
             await publicarRecordGlobal(recLocal, modo, dif);
             await cargarYMostrarGlobal(false);
             alert(`🚀 Récord local (Nivel ${recLocal}) sincronizado con la Clasificación Global.`);
-        }
-
-        function abrirModalDecisionGlobal(nivelAlcanzado, modo, dif, tituloTexto) {
-            if (!usuarioActual || !usuarioActual.nombre || modo === 'libre' || nivelAlcanzado < 1) {
-                return;
-            }
-
-            recordPendienteGlobal = {
-                record: Number(nivelAlcanzado),
-                modo: String(modo),
-                dificultad: Number(dif)
-            };
-
-            const tituloEl = document.getElementById('fin-partida-titulo');
-            const detalleEl = document.getElementById('fin-partida-detalle');
-            const btnSubir = document.getElementById('btn-subir-global-fin');
-
-            if (tituloEl) tituloEl.textContent = tituloTexto || 'Partida Terminada';
-            if (detalleEl) {
-                const nombreModo = ETIQUETAS_MODO[modo] || modo;
-                const difTxt = (modo === 'hacker' || modo === 'extremo') ? '' : ` · ${ETIQUETAS_DIF[dif] || ''}`;
-                detalleEl.textContent = `Alcanzaste el Nivel ${nivelAlcanzado} en ${nombreModo}${difTxt}. ¿Dónde quieres guardar este récord?`;
-            }
-            if (btnSubir) {
-                btnSubir.disabled = false;
-                btnSubir.textContent = '🌍 Subir a Clasificación Global';
-            }
-
-            document.getElementById('modal-fin-partida').classList.add('activo');
-        }
-
-        function cerrarModalDecisionGlobal() {
-            document.getElementById('modal-fin-partida').classList.remove('activo');
-            recordPendienteGlobal = null;
-        }
-
-        function guardarSoloLocalFinPartida() {
-            cerrarModalDecisionGlobal();
-            document.getElementById('mensaje').textContent = '🔒 Récord guardado solo en este dispositivo.';
-        }
-
-        async function confirmarSubirRecordGlobalFinPartida() {
-            if (!recordPendienteGlobal) return;
-            const { record, modo, dificultad } = recordPendienteGlobal;
-            const btnSubir = document.getElementById('btn-subir-global-fin');
-            if (btnSubir) {
-                btnSubir.disabled = true;
-                btnSubir.textContent = '⏳ Subiendo...';
-            }
-
-            ultimoRecordEnviado = { clave: '', record: 0 };
-            await publicarRecordGlobal(record, modo, dificultad);
-            await cargarYMostrarGlobal(false);
-
-            cerrarModalDecisionGlobal();
-            document.getElementById('mensaje').textContent = `🌍 ¡Nivel ${record} publicado en la Clasificación Global!`;
         }
 
         async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
@@ -2319,11 +2245,9 @@
             actualizarBotonComodin();
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
-            document.getElementById('mensaje').textContent = '🛑 Partida terminada';
-
-            if (nivelAlcanzado >= 1) {
-                abrirModalDecisionGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada, '🛑 Partida Terminada');
-            }
+            document.getElementById('mensaje').textContent = nivelAlcanzado >= 1
+                ? `🛑 Partida terminada · Récord local guardado (Nivel ${nivelAlcanzado})`
+                : '🛑 Partida terminada';
         }
 
         function aplicarPreferenciasVisualesAlCargar() {
@@ -2510,25 +2434,52 @@
             }
         }
 
+        function obtenerRachaActual() {
+            const hoy = new Date();
+            const hoyStr = `${hoy.getFullYear()}-${hoy.getMonth() + 1}-${hoy.getDate()}`;
+            const ayer = new Date(hoy);
+            ayer.setDate(hoy.getDate() - 1);
+            const ayerStr = `${ayer.getFullYear()}-${ayer.getMonth() + 1}-${ayer.getDate()}`;
+
+            const datosDias = JSON.parse(localStorage.getItem('memoria_dias_jugados_v1') || '{"ultimoDia":"","racha":0}');
+
+            if (datosDias.ultimoDia === hoyStr || datosDias.ultimoDia === ayerStr) {
+                return Number(datosDias.racha) || 0;
+            }
+            return 0;
+        }
+
+        function actualizarBadgeRacha() {
+            const badge = document.getElementById('badge-racha');
+            if (!badge) return;
+            const racha = obtenerRachaActual();
+            const palabraDia = racha === 1 ? 'día' : 'días';
+            badge.textContent = `🔥 Racha: ${racha} ${palabraDia}`;
+        }
+
         function registrarDiaJugado() {
             const hoy = new Date();
             const hoyStr = `${hoy.getFullYear()}-${hoy.getMonth() + 1}-${hoy.getDate()}`;
             const datosDias = JSON.parse(localStorage.getItem('memoria_dias_jugados_v1') || '{"ultimoDia":"","racha":0}');
 
-            if (datosDias.ultimoDia === hoyStr) return;
+            if (datosDias.ultimoDia === hoyStr) {
+                actualizarBadgeRacha();
+                return;
+            }
 
             const ayer = new Date(hoy);
             ayer.setDate(hoy.getDate() - 1);
             const ayerStr = `${ayer.getFullYear()}-${ayer.getMonth() + 1}-${ayer.getDate()}`;
 
             if (datosDias.ultimoDia === ayerStr) {
-                datosDias.racha += 1;
+                datosDias.racha = (Number(datosDias.racha) || 0) + 1;
             } else {
                 datosDias.racha = 1;
             }
 
             datosDias.ultimoDia = hoyStr;
             localStorage.setItem('memoria_dias_jugados_v1', JSON.stringify(datosDias));
+            actualizarBadgeRacha();
 
             if (datosDias.racha >= 2) {
                 desbloquearLogro('jugador_frecuente');
@@ -2613,6 +2564,7 @@
             }
 
             try { aplicarPreferenciasVisualesAlCargar(); } catch (e) { console.error(e); }
+            try { actualizarBadgeRacha(); } catch (e) { console.error(e); }
             try { verificarLogrosDeNotas(); } catch (e) { console.error(e); }
             try { iniciarAtmosfera(); } catch (e) { console.error(e); }
             try { verificarProgresoEstetico(); } catch (e) { console.error(e); }
@@ -3315,10 +3267,6 @@
             detenerBarraContrarreloj();
             document.getElementById('mensaje').textContent = textoMensaje;
             setControlesPartidaActivos(false);
-
-            if (nivelAlcanzado >= 1) {
-                abrirModalDecisionGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada, textoMensaje);
-            }
         }
 
         function limpiarTimers() {
@@ -3538,6 +3486,7 @@
             ultimoRecordEnviado = { clave: '', record: 0 };
 
             aplicarPreferenciasVisualesAlCargar();
+            actualizarBadgeRacha();
             iniciarAtmosfera();
 
             cerrarConfirmacionBorrar();
