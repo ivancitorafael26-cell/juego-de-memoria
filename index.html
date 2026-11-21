@@ -661,6 +661,34 @@
             transform: translateY(-50%) scale(0.95);
         }
 
+        .btn-ayuda-pin {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255, 215, 0, 0.2);
+            border: 1.5px solid #ffd700;
+            color: #ffd700;
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .btn-ayuda-pin:hover {
+            background-color: #ffd700;
+            color: #1a1a2e;
+            transform: translateY(-50%) scale(1.08);
+        }
+
         .grupo-opcion-config {
             margin-bottom: 12px;
             display: flex;
@@ -854,6 +882,78 @@
             color: #2ed573;
             white-space: nowrap;
         }
+
+        .btn-borrar-fila-global {
+            background: rgba(255, 71, 87, 0.22);
+            border: 1px solid #ff4757;
+            color: #ff6b81;
+            border-radius: 10px;
+            padding: 6px 9px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .btn-borrar-fila-global:hover:not(:disabled) {
+            background: #ff4757;
+            color: #ffffff;
+            transform: scale(1.06);
+        }
+
+        /* Panel de Administrador */
+        .admin-seccion {
+            background: rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        .admin-seccion-titulo {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .admin-fila-input {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-input, .admin-select {
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            font-size: 0.88rem;
+            font-weight: 600;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .admin-lista-logros {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .admin-item-logro {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.84rem;
+        }
     </style>
 </head>
 <body>
@@ -934,10 +1034,11 @@
         </div>
     </div>
 
-    <!-- Modal de Configuración con Emojis -->
+    <!-- Modal de Configuración con Emojis y Botón ? de PIN -->
     <div class="modal-overlay" id="modal-configuracion">
         <div class="modal-contenido">
             <div class="modal-header">
+                <button class="btn-ayuda-pin" type="button" onclick="abrirModalPinAdmin()" title="Código">?</button>
                 <h2>⚙️ Configuración</h2>
                 <button class="btn-cerrar-x" type="button" onclick="cerrarConfiguracion()" title="Cerrar">✕</button>
             </div>
@@ -1008,6 +1109,82 @@
                     <option value="#172554">🟦 Azul Oscuro</option>
                     <option value="#2e1065">🟪 Morado Oscuro</option>
                 </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Contraseña -->
+    <div class="modal-overlay" id="modal-pin-admin" style="z-index: 1250;">
+        <div class="modal-contenido" style="text-align: center; max-width: 350px;">
+            <div class="modal-header">
+                <h2>🔐 Código</h2>
+                <button class="btn-cerrar-x" type="button" onclick="cerrarModalPinAdmin()" title="Cerrar">✕</button>
+            </div>
+            <p style="color: var(--subtext-color); font-size: 0.88rem; margin-bottom: 12px;">Ingresa la contraseña:</p>
+            <input type="password" id="input-pin-admin" inputmode="numeric" maxlength="6" placeholder="••••" style="width: 140px; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.4); color: #ffffff; font-size: 1.2rem; letter-spacing: 6px; text-align: center; outline: none; margin-bottom: 10px;">
+            <div id="mensaje-error-pin" style="color: #ff4757; font-size: 0.8rem; font-weight: 700; min-height: 18px; margin-bottom: 12px;"></div>
+            <button class="btn-mini" type="button" onclick="verificarPinAdmin()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none; padding: 10px;">Comprobar</button>
+        </div>
+    </div>
+
+    <!-- Modal Panel de Administrador -->
+    <div class="modal-overlay" id="modal-panel-admin" style="z-index: 1260;">
+        <div class="modal-contenido" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2>🛡️ Administrador</h2>
+                <button class="btn-cerrar-x" type="button" onclick="cerrarPanelAdmin()" title="Cerrar">✕</button>
+            </div>
+
+            <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🎵 Total de Notas</div>
+                <div class="admin-fila-input">
+                    <input type="number" id="admin-input-notas" class="admin-input" min="0" max="9999999" style="flex: 1;" placeholder="Ej. 1500">
+                    <button class="btn-mini" type="button" onclick="adminGuardarNotas()" style="background-color: #2ed573; color: #ffffff; border: none;">Guardar Notas</button>
+                </div>
+            </div>
+
+            <div class="admin-seccion">
+                <div class="admin-seccion-titulo">📊 Editar Récord en los Modos</div>
+                <div class="admin-fila-input" style="margin-bottom: 8px;">
+                    <select id="admin-select-modo" class="admin-select" style="flex: 1;" onchange="cargarCamposAdminEstadistica()">
+                        <option value="normal">▶️ Normal</option>
+                        <option value="invertido">🔄 Invertido</option>
+                        <option value="relampago">⚡ Relámpago</option>
+                        <option value="contrarreloj">⏱️ Contrarreloj</option>
+                        <option value="extremo">🔥 Extremo</option>
+                        <option value="hacker">💻 Hacker</option>
+                    </select>
+                    <select id="admin-select-dif" class="admin-select" onchange="cargarCamposAdminEstadistica()">
+                        <option value="2">🟢 Fácil</option>
+                        <option value="3">🟡 Medio</option>
+                        <option value="4">🔴 Difícil</option>
+                    </select>
+                </div>
+                <div class="admin-fila-input">
+                    <input type="number" id="admin-input-record" class="admin-input" min="0" max="10" style="width: 115px;" placeholder="Nivel (0-10)">
+                    <button class="btn-mini" type="button" onclick="adminGuardarEstadisticaModo()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Guardar Nivel</button>
+                </div>
+            </div>
+
+            <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🌍 Clasificación Global</div>
+                <div class="admin-fila-input">
+                    <button class="btn-mini" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
+                    <button class="btn-mini" type="button" onclick="borrarTodosRecordsGlobalAdmin()" style="flex: 1; background-color: rgba(255, 71, 87, 0.55); color: #ffffff;">💥 Borrar Todos los Récords</button>
+                </div>
+            </div>
+
+            <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🏆 Control de Logros</div>
+                <div class="admin-fila-input" style="margin-bottom: 10px;">
+                    <button class="btn-mini" type="button" onclick="adminToggleTodosLogros(true)" style="flex: 1; background-color: rgba(46, 213, 115, 0.35);">✅ Poner Todos</button>
+                    <button class="btn-mini" type="button" onclick="adminToggleTodosLogros(false)" style="flex: 1; background-color: rgba(255, 71, 87, 0.35);">❌ Quitar Todos</button>
+                </div>
+                <div class="admin-lista-logros" id="admin-lista-logros"></div>
+            </div>
+
+            <div class="admin-fila-input">
+                <button class="btn-mini" type="button" onclick="desactivarModoAdmin()" style="width: 100%; background-color: rgba(255, 71, 87, 0.45);">Salir del Modo Admin</button>
             </div>
         </div>
     </div>
@@ -1090,6 +1267,9 @@
 
     <script>
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
+        const CLAVE_ADMIN_5_DIGITOS = '3905';
+        let esAdminActivo = false;
+
         let cacheClasificacionGlobal = [];
         let ultimoRecordEnviado = { clave: '', record: 0 };
 
@@ -1112,6 +1292,199 @@
             return String(texto || '').replace(/[&<>"']/g, m => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             }[m]));
+        }
+
+        function abrirModalPinAdmin() {
+            const input = document.getElementById('input-pin-admin');
+            const err = document.getElementById('mensaje-error-pin');
+            if (err) err.textContent = '';
+            if (input) {
+                input.value = '';
+                setTimeout(() => input.focus(), 50);
+            }
+            document.getElementById('modal-pin-admin').classList.add('activo');
+        }
+
+        function cerrarModalPinAdmin() {
+            document.getElementById('modal-pin-admin').classList.remove('activo');
+        }
+
+        function verificarPinAdmin() {
+            const input = document.getElementById('input-pin-admin');
+            const err = document.getElementById('mensaje-error-pin');
+            const pin = input ? input.value.trim() : '';
+
+            if (!/^\d{4,6}$/.test(pin)) {
+                if (err) err.textContent = '⚠️ Escribe solo números.';
+                return;
+            }
+
+            if (pin !== CLAVE_ADMIN_5_DIGITOS) {
+                if (err) err.textContent = '❌ Contraseña incorrecta.';
+                return;
+            }
+
+            esAdminActivo = true;
+            cerrarModalPinAdmin();
+            cerrarConfiguracion();
+            abrirPanelAdmin();
+        }
+
+        function abrirPanelAdmin() {
+            if (!esAdminActivo) return;
+            const inputNotas = document.getElementById('admin-input-notas');
+            if (inputNotas) inputNotas.value = totalNotasTocadas;
+            cargarCamposAdminEstadistica();
+            renderizarListaAdminLogros();
+            document.getElementById('modal-panel-admin').classList.add('activo');
+        }
+
+        function cerrarPanelAdmin() {
+            document.getElementById('modal-panel-admin').classList.remove('activo');
+        }
+
+        function desactivarModoAdmin() {
+            esAdminActivo = false;
+            cerrarPanelAdmin();
+            renderizarClasificacionGlobal();
+        }
+
+        function adminGuardarNotas() {
+            if (!esAdminActivo) return;
+            const input = document.getElementById('admin-input-notas');
+            const val = parseInt(input ? input.value : '0', 10);
+            if (!Number.isFinite(val) || val < 0) return;
+
+            totalNotasTocadas = val;
+            localStorage.setItem('memoria_total_notas_v1', String(totalNotasTocadas));
+            verificarLogrosDeNotas();
+            alert(`✅ Total de notas actualizado a ${totalNotasTocadas}.`);
+        }
+
+        function cargarCamposAdminEstadistica() {
+            const selModo = document.getElementById('admin-select-modo');
+            const selDif = document.getElementById('admin-select-dif');
+            const inpRec = document.getElementById('admin-input-record');
+            if (!selModo || !selDif || !inpRec) return;
+
+            const modo = selModo.value;
+            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
+            const stats = obtenerDatosStats();
+            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
+            inpRec.value = actual.record;
+        }
+
+        function adminGuardarEstadisticaModo() {
+            if (!esAdminActivo) return;
+            const selModo = document.getElementById('admin-select-modo');
+            const selDif = document.getElementById('admin-select-dif');
+            const inpRec = document.getElementById('admin-input-record');
+            if (!selModo || !selDif || !inpRec) return;
+
+            const modo = selModo.value;
+            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
+            const rec = Math.max(0, Math.min(NIVEL_FINAL, parseInt(inpRec.value || '0', 10) || 0));
+
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${dif}`;
+            const previa = stats[clave] || { record: 0, derrotas: 0, notas: 0 };
+            stats[clave] = {
+                record: rec,
+                derrotas: previa.derrotas || 0,
+                notas: previa.notas || 0
+            };
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            alert(`✅ Nivel récord guardado en ${rec}.`);
+        }
+
+        function verificarLogroCienPorCientoAuto() {
+            const otros = DEFINICION_LOGROS.filter(l => l.id !== 'cien_por_ciento');
+            const todosListos = otros.every(l => !!logrosDesbloqueados[l.id]);
+            if (todosListos) {
+                logrosDesbloqueados['cien_por_ciento'] = true;
+            } else {
+                delete logrosDesbloqueados['cien_por_ciento'];
+            }
+            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+        }
+
+        function adminToggleLogroIndividual(id) {
+            if (!esAdminActivo) return;
+            if (logrosDesbloqueados[id]) {
+                delete logrosDesbloqueados[id];
+            } else {
+                logrosDesbloqueados[id] = true;
+            }
+            if (id !== 'cien_por_ciento') {
+                verificarLogroCienPorCientoAuto();
+            } else {
+                localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+            }
+            renderizarListaAdminLogros();
+        }
+
+        function adminToggleTodosLogros(activar) {
+            if (!esAdminActivo) return;
+            if (activar) {
+                DEFINICION_LOGROS.forEach(l => {
+                    logrosDesbloqueados[l.id] = true;
+                });
+            } else {
+                logrosDesbloqueados = {};
+            }
+            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+            renderizarListaAdminLogros();
+        }
+
+        function renderizarListaAdminLogros() {
+            const cont = document.getElementById('admin-lista-logros');
+            if (!cont) return;
+            cont.innerHTML = DEFINICION_LOGROS.map(l => {
+                const tiene = !!logrosDesbloqueados[l.id];
+                return `
+                    <div class="admin-item-logro">
+                        <span>${l.icono} ${escaparTextoHTML(l.nombre)}</span>
+                        <button class="btn-mini" type="button" onclick="adminToggleLogroIndividual('${l.id}')" style="padding: 5px 10px; font-size: 0.78rem; background-color: ${tiene ? 'rgba(46, 213, 115, 0.35)' : 'rgba(255, 255, 255, 0.12)'};">
+                            ${tiene ? '✅ Activo' : '🔒 Quitar'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function borrarRegistroGlobalAdmin(idFirebase) {
+            if (!esAdminActivo || !idFirebase) return;
+            try {
+                const res = await fetch(`${URL_RANKING}/${encodeURIComponent(idFirebase)}.json`, {
+                    method: 'DELETE'
+                });
+                if (!res.ok) throw new Error('Error al borrar');
+                cacheClasificacionGlobal = cacheClasificacionGlobal.filter(item => item._id !== idFirebase);
+                renderizarClasificacionGlobal();
+            } catch (err) {
+                console.error('No se pudo borrar el registro:', err);
+                alert('⚠️ No se pudo borrar el registro. Revisa las reglas de Firebase.');
+            }
+        }
+
+        async function borrarTodosRecordsGlobalAdmin() {
+            if (!esAdminActivo) return;
+            const confirmar = confirm('⚠️ ¿Seguro que quieres borrar TODOS los récords de la clasificación global?');
+            if (!confirmar) return;
+
+            try {
+                const res = await fetch(`${URL_RANKING}.json`, {
+                    method: 'DELETE'
+                });
+                if (!res.ok) throw new Error('Error al borrar todos los récords');
+                cacheClasificacionGlobal = [];
+                ultimoRecordEnviado = { clave: '', record: 0 };
+                renderizarClasificacionGlobal();
+                alert('💥 Se borraron todos los récords de la clasificación global.');
+            } catch (err) {
+                console.error('No se pudieron borrar todos los récords:', err);
+                alert('⚠️ No se pudieron borrar todos los récords. Revisa las reglas de Firebase.');
+            }
         }
 
         async function publicarRecordGlobal(record, modo, dif) {
@@ -1154,7 +1527,8 @@
                 const data = await res.json();
                 if (!data || typeof data !== 'object') return [];
 
-                return Object.values(data)
+                return Object.entries(data)
+                    .map(([id, item]) => Object.assign({}, item, { _id: id }))
                     .filter(item => item && typeof item.nombre === 'string' && typeof item.record === 'number')
                     .sort((a, b) => b.record - a.record || (a.fecha || 0) - (b.fecha || 0));
             } catch (err) {
@@ -1211,6 +1585,9 @@
                 const claseTop = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
                 const modoTxt = ETIQUETAS_MODO[item.modo] || item.modo || 'Normal';
                 const difTxt = item.modo === 'hacker' || item.modo === 'extremo' ? '' : ` · ${ETIQUETAS_DIF[item.dificultad] || ''}`;
+                const btnBorrar = esAdminActivo && item._id
+                    ? `<button class="btn-borrar-fila-global" type="button" onclick="borrarRegistroGlobalAdmin('${escaparTextoHTML(item._id)}')" title="Borrar registro">🗑️</button>`
+                    : '';
 
                 return `
                     <div class="fila-ranking ${claseTop}">
@@ -1220,6 +1597,7 @@
                             <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
                         </div>
                         <div class="ranking-puntaje">Nivel ${Number(item.record)}</div>
+                        ${btnBorrar}
                     </div>
                 `;
             }).join('');
