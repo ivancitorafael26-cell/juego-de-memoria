@@ -1136,6 +1136,31 @@
             </div>
 
             <div class="admin-seccion">
+                <div class="admin-seccion-titulo">👤 Nombre y Emoji del Usuario</div>
+                <div class="admin-fila-input" style="margin-bottom: 8px;">
+                    <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
+                    <select id="admin-select-emoji" class="admin-select" style="width: 84px; text-align: center;">
+                        <option value="🚀">🚀</option>
+                        <option value="🐱">🐱</option>
+                        <option value="🌟">🌟</option>
+                        <option value="🎮">🎮</option>
+                        <option value="🔥">🔥</option>
+                        <option value="⚡">⚡</option>
+                        <option value="🤖">🤖</option>
+                        <option value="👑">👑</option>
+                        <option value="🍕">🍕</option>
+                        <option value="🎸">🎸</option>
+                        <option value="🦄">🦄</option>
+                        <option value="💎">💎</option>
+                        <option value="🍀">🍀</option>
+                        <option value="🎯">🎯</option>
+                        <option value="🐉">🐉</option>
+                    </select>
+                </div>
+                <button class="btn-mini" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
+            </div>
+
+            <div class="admin-seccion">
                 <div class="admin-seccion-titulo">🎵 Total de Notas</div>
                 <div class="admin-fila-input">
                     <input type="number" id="admin-input-notas" class="admin-input" min="0" max="9999999" style="flex: 1;" placeholder="Ej. 1500">
@@ -1332,11 +1357,45 @@
 
         function abrirPanelAdmin() {
             if (!esAdminActivo) return;
+            const inputNombre = document.getElementById('admin-input-nombre');
+            const selectEmoji = document.getElementById('admin-select-emoji');
+            if (inputNombre) inputNombre.value = usuarioActual.nombre || '';
+            if (selectEmoji) {
+                const emojiActual = usuarioActual.emoji || '🚀';
+                if (![...selectEmoji.options].some(o => o.value === emojiActual)) {
+                    const opt = document.createElement('option');
+                    opt.value = emojiActual;
+                    opt.textContent = emojiActual;
+                    selectEmoji.appendChild(opt);
+                }
+                selectEmoji.value = emojiActual;
+            }
+
             const inputNotas = document.getElementById('admin-input-notas');
             if (inputNotas) inputNotas.value = totalNotasTocadas;
             cargarCamposAdminEstadistica();
             renderizarListaAdminLogros();
             document.getElementById('modal-panel-admin').classList.add('activo');
+        }
+
+        function adminGuardarPerfilUsuario() {
+            if (!esAdminActivo) return;
+            const inputNombre = document.getElementById('admin-input-nombre');
+            const selectEmoji = document.getElementById('admin-select-emoji');
+            const nuevoNombre = inputNombre ? inputNombre.value.trim() : '';
+            if (!nuevoNombre) {
+                alert('⚠️ El nombre no puede estar vacío.');
+                return;
+            }
+            const nuevoEmoji = selectEmoji ? selectEmoji.value : (usuarioActual.emoji || '🚀');
+            usuarioActual = { nombre: nuevoNombre, emoji: nuevoEmoji };
+            localStorage.setItem('memoria_usuario_v1', JSON.stringify(usuarioActual));
+
+            const badgeUsuario = document.getElementById('badge-usuario');
+            if (badgeUsuario) {
+                badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
+            }
+            alert('✅ Nombre y emoji actualizados.');
         }
 
         function cerrarPanelAdmin() {
