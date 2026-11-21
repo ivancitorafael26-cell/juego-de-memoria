@@ -1381,6 +1381,51 @@
             4: 'Difícil'
         };
 
+        const MODOS_CON_COMODIN = ['normal', 'invertido', 'relampago'];
+        let comodinDisponibleEnPartida = false;
+        let comodinUsosConfigurados = 1;
+        let comodinUsosRestantes = 1;
+        let reproduciendoSecuenciaActual = false;
+        let partidaEnCurso = false;
+
+        let secuencia = [];
+        let secuenciaObjetivo = [];
+        let pasoUsuario = 0;
+        let bloqueado = true;
+        let nivel = 0;
+        const NIVEL_FINAL = 10;
+        let audioCtx = null;
+        let timeouts = [];
+        let estaSilenciado = false;
+        let modoJuego = 'normal';
+
+        let timerPartidaInterval = null;
+        let segundosPartida = 0;
+        let haJugadoPartida = false;
+
+        let tamanoCuadricula = 2;
+        let totalBloques = 4;
+        let totalNotasTocadas = parseInt(localStorage.getItem('memoria_total_notas_v1'), 10) || 0;
+
+        let toquesLibreSinGrabar = 0;
+        let toquesHacker = 0;
+        let firmaUltimaGrabacion = '';
+        let repeticionesConsecutivas = 0;
+
+        let temporizadorTurno = null;
+        let intervaloProgreso = null;
+        let tiempoRestante = 6000;
+        const TIEMPO_MAXIMO = 6000;
+
+        let esGrabando = false;
+        let esReproduciendo = false;
+        let notasGrabadas = [];
+        let tiempoInicioGrabacion = 0;
+        let timeoutsGrabacion = [];
+
+        const listaEmojis = ['🚀', '🐱', '🌟', '🎮', '🔥', '⚡', '🤖', '👑', '🍕', '🎸', '🦄', '💎', '🍀', '🎯', '🐉'];
+        let usuarioActual = { nombre: '', emoji: '' };
+
         function escaparTextoHTML(texto) {
             return String(texto || '').replace(/[&<>"']/g, m => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -1660,3 +1705,1676 @@
             const inputNombre = document.getElementById('admin-input-nombre');
             const selectEmoji = document.getElementById('admin-select-emoji');
             if (inputNombre) inputNombre.value = usuarioActual.nombre || '';
+            if (selectEmoji) {
+                const emojiActual = usuarioActual.emoji || '🚀';
+                if (![...selectEmoji.options].some(o => o.value === emojiActual)) {
+                    const opt = document.createElement('option');
+                    opt.value = emojiActual;
+                    opt.textContent = emojiActual;
+                    selectEmoji.appendChild(opt);
+                }
+                selectEmoji.value = emojiActual;
+            }
+
+            const inputNotas = document.getElementById('admin-input-notas');
+            if (inputNotas) inputNotas.value = totalNotasTocadas;
+            cargarCamposAdminEstadistica();
+            renderizarListaAdminLogros();
+            document.getElementById('modal-panel-admin').classList.add('activo');
+        }
+
+        async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
+            const datos = await obtenerClasificacionGlobal();
+            if (!Array.isArray(datos) || datos.length === 0) return;
+
+            const nombrePrevNorm = String(nombreAnterior || '').trim().toLowerCase();
+            const nombreNuevoNorm = String(nuevoNombre || '').trim().toLowerCase();
+
+            const registrosPropios = datos.filter(item => {
+                const n = String(item.nombre || '').trim().toLowerCase();
+                return (nombrePrevNorm && n === nombrePrevNorm) || (nombreNuevoNorm && n === nombreNuevoNorm);
+            });
+
+            if (registrosPropios.length === 0) return;
+
+            await Promise.all(registrosPropios.map(async item => {
+                if (!item._id) return;
+                try {
+                    const res = await fetch(`${URL_RANKING}/${encodeURIComponent(item._id)}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: nuevoNombre,
+                            emoji: nuevoEmoji
+                        })
+                    });
+                    if (res.ok) {
+                        item.nombre = nuevoNombre;
+                        item.emoji = nuevoEmoji;
+                    }
+                } catch (err) {
+                    console.error('No se pudo actualizar un récord global:', err);
+                }
+            }));
+
+            cacheClasificacionGlobal = datos;
+            renderizarClasificacionGlobal();
+        }
+
+        async function adminGuardarPerfilUsuario() {
+            if (!esAdminActivo) return;
+            const inputNombre = document.getElementById('admin-input-nombre');
+            const selectEmoji = document.getElementById('admin-select-emoji');
+            const nuevoNombre = inputNombre ? inputNombre.value.trim().slice(0, 20) : '';
+            if (!nuevoNombre) {
+                alert('⚠️ El nombre no puede estar vacío.');
+                return;
+            }
+            const nombreAnterior = usuarioActual.nombre || '';
+            const nuevoEmoji = selectEmoji ? selectEmoji.value : (usuarioActual.emoji || '🚀');
+            usuarioActual = { nombre: nuevoNombre, emoji: nuevoEmoji };
+            localStorage.setItem('memoria_usuario_v1', JSON.stringify(usuarioActual));
+
+            const badgeUsuario = document.getElementById('badge-usuario');
+            if (badgeUsuario) {
+                badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
+            }
+
+            await actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji);
+            alert('✅ Nombre y emoji actualizados también en tus récords globales.');
+        }
+
+        function cerrarPanelAdmin() {
+            document.getElementById('modal-panel-admin').classList.remove('activo');
+        }
+
+        function desactivarModoAdmin() {
+            esAdminActivo = false;
+            actualizarVisibilidadControlesAdmin();
+            cerrarPanelAdmin();
+            renderizarClasificacionGlobal();
+        }
+
+        function adminGuardarNotas() {
+            if (!esAdminActivo) return;
+            const input = document.getElementById('admin-input-notas');
+            const val = parseInt(input ? input.value : '0', 10);
+            if (!Number.isFinite(val) || val < 0) return;
+
+            totalNotasTocadas = val;
+            localStorage.setItem('memoria_total_notas_v1', String(totalNotasTocadas));
+            verificarLogrosDeNotas();
+            alert(`✅ Total de notas actualizado a ${totalNotasTocadas}.`);
+        }
+
+        function cargarCamposAdminEstadistica() {
+            const selModo = document.getElementById('admin-select-modo');
+            const selDif = document.getElementById('admin-select-dif');
+            const inpRec = document.getElementById('admin-input-record');
+            if (!selModo || !selDif || !inpRec) return;
+
+            const modo = selModo.value;
+            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
+            const stats = obtenerDatosStats();
+            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
+            inpRec.value = actual.record;
+        }
+
+        function adminGuardarEstadisticaModo() {
+            if (!esAdminActivo) return;
+            const selModo = document.getElementById('admin-select-modo');
+            const selDif = document.getElementById('admin-select-dif');
+            const inpRec = document.getElementById('admin-input-record');
+            if (!selModo || !selDif || !inpRec) return;
+
+            const modo = selModo.value;
+            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
+            const rec = Math.max(0, Math.min(NIVEL_FINAL, parseInt(inpRec.value || '0', 10) || 0));
+
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${dif}`;
+            const previa = stats[clave] || { record: 0, derrotas: 0, notas: 0 };
+            stats[clave] = {
+                record: rec,
+                derrotas: previa.derrotas || 0,
+                notas: previa.notas || 0
+            };
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            alert(`✅ Nivel récord guardado en ${rec}.`);
+        }
+
+        function verificarLogroCienPorCientoAuto() {
+            const otros = DEFINICION_LOGROS.filter(l => l.id !== 'cien_por_ciento');
+            const todosListos = otros.every(l => !!logrosDesbloqueados[l.id]);
+            if (todosListos) {
+                logrosDesbloqueados['cien_por_ciento'] = true;
+            } else {
+                delete logrosDesbloqueados['cien_por_ciento'];
+            }
+            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+        }
+
+        function adminToggleLogroIndividual(id) {
+            if (!esAdminActivo) return;
+            if (logrosDesbloqueados[id]) {
+                delete logrosDesbloqueados[id];
+            } else {
+                logrosDesbloqueados[id] = true;
+            }
+            if (id !== 'cien_por_ciento') {
+                verificarLogroCienPorCientoAuto();
+            } else {
+                localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+            }
+            renderizarListaAdminLogros();
+        }
+
+        function adminToggleTodosLogros(activar) {
+            if (!esAdminActivo) return;
+            if (activar) {
+                DEFINICION_LOGROS.forEach(l => {
+                    logrosDesbloqueados[l.id] = true;
+                });
+            } else {
+                logrosDesbloqueados = {};
+            }
+            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+            renderizarListaAdminLogros();
+        }
+
+        function renderizarListaAdminLogros() {
+            const cont = document.getElementById('admin-lista-logros');
+            if (!cont) return;
+            cont.innerHTML = DEFINICION_LOGROS.map(l => {
+                const tiene = !!logrosDesbloqueados[l.id];
+                return `
+                    <div class="admin-item-logro">
+                        <span>${l.icono} ${escaparTextoHTML(l.nombre)}</span>
+                        <button class="btn-mini" type="button" onclick="adminToggleLogroIndividual('${l.id}')" style="padding: 5px 10px; font-size: 0.78rem; background-color: ${tiene ? 'rgba(46, 213, 115, 0.35)' : 'rgba(255, 255, 255, 0.12)'};">
+                            ${tiene ? '✅ Activo' : '🔒 Quitar'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function borrarRegistroGlobalAdmin(idFirebase) {
+            if (!esAdminActivo || !idFirebase) return;
+            try {
+                const res = await fetch(`${URL_RANKING}/${encodeURIComponent(idFirebase)}.json`, {
+                    method: 'DELETE'
+                });
+                if (!res.ok) throw new Error('Error al borrar');
+                cacheClasificacionGlobal = cacheClasificacionGlobal.filter(item => item._id !== idFirebase);
+                renderizarClasificacionGlobal();
+            } catch (err) {
+                console.error('No se pudo borrar el registro:', err);
+                alert('⚠️ No se pudo borrar el registro. Revisa las reglas de Firebase.');
+            }
+        }
+
+        async function borrarTodosRecordsGlobalAdmin() {
+            if (!esAdminActivo) return;
+            const confirmar = confirm('⚠️ ¿Seguro que quieres borrar TODOS los récords de la clasificación global?');
+            if (!confirmar) return;
+
+            try {
+                const res = await fetch(`${URL_RANKING}.json`, {
+                    method: 'DELETE'
+                });
+                if (!res.ok) throw new Error('Error al borrar todos los récords');
+                cacheClasificacionGlobal = [];
+                ultimoRecordEnviado = { clave: '', record: 0 };
+                renderizarClasificacionGlobal();
+                alert('💥 Se borraron todos los récords de la clasificación global.');
+            } catch (err) {
+                console.error('No se pudieron borrar todos los récords:', err);
+                alert('⚠️ No se pudieron borrar todos los récords. Revisa las reglas de Firebase.');
+            }
+        }
+
+        async function publicarRecordGlobal(record, modo, dif) {
+            if (!usuarioActual || !usuarioActual.nombre || modo === 'libre') return;
+            const nivelNum = Number(record);
+            if (!Number.isFinite(nivelNum) || nivelNum < 1 || nivelNum > NIVEL_FINAL) return;
+
+            const nombreLimpio = usuarioActual.nombre.trim().slice(0, 20);
+            const emojiLimpio = usuarioActual.emoji || '🎮';
+            const difNum = Number(dif);
+            const claveJugador = `${nombreLimpio.toLowerCase()}_${modo}_${difNum}`;
+
+            if (ultimoRecordEnviado.clave === claveJugador && nivelNum <= ultimoRecordEnviado.record) {
+                return;
+            }
+
+            try {
+                const existentes = await obtenerClasificacionGlobal();
+                const registroPrevio = Array.isArray(existentes)
+                    ? existentes.find(item =>
+                        String(item.nombre || '').trim().toLowerCase() === nombreLimpio.toLowerCase() &&
+                        item.modo === String(modo) &&
+                        Number(item.dificultad) === difNum
+                    )
+                    : null;
+
+                if (registroPrevio && registroPrevio._id) {
+                    const nuevoRecord = Math.max(Number(registroPrevio.record) || 0, nivelNum);
+                    const res = await fetch(`${URL_RANKING}/${encodeURIComponent(registroPrevio._id)}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: nombreLimpio,
+                            emoji: emojiLimpio,
+                            record: nuevoRecord,
+                            fecha: Date.now()
+                        })
+                    });
+                    if (res.ok) {
+                        ultimoRecordEnviado = { clave: claveJugador, record: nuevoRecord };
+                    }
+                    return;
+                }
+
+                const entrada = {
+                    nombre: nombreLimpio,
+                    emoji: emojiLimpio,
+                    record: nivelNum,
+                    modo: String(modo),
+                    dificultad: difNum,
+                    fecha: Date.now()
+                };
+
+                const res = await fetch(`${URL_RANKING}.json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(entrada)
+                });
+                if (res.ok) {
+                    ultimoRecordEnviado = { clave: claveJugador, record: nivelNum };
+                }
+            } catch (err) {
+                console.error('No se pudo publicar el récord global:', err);
+            }
+        }
+
+        async function obtenerClasificacionGlobal() {
+            try {
+                const res = await fetch(`${URL_RANKING}.json`);
+                if (!res.ok) throw new Error('Respuesta no válida');
+                const data = await res.json();
+                if (!data || typeof data !== 'object') return [];
+
+                return Object.entries(data)
+                    .map(([id, item]) => Object.assign({}, item, { _id: id }))
+                    .filter(item => item && typeof item.nombre === 'string' && typeof item.record === 'number')
+                    .sort((a, b) => b.record - a.record || (a.fecha || 0) - (b.fecha || 0));
+            } catch (err) {
+                console.error('Error al cargar clasificación global:', err);
+                return null;
+            }
+        }
+
+        function abrirClasificacionGlobal() {
+            document.getElementById('modal-global').classList.add('activo');
+            cargarYMostrarGlobal(false);
+        }
+
+        function cerrarClasificacionGlobal() {
+            document.getElementById('modal-global').classList.remove('activo');
+        }
+
+        async function cargarYMostrarGlobal(forzarMensaje = false) {
+            const lista = document.getElementById('lista-ranking-global');
+            if (!lista) return;
+            if (forzarMensaje || cacheClasificacionGlobal.length === 0) {
+                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Cargando clasificación...</div>';
+            }
+
+            const datos = await obtenerClasificacionGlobal();
+            if (datos === null) {
+                lista.innerHTML = '<div style="text-align: center; color: #ff4757; padding: 16px;">⚠️ No se pudo conectar con la clasificación global.</div>';
+                return;
+            }
+
+            cacheClasificacionGlobal = datos;
+            renderizarClasificacionGlobal();
+        }
+
+        function renderizarClasificacionGlobal() {
+            const lista = document.getElementById('lista-ranking-global');
+            const filtro = document.getElementById('filtro-modo-global');
+            if (!lista) return;
+
+            const modoFiltro = filtro ? filtro.value : 'normal';
+            const filtrados = cacheClasificacionGlobal
+                .filter(item => item.modo === modoFiltro)
+                .sort((a, b) => b.record - a.record || (a.fecha || 0) - (b.fecha || 0))
+                .slice(0, 10);
+
+            if (filtrados.length === 0) {
+                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Aún no hay récords registrados en este modo. ¡Sé el primero!</div>';
+                return;
+            }
+
+            lista.innerHTML = filtrados.map((item, idx) => {
+                const pos = idx + 1;
+                const medalla = pos === 1 ? '🥇' : (pos === 2 ? '🥈' : (pos === 3 ? '🥉' : `#${pos}`));
+                const claseTop = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
+                const modoTxt = ETIQUETAS_MODO[item.modo] || item.modo || 'Normal';
+                const difTxt = item.modo === 'hacker' || item.modo === 'extremo' ? '' : ` · ${ETIQUETAS_DIF[item.dificultad] || ''}`;
+                const btnBorrar = esAdminActivo && item._id
+                    ? `<button class="btn-borrar-fila-global" type="button" onclick="borrarRegistroGlobalAdmin('${escaparTextoHTML(item._id)}')" title="Borrar registro">🗑️</button>`
+                    : '';
+
+                return `
+                    <div class="fila-ranking ${claseTop}">
+                        <div class="ranking-pos">${medalla}</div>
+                        <div class="ranking-jugador">
+                            <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}</div>
+                            <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
+                        </div>
+                        <div class="ranking-puntaje">Nivel ${Number(item.record)}</div>
+                        ${btnBorrar}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        const PREFS_DEFAULT = {
+            atmosfera: '1',
+            sonido: '1',
+            temaColor: '0',
+            fondo: '#1a1a2e',
+            modo: 'normal',
+            dificultad: '2'
+        };
+
+        function obtenerPreferenciasVisuales() {
+            try {
+                const guardadas = JSON.parse(localStorage.getItem('memoria_prefs_visuales_v1'));
+                return Object.assign({}, PREFS_DEFAULT, guardadas || {});
+            } catch (e) {
+                return Object.assign({}, PREFS_DEFAULT);
+            }
+        }
+
+        function guardarPreferenciaVisual(clave, valor) {
+            const prefs = obtenerPreferenciasVisuales();
+            prefs[clave] = String(valor);
+            localStorage.setItem('memoria_prefs_visuales_v1', JSON.stringify(prefs));
+        }
+
+        function actualizarBrilloNivelAlto() {
+            const activar = partidaEnCurso && modoJuego !== 'libre' && nivel >= 7;
+            document.body.classList.toggle('brillo-nivel-alto', activar);
+        }
+
+        function actualizarBotonesPartida() {
+            const btnJugar = document.getElementById('btn-jugar');
+            const btnTerminar = document.getElementById('btn-terminar-partida');
+
+            if (btnJugar) {
+                btnJugar.style.display = modoJuego === 'libre' || partidaEnCurso ? 'none' : 'inline-block';
+                btnJugar.textContent = haJugadoPartida ? 'Jugar de nuevo' : 'Jugar';
+                btnJugar.disabled = partidaEnCurso;
+            }
+
+            if (btnTerminar) {
+                btnTerminar.classList.toggle('visible', modoJuego !== 'libre' && partidaEnCurso);
+            }
+        }
+
+        function terminarPartidaManualmente() {
+            if (!partidaEnCurso || modoJuego === 'libre') return;
+
+            if (nivel >= 1) {
+                publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
+            }
+
+            limpiarTimers();
+            detenerBarraContrarreloj();
+
+            for (let i = 0; i < totalBloques; i++) {
+                const b = document.getElementById(`bloque-${i}`);
+                if (b) b.classList.remove('brillar');
+            }
+
+            secuencia = [];
+            secuenciaObjetivo = [];
+            pasoUsuario = 0;
+            nivel = 0;
+            bloqueado = true;
+            reproduciendoSecuenciaActual = false;
+            partidaEnCurso = false;
+            comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = 0;
+            segundosPartida = 0;
+
+            const crono = document.getElementById('cronometro-juego');
+            if (crono) {
+                crono.style.display = 'none';
+                crono.textContent = '⏱️ 00:00';
+            }
+
+            if (modoJuego === 'extremo') {
+                construirTablero(2);
+            }
+
+            actualizarBrilloNivelAlto();
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+            setControlesPartidaActivos(false);
+            document.getElementById('mensaje').textContent = '🛑 Partida terminada';
+        }
+
+        function aplicarPreferenciasVisualesAlCargar() {
+            const prefs = obtenerPreferenciasVisuales();
+            const selAtmos = document.getElementById('selector-atmosfera');
+            const selSonido = document.getElementById('selector-sonido');
+            const selTema = document.getElementById('selector-color-bloques');
+            const selFondo = document.getElementById('selector-fondo-oscuro');
+            const selDif = document.getElementById('selector-dificultad');
+            const selModo = document.getElementById('selector-modo');
+
+            if (selAtmos) selAtmos.value = prefs.atmosfera;
+            if (selSonido) selSonido.value = prefs.sonido;
+            if (selTema) selTema.value = prefs.temaColor;
+            if (selFondo) selFondo.value = prefs.fondo;
+
+            if (selDif && ['2', '3', '4'].includes(prefs.dificultad)) {
+                selDif.value = prefs.dificultad;
+                tamanoCuadricula = parseInt(prefs.dificultad, 10);
+            }
+
+            document.documentElement.style.setProperty('--bg-color', prefs.fondo);
+            document.body.style.backgroundColor = prefs.fondo;
+            actualizarColoresTablero(false);
+
+            const modosValidos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker'];
+            const modoGuardado = modosValidos.includes(prefs.modo) ? prefs.modo : 'normal';
+            if (selModo) {
+                selModo.value = modoGuardado;
+                cambiarModoJuego(selModo, false);
+            } else {
+                construirTablero(tamanoCuadricula);
+            }
+        }
+
+        function activarVibracionError() {
+            const tableroCont = document.getElementById('tablero-contenedor');
+            if (tableroCont) {
+                tableroCont.classList.remove('vibrar-error');
+                void tableroCont.offsetWidth;
+                tableroCont.classList.add('vibrar-error');
+                setTimeout(() => tableroCont.classList.remove('vibrar-error'), 380);
+            }
+            if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+                navigator.vibrate([70, 40, 90]);
+            }
+        }
+
+        const canvasConfeti = document.getElementById('confeti-canvas');
+        const ctxConfeti = canvasConfeti.getContext('2d');
+        let particulasConfeti = [];
+        let confetiAnimId = null;
+
+        function lanzarConfeti() {
+            canvasConfeti.width = window.innerWidth;
+            canvasConfeti.height = window.innerHeight;
+            particulasConfeti = [];
+
+            const colores = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ffd700', '#ff6b81', '#05d9e8', '#a29bfe'];
+            for (let i = 0; i < 65; i++) {
+                particulasConfeti.push({
+                    x: Math.random() * canvasConfeti.width,
+                    y: Math.random() * -canvasConfeti.height * 0.5,
+                    w: Math.random() * 9 + 5,
+                    h: Math.random() * 6 + 4,
+                    color: colores[Math.floor(Math.random() * colores.length)],
+                    speedY: Math.random() * 3.5 + 2.5,
+                    speedX: Math.random() * 4 - 2
+                });
+            }
+
+            if (confetiAnimId) cancelAnimationFrame(confetiAnimId);
+            animarConfeti();
+        }
+
+        function animarConfeti() {
+            ctxConfeti.clearRect(0, 0, canvasConfeti.width, canvasConfeti.height);
+            let activas = 0;
+
+            for (let i = 0; i < particulasConfeti.length; i++) {
+                const p = particulasConfeti[i];
+                p.y += p.speedY;
+                p.x += p.speedX;
+
+                if (p.y < canvasConfeti.height + 30) {
+                    activas++;
+                    ctxConfeti.fillStyle = p.color;
+                    ctxConfeti.fillRect(p.x, p.y, p.w, p.h);
+                }
+            }
+
+            if (activas > 0) {
+                confetiAnimId = requestAnimationFrame(animarConfeti);
+            } else {
+                ctxConfeti.clearRect(0, 0, canvasConfeti.width, canvasConfeti.height);
+            }
+        }
+
+        const DEFINICION_LOGROS = [
+            { id: 'primeros_pasos', icono: '🥉', nombre: 'Primeros Pasos', desc: 'Supera el nivel 3 en modo Normal.' },
+            { id: 'cerebro_titanio', icono: '🥈', nombre: 'Cerebro de Titanio', desc: 'Supera el nivel 6 en modo Normal.' },
+            { id: 'memoria_fotografica', icono: '🥇', nombre: 'Memoria Fotográfica', desc: 'Llega al nivel 8 en cualquier modo.' },
+            { id: 'hacker_maestro', icono: '💻', nombre: 'Hacker Maestro', desc: 'Llega al nivel 6 en modo Hacker.' },
+            { id: 'mete_al_reves', icono: '🔄', nombre: 'Mente al Revés', desc: 'Supera el nivel 6 en modo Invertido.' },
+            { id: 'bajo_presion', icono: '⏱️', nombre: 'Bajo Presión', desc: 'Gana el modo Contrarreloj llegando hasta el nivel 8.' },
+            { id: 'estetico', icono: '🎨', nombre: 'Estético', desc: 'Prueba todos los sonidos y atmósferas.' },
+            { id: 'jugador_frecuente', icono: '🌟', nombre: 'Jugador Frecuente', desc: 'Juega el juego 2 días seguidos.' },
+            { id: 'compositor', icono: '🎵', nombre: 'Compositor', desc: 'Graba y reproduce una melodía en el Modo Libre.' },
+            { id: 'gran_compositor', icono: '🎼', nombre: 'Gran Compositor', desc: 'Graba una melodía de 15 notas o más en el Modo Libre.' },
+            { id: 'cien_notas', icono: '🎵', nombre: 'Cien Notas', desc: 'Llega a 100 notas tocadas en total.' },
+            { id: 'quinientas_notas', icono: '🎶', nombre: 'Quinientas Notas', desc: 'Llega a 500 notas tocadas en total.' },
+            { id: 'mil_notas', icono: '🎹', nombre: 'Mil Notas', desc: 'Toca 1,000 notas en total entre tus partidas.' },
+            { id: 'cinco_mil_notas', icono: '🏅', nombre: 'Cinco Mil Notas', desc: 'Toca 5,000 notas en total entre tus partidas.' },
+            { id: 'tecla_loca', icono: '🎹', nombre: 'Tecla Loca', desc: 'Toca 25 bloques en el Modo Libre sin estar grabando.' },
+            { id: 'repeticion', icono: '🔁', nombre: 'Repetición', desc: 'Reproduce tu misma melodía grabada 2 veces seguidas.' },
+            { id: 'modo_matrix', icono: '💻', nombre: 'Modo Matrix', desc: 'Activa el modo Hacker y toca al menos 10 bloques.' },
+            { id: 'curioso', icono: '👀', nombre: 'Curioso', desc: 'Abre Estadísticas o Logros después de jugar una partida.' },
+            { id: 'cien_por_ciento', icono: '👑', nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
+        ];
+
+        let logrosDesbloqueados = JSON.parse(localStorage.getItem('memoria_logros_v1') || '{}');
+        let progresoEstetico = JSON.parse(localStorage.getItem('memoria_estetico_v1') || '{"sonidos":["1"],"atmosferas":["1"]}');
+
+        let colaToasts = [];
+        let mostrandoToast = false;
+
+        function verificarLogrosDeNotas() {
+            if (totalNotasTocadas >= 100) desbloquearLogro('cien_notas');
+            if (totalNotasTocadas >= 500) desbloquearLogro('quinientas_notas');
+            if (totalNotasTocadas >= 1000) desbloquearLogro('mil_notas');
+            if (totalNotasTocadas >= 5000) desbloquearLogro('cinco_mil_notas');
+        }
+
+        function comprobarLogroCurioso() {
+            if (haJugadoPartida) {
+                desbloquearLogro('curioso');
+            }
+        }
+
+        function desbloquearLogro(id) {
+            if (logrosDesbloqueados[id]) return;
+            logrosDesbloqueados[id] = true;
+            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+
+            const info = DEFINICION_LOGROS.find(l => l.id === id);
+            if (info) {
+                colaToasts.push(info);
+                procesarColaToasts();
+            }
+
+            if (id !== 'cien_por_ciento') {
+                const otros = DEFINICION_LOGROS.filter(l => l.id !== 'cien_por_ciento');
+                const todosCompletos = otros.every(l => logrosDesbloqueados[l.id]);
+                if (todosCompletos) {
+                    setTimeout(() => desbloquearLogro('cien_por_ciento'), 600);
+                }
+            }
+        }
+
+        function procesarColaToasts() {
+            if (mostrandoToast || colaToasts.length === 0) return;
+            mostrandoToast = true;
+
+            const logro = colaToasts.shift();
+            const toast = document.getElementById('toast-logro');
+            document.getElementById('toast-logro-icono').textContent = logro.icono;
+            document.getElementById('toast-logro-nombre').textContent = logro.nombre;
+
+            toast.classList.add('mostrar');
+            setTimeout(() => {
+                toast.classList.remove('mostrar');
+                setTimeout(() => {
+                    mostrandoToast = false;
+                    procesarColaToasts();
+                }, 400);
+            }, 3000);
+        }
+
+        function verificarProgresoEstetico() {
+            const todosSonidos = ['1', '3', '5', '7', '8'].every(s => progresoEstetico.sonidos.includes(s));
+            const todasAtmosferas = ['0', '1', '2', '3'].every(a => progresoEstetico.atmosferas.includes(a));
+            if (todosSonidos && todasAtmosferas) {
+                desbloquearLogro('estetico');
+            }
+        }
+
+        function registrarDiaJugado() {
+            const hoy = new Date();
+            const hoyStr = `${hoy.getFullYear()}-${hoy.getMonth() + 1}-${hoy.getDate()}`;
+            const datosDias = JSON.parse(localStorage.getItem('memoria_dias_jugados_v1') || '{"ultimoDia":"","racha":0}');
+
+            if (datosDias.ultimoDia === hoyStr) return;
+
+            const ayer = new Date(hoy);
+            ayer.setDate(hoy.getDate() - 1);
+            const ayerStr = `${ayer.getFullYear()}-${ayer.getMonth() + 1}-${ayer.getDate()}`;
+
+            if (datosDias.ultimoDia === ayerStr) {
+                datosDias.racha += 1;
+            } else {
+                datosDias.racha = 1;
+            }
+
+            datosDias.ultimoDia = hoyStr;
+            localStorage.setItem('memoria_dias_jugados_v1', JSON.stringify(datosDias));
+
+            if (datosDias.racha >= 2) {
+                desbloquearLogro('jugador_frecuente');
+            }
+        }
+
+        function abrirLogros() {
+            comprobarLogroCurioso();
+            const modal = document.getElementById('modal-logros');
+            const lista = document.getElementById('lista-logros');
+            const contador = document.getElementById('contador-logros');
+
+            let totalDesbloqueados = 0;
+            lista.innerHTML = '';
+
+            DEFINICION_LOGROS.forEach(logro => {
+                const desb = !!logrosDesbloqueados[logro.id];
+                if (desb) totalDesbloqueados++;
+
+                const div = document.createElement('div');
+                div.className = `item-logro ${desb ? 'desbloqueado' : ''}`;
+                div.innerHTML = `
+                    <div class="logro-icono">${logro.icono}</div>
+                    <div class="logro-info">
+                        <div class="logro-nombre">${logro.nombre}</div>
+                        <div class="logro-desc">${logro.desc}</div>
+                    </div>
+                    <div class="logro-estado">${desb ? '✅' : '🔒'}</div>
+                `;
+                lista.appendChild(div);
+            });
+
+            contador.textContent = `${totalDesbloqueados}/${DEFINICION_LOGROS.length}`;
+            modal.classList.add('activo');
+        }
+
+        function cerrarLogros() {
+            document.getElementById('modal-logros').classList.remove('activo');
+        }
+
+        function inicializarUsuarioAlCargar() {
+            const guardado = localStorage.getItem('memoria_usuario_v1');
+            const modalUsuario = document.getElementById('modal-usuario');
+            const badgeUsuario = document.getElementById('badge-usuario');
+            const inputNombre = document.getElementById('input-nombre-usuario');
+
+            if (guardado) {
+                try {
+                    const parsed = JSON.parse(guardado);
+                    if (parsed && parsed.nombre && parsed.nombre.trim().length > 0) {
+                        usuarioActual = parsed;
+                        if (modalUsuario) {
+                            modalUsuario.classList.remove('activo');
+                            modalUsuario.style.display = 'none';
+                        }
+                        if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji || '🚀'} ${usuarioActual.nombre}`;
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error leyendo usuario guardado:', e);
+                }
+            }
+
+            if (modalUsuario) {
+                modalUsuario.style.display = 'flex';
+                modalUsuario.classList.add('activo');
+            }
+            if (inputNombre) inputNombre.focus();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            inicializarUsuarioAlCargar();
+
+            const inputNombre = document.getElementById('input-nombre-usuario');
+            if (inputNombre) {
+                inputNombre.addEventListener('input', () => {
+                    const aviso = document.getElementById('aviso-nombre-obligatorio');
+                    if (aviso) {
+                        aviso.textContent = inputNombre.value.trim().length > 0 ? '' : '⚠️ Debes escribir un nombre para continuar';
+                    }
+                });
+            }
+
+            try { aplicarPreferenciasVisualesAlCargar(); } catch (e) { console.error(e); }
+            try { verificarLogrosDeNotas(); } catch (e) { console.error(e); }
+            try { iniciarAtmosfera(); } catch (e) { console.error(e); }
+            try { verificarProgresoEstetico(); } catch (e) { console.error(e); }
+            actualizarVisibilidadControlesAdmin();
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+        });
+
+        function guardarUsuario() {
+            const input = document.getElementById('input-nombre-usuario');
+            const modalUsuario = document.getElementById('modal-usuario');
+            const badgeUsuario = document.getElementById('badge-usuario');
+            const aviso = document.getElementById('aviso-nombre-obligatorio');
+
+            const nombreVal = input ? input.value.trim() : '';
+            if (!nombreVal) {
+                if (aviso) {
+                    aviso.textContent = '⚠️ ¡Tienes que escribir un nombre! No puede quedar vacío.';
+                }
+                if (input) {
+                    input.focus();
+                    input.style.borderColor = '#ff4757';
+                }
+                return;
+            }
+
+            if (input) input.style.borderColor = 'rgba(255,255,255,0.25)';
+            const emojiAleatorio = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
+            usuarioActual = { nombre: nombreVal, emoji: emojiAleatorio };
+
+            localStorage.setItem('memoria_usuario_v1', JSON.stringify(usuarioActual));
+
+            if (modalUsuario) {
+                modalUsuario.classList.remove('activo');
+                modalUsuario.style.display = 'none';
+            }
+            if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
+        }
+
+        function abrirConfiguracion() {
+            const modal = document.getElementById('modal-configuracion');
+            if (modal) modal.classList.add('activo');
+        }
+
+        function cerrarConfiguracion() {
+            const modal = document.getElementById('modal-configuracion');
+            if (modal) modal.classList.remove('activo');
+        }
+
+        function setControlesPartidaActivos(enPartida) {
+            const btnStats = document.getElementById('btn-estadisticas-top');
+            const btnConfig = document.getElementById('btn-config');
+            if (btnStats) btnStats.disabled = enPartida;
+            if (btnConfig) btnConfig.disabled = enPartida;
+        }
+
+        function toggleListaFondo() {
+            if (modoJuego === 'hacker') return;
+            const selectorFondo = document.getElementById('selector-fondo-oscuro');
+            if (selectorFondo) {
+                selectorFondo.classList.toggle('visible');
+            }
+        }
+
+        function aplicarFondoOscuro(select) {
+            if (modoJuego === 'hacker' || !select) return;
+            const colorElegido = select.value;
+            guardarPreferenciaVisual('fondo', colorElegido);
+            document.documentElement.style.setProperty('--bg-color', colorElegido);
+            document.body.style.backgroundColor = colorElegido;
+        }
+
+        const canvasMatrix = document.getElementById('matrix-canvas');
+        const ctxMatrix = canvasMatrix.getContext('2d');
+        let matrixInterval = null;
+
+        function iniciarMatrizHacker() {
+            canvasMatrix.width = window.innerWidth;
+            canvasMatrix.height = window.innerHeight;
+            const fontSize = 18;
+            const columns = Math.floor(canvasMatrix.width / fontSize);
+            const drops = new Array(columns).fill(1);
+
+            if (matrixInterval) clearInterval(matrixInterval);
+            matrixInterval = setInterval(() => {
+                ctxMatrix.fillStyle = 'rgba(0, 0, 0, 0.12)';
+                ctxMatrix.fillRect(0, 0, canvasMatrix.width, canvasMatrix.height);
+
+                ctxMatrix.fillStyle = '#00ff00';
+                ctxMatrix.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = Math.random() > 0.5 ? '1' : '0';
+                    ctxMatrix.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvasMatrix.height && Math.random() > 0.97) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }, 80);
+        }
+
+        function detenerMatrizHacker() {
+            if (matrixInterval) {
+                clearInterval(matrixInterval);
+                matrixInterval = null;
+            }
+            if (ctxMatrix && canvasMatrix) {
+                ctxMatrix.clearRect(0, 0, canvasMatrix.width, canvasMatrix.height);
+            }
+        }
+
+        const canvasAtmos = document.getElementById('atmosfera-canvas');
+        const ctxAtmos = canvasAtmos.getContext('2d');
+        let atmosParticles = [];
+        let atmosAnimId = null;
+
+        function cambiarAtmosfera() {
+            const selector = document.getElementById('selector-atmosfera');
+            if (selector) {
+                guardarPreferenciaVisual('atmosfera', selector.value);
+                if (!progresoEstetico.atmosferas.includes(selector.value)) {
+                    progresoEstetico.atmosferas.push(selector.value);
+                    localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
+                    verificarProgresoEstetico();
+                }
+            }
+            iniciarAtmosfera();
+        }
+
+        function iniciarAtmosfera() {
+            canvasAtmos.width = window.innerWidth;
+            canvasAtmos.height = window.innerHeight;
+            
+            const selector = document.getElementById('selector-atmosfera');
+            const tipo = selector ? parseInt(selector.value, 10) : 0;
+
+            if (tipo === 0) {
+                ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
+                if (atmosAnimId) cancelAnimationFrame(atmosAnimId);
+                return;
+            }
+
+            atmosParticles = [];
+            const count = tipo === 1 ? 16 : 26;
+            const coloresHojas = ['#2ed573', '#26de81', '#20bf6b', '#4cd137'];
+            const coloresBrillitos = ['#ffd700', '#fffa65', '#ffaf40', '#ffffff'];
+
+            for (let i = 0; i < count; i++) {
+                atmosParticles.push({
+                    x: Math.random() * canvasAtmos.width,
+                    y: Math.random() * canvasAtmos.height,
+                    size: tipo === 1 ? (Math.random() * 7 + 6) : (Math.random() * 5.5 + 3.5),
+                    speedY: tipo === 1 ? (Math.random() * 1.15 + 0.45) : (tipo === 2 ? (Math.random() * 1.7 + 0.85) : (Math.random() * 0.65 - 0.32)),
+                    speedX: tipo === 1 ? (Math.random() * 1.3 - 0.65) : (tipo === 2 ? (Math.random() * 0.45 - 0.22) : (Math.random() * 1.1 - 0.55)),
+                    color: tipo === 1 ? coloresHojas[i % coloresHojas.length] : (tipo === 2 ? '#ffffff' : coloresBrillitos[i % coloresBrillitos.length]),
+                    angle: Math.random() * Math.PI * 2
+                });
+            }
+
+            if (atmosAnimId) cancelAnimationFrame(atmosAnimId);
+            animarAtmosfera(tipo);
+        }
+
+        function animarAtmosfera(tipo) {
+            ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
+
+            for (let i = 0; i < atmosParticles.length; i++) {
+                const p = atmosParticles[i];
+                ctxAtmos.fillStyle = p.color;
+                ctxAtmos.globalAlpha = tipo === 3 ? (0.45 + Math.abs(Math.sin(p.angle)) * 0.5) : 0.65;
+
+                if (tipo === 1) {
+                    ctxAtmos.save();
+                    ctxAtmos.translate(p.x, p.y);
+                    ctxAtmos.rotate(Math.sin(p.angle) * 0.45);
+                    ctxAtmos.beginPath();
+                    ctxAtmos.ellipse(0, 0, p.size * 1.25, p.size * 0.55, 0, 0, Math.PI * 2);
+                    ctxAtmos.fill();
+                    ctxAtmos.restore();
+                } else {
+                    ctxAtmos.beginPath();
+                    ctxAtmos.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+                    ctxAtmos.fill();
+                }
+
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.angle += 0.03;
+
+                if (p.y > canvasAtmos.height + 15) {
+                    p.y = -15;
+                    p.x = Math.random() * canvasAtmos.width;
+                }
+                if (p.x > canvasAtmos.width + 15) p.x = -15;
+                if (p.x < -15) p.x = canvasAtmos.width + 15;
+            }
+
+            ctxAtmos.globalAlpha = 1;
+            atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
+        }
+
+        function toggleSilenciar() {
+            estaSilenciado = !estaSilenciado;
+            document.getElementById('btn-silenciar').textContent = estaSilenciado ? '🔇' : '🔊';
+        }
+
+        function cambiarSonidoSeleccionado(select) {
+            if (select) {
+                guardarPreferenciaVisual('sonido', select.value);
+                if (!progresoEstetico.sonidos.includes(select.value)) {
+                    progresoEstetico.sonidos.push(select.value);
+                    localStorage.setItem('memoria_estetico_v1', JSON.stringify(progresoEstetico));
+                    verificarProgresoEstetico();
+                }
+            }
+            reproducirSonido(0, false, false);
+        }
+
+        function reproducirSonido(indice, esError = false, contarNota = true) {
+            if (!esError && contarNota && modoJuego !== 'libre') {
+                totalNotasTocadas++;
+                localStorage.setItem('memoria_total_notas_v1', totalNotasTocadas);
+                registrarNotaEstadistica(modoJuego, tamanoCuadricula);
+                verificarLogrosDeNotas();
+            }
+
+            if (estaSilenciado) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const tipoSonido = parseInt(document.getElementById('selector-sonido').value, 10);
+
+            if (esError) {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(75, audioCtx.currentTime + 0.45);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.45);
+                return;
+            }
+
+            const frecuencias = [
+                261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25,
+                587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 1174.66,
+                1244.51, 1318.51, 1396.91, 1479.98, 1567.98, 1661.22, 1760.00, 1864.66, 1975.53
+            ];
+            osc.frequency.value = frecuencias[indice % frecuencias.length];
+
+            if (tipoSonido === 3) osc.type = 'sawtooth';
+            else if (tipoSonido === 5) osc.type = 'triangle';
+            else if (tipoSonido === 7) osc.type = 'square';
+            else if (tipoSonido === 8) osc.type = 'square';
+            else osc.type = 'sine';
+
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
+        }
+
+        const temasColores = [
+            ['#ff4757', '#05d9e8', '#2ed573', '#ffa502', '#7700a6', '#ff6b81', '#1e90ff', '#32ff7e', '#fffa65'],
+            ['#ffb3ba', '#bae1ff', '#baffc9', '#ffffba', '#ffdfba', '#e0bbe4', '#957dad', '#d291bc', '#fec8d8'],
+            ['#ff5e57', '#ff9f43', '#feca57', '#ff6b6b', '#ee5253', '#ff9ff3', '#f368e0', '#ff793f', '#ffb142'],
+            ['#00a8ff', '#0097e6', '#4cd137', '#487eb0', '#00d2d3', '#54a0ff', '#2e86de', '#1dd1a1', '#10ac84'],
+            ['#2ed573', '#7bed9f', '#ffa502', '#eccc68', '#26de81', '#20bf6b', '#fed330', '#f7b731', '#a3cb38']
+        ];
+
+        function actualizarColoresTablero(guardar = true) {
+            const selTema = document.getElementById('selector-color-bloques');
+            const temaIdx = selTema ? parseInt(selTema.value, 10) : 0;
+            if (guardar && selTema) {
+                guardarPreferenciaVisual('temaColor', selTema.value);
+            }
+            const paleta = temasColores[temaIdx] || temasColores[0];
+            for (let i = 0; i < totalBloques; i++) {
+                const bloque = document.getElementById(`bloque-${i}`);
+                if (bloque) {
+                    const color = paleta[i % paleta.length];
+                    bloque.style.backgroundColor = color;
+                    bloque.style.color = color;
+                }
+            }
+        }
+
+        function cambiarDificultad(select) {
+            tamanoCuadricula = parseInt(select.value, 10);
+            guardarPreferenciaVisual('dificultad', select.value);
+            construirTablero(tamanoCuadricula);
+        }
+
+        function construirTablero(dimension) {
+            tamanoCuadricula = dimension;
+            totalBloques = dimension * dimension;
+            const tablero = document.getElementById('tablero');
+            const sizePx = dimension === 5 ? 60 : (dimension === 4 ? 75 : (dimension === 3 ? 95 : 120));
+            tablero.style.gridTemplateColumns = `repeat(${dimension}, ${sizePx}px)`;
+            tablero.style.gridTemplateRows = `repeat(${dimension}, ${sizePx}px)`;
+            tablero.innerHTML = '';
+
+            const selTema = document.getElementById('selector-color-bloques');
+            const temaIdx = selTema ? parseInt(selTema.value, 10) : 0;
+            const paleta = temasColores[temaIdx] || temasColores[0];
+
+            for (let i = 0; i < totalBloques; i++) {
+                const color = paleta[i % paleta.length];
+                const div = document.createElement('div');
+                div.className = 'bloque';
+                div.id = `bloque-${i}`;
+                div.style.backgroundColor = color;
+                div.style.color = color;
+                div.onclick = () => manejarClicBloque(i);
+                tablero.appendChild(div);
+            }
+        }
+
+        function obtenerDimensionExtremoPorNivel(niv) {
+            if (niv >= 7) return 4;
+            if (niv >= 4) return 3;
+            return 2;
+        }
+
+        function actualizarBotonComodin() {
+            const btn = document.getElementById('btn-comodin-repetir');
+            if (!btn) return;
+            const modoPermitido = MODOS_CON_COMODIN.includes(modoJuego);
+            const cantMostrar = Math.max(0, comodinUsosRestantes);
+            btn.textContent = `🔁 Repetir (${cantMostrar})`;
+            btn.classList.toggle('visible', modoPermitido);
+            btn.disabled = !modoPermitido || !comodinDisponibleEnPartida || cantMostrar <= 0 || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0;
+        }
+
+        function usarComodinRepetir() {
+            if (!MODOS_CON_COMODIN.includes(modoJuego)) return;
+            if (!comodinDisponibleEnPartida || comodinUsosRestantes <= 0 || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0) return;
+
+            comodinUsosRestantes = Math.max(0, comodinUsosRestantes - 1);
+            if (comodinUsosRestantes <= 0) {
+                comodinDisponibleEnPartida = false;
+            }
+            pasoUsuario = 0;
+            actualizarBotonComodin();
+
+            const velocidad = modoJuego === 'relampago' ? 260 : 580;
+            document.getElementById('mensaje').textContent = '🔁 Repitiendo secuencia...';
+            reproducirSecuencia(velocidad);
+        }
+
+        function resetearEstadoAlCambiarModo() {
+            limpiarTimers();
+            limpiarTimersGrabacion();
+            detenerBarraContrarreloj();
+            secuencia = [];
+            secuenciaObjetivo = [];
+            pasoUsuario = 0;
+            nivel = 0;
+            bloqueado = true;
+            reproduciendoSecuenciaActual = false;
+            partidaEnCurso = false;
+            comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = 0;
+            segundosPartida = 0;
+            toquesLibreSinGrabar = 0;
+            toquesHacker = 0;
+
+            actualizarBrilloNivelAlto();
+
+            const crono = document.getElementById('cronometro-juego');
+            if (crono) {
+                crono.style.display = 'none';
+                crono.textContent = '⏱️ 00:00';
+            }
+
+            esGrabando = false;
+            esReproduciendo = false;
+            notasGrabadas = [];
+            firmaUltimaGrabacion = '';
+            repeticionesConsecutivas = 0;
+            const btnGrabar = document.getElementById('btn-grabar');
+            const btnReproducir = document.getElementById('btn-reproducir');
+            if (btnGrabar) {
+                btnGrabar.classList.remove('grabando');
+                btnGrabar.textContent = '🔴 Grabar';
+            }
+            if (btnReproducir) {
+                btnReproducir.classList.remove('visible');
+            }
+
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+            setControlesPartidaActivos(false);
+            document.getElementById('mensaje').textContent = 'Presiona "Jugar" para empezar';
+        }
+
+        function cambiarModoJuego(select, guardar = true) {
+            modoJuego = select.value;
+            if (guardar) {
+                guardarPreferenciaVisual('modo', modoJuego);
+            }
+            const nombreModo = select.options[select.selectedIndex].text;
+            document.getElementById('badge-modo').textContent = `Modo = ${nombreModo}`;
+
+            resetearEstadoAlCambiarModo();
+
+            const panelGrabadora = document.getElementById('panel-grabadora');
+            const zonaTablero = document.getElementById('zona-tablero-principal');
+            const contTiempo = document.getElementById('contenedor-tiempo');
+            const difSelect = document.getElementById('selector-dificultad');
+
+            const esLibre = modoJuego === 'libre';
+            panelGrabadora.classList.toggle('activo', esLibre);
+            if (zonaTablero) zonaTablero.classList.toggle('con-panel-lateral', esLibre);
+            contTiempo.classList.toggle('activo', modoJuego === 'contrarreloj');
+
+            if (modoJuego === 'hacker') {
+                document.body.classList.add('modo-hacker');
+                iniciarMatrizHacker();
+            } else {
+                document.body.classList.remove('modo-hacker');
+                detenerMatrizHacker();
+                const selectorFondo = document.getElementById('selector-fondo-oscuro');
+                const colorActual = selectorFondo ? selectorFondo.value : '#1a1a2e';
+                document.documentElement.style.setProperty('--bg-color', colorActual);
+                document.body.style.backgroundColor = colorActual;
+            }
+
+            if (modoJuego === 'libre') {
+                difSelect.disabled = true;
+                construirTablero(5);
+                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+            } else if (modoJuego === 'extremo') {
+                difSelect.disabled = true;
+                construirTablero(2);
+            } else if (modoJuego === 'hacker') {
+                difSelect.disabled = true;
+                construirTablero(2);
+            } else {
+                difSelect.disabled = false;
+                construirTablero(parseInt(difSelect.value, 10));
+            }
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+        }
+
+        function iniciarJuego() {
+            if (modoJuego === 'libre') {
+                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+                return;
+            }
+
+            haJugadoPartida = true;
+            partidaEnCurso = true;
+            registrarDiaJugado();
+
+            limpiarTimers();
+            secuencia = [];
+            nivel = 0;
+            bloqueado = true;
+            reproduciendoSecuenciaActual = false;
+            comodinUsosRestantes = comodinUsosConfigurados;
+            comodinDisponibleEnPartida = MODOS_CON_COMODIN.includes(modoJuego);
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+            actualizarBrilloNivelAlto();
+            setControlesPartidaActivos(true);
+
+            if (modoJuego === 'extremo') {
+                construirTablero(2);
+            }
+
+            segundosPartida = 0;
+            const crono = document.getElementById('cronometro-juego');
+            crono.style.display = 'inline-block';
+            crono.textContent = '⏱️ 00:00';
+            timerPartidaInterval = setInterval(() => {
+                segundosPartida++;
+                const min = String(Math.floor(segundosPartida / 60)).padStart(2, '0');
+                const seg = String(segundosPartida % 60).padStart(2, '0');
+                crono.textContent = `⏱️ ${min}:${seg}`;
+            }, 1000);
+
+            siguienteNivel();
+        }
+
+        function siguienteNivel() {
+            if (!partidaEnCurso) return;
+            nivel++;
+            pasoUsuario = 0;
+            actualizarBrilloNivelAlto();
+
+            if (modoJuego === 'extremo') {
+                const dimDeseada = obtenerDimensionExtremoPorNivel(nivel);
+                if (tamanoCuadricula !== dimDeseada) {
+                    construirTablero(dimDeseada);
+                }
+            }
+
+            if (nivel >= 8) {
+                desbloquearLogro('memoria_fotografica');
+            }
+            if (modoJuego === 'hacker' && nivel >= 6) {
+                desbloquearLogro('hacker_maestro');
+            }
+
+            const prefijoExtremo = (modoJuego === 'extremo') ? ` (${tamanoCuadricula}x${tamanoCuadricula})` : '';
+            document.getElementById('mensaje').textContent = `Nivel ${nivel}/${NIVEL_FINAL}${prefijoExtremo} — Observa la secuencia`;
+            const nuevoBloque = Math.floor(Math.random() * totalBloques);
+            secuencia.push(nuevoBloque);
+
+            secuenciaObjetivo = (modoJuego === 'invertido') ? [...secuencia].reverse() : [...secuencia];
+
+            const velocidad = modoJuego === 'relampago' ? 260 : (modoJuego === 'extremo' ? 350 : 580);
+            reproducirSecuencia(velocidad);
+        }
+
+        function reproducirSecuencia(velocidad) {
+            if (!partidaEnCurso) return;
+            bloqueado = true;
+            reproduciendoSecuenciaActual = true;
+            actualizarBotonComodin();
+
+            let i = 0;
+            const intervalo = setInterval(() => {
+                if (!partidaEnCurso) {
+                    clearInterval(intervalo);
+                    return;
+                }
+                if (i < secuencia.length) {
+                    iluminarBloque(secuencia[i], velocidad * 0.55, false);
+                    i++;
+                } else {
+                    clearInterval(intervalo);
+                    if (!partidaEnCurso) return;
+                    bloqueado = false;
+                    reproduciendoSecuenciaActual = false;
+                    actualizarBotonComodin();
+
+                    document.getElementById('mensaje').textContent = modoJuego === 'invertido'
+                        ? "🔄 ¡Tu turno! Repite AL REVÉS"
+                        : "👉 ¡Tu turno!";
+
+                    if (modoJuego === 'contrarreloj') {
+                        iniciarBarraContrarreloj();
+                    }
+                }
+            }, velocidad);
+            timeouts.push(intervalo);
+        }
+
+        function iniciarBarraContrarreloj() {
+            detenerBarraContrarreloj();
+            tiempoRestante = TIEMPO_MAXIMO;
+            const barra = document.getElementById('barra-progreso-tiempo');
+            barra.style.width = '100%';
+            barra.classList.remove('vibrando-alerta');
+
+            intervaloProgreso = setInterval(() => {
+                if (!partidaEnCurso) {
+                    detenerBarraContrarreloj();
+                    return;
+                }
+                tiempoRestante -= 100;
+                const porcentaje = Math.max(0, (tiempoRestante / TIEMPO_MAXIMO) * 100);
+                barra.style.width = `${porcentaje}%`;
+
+                if (porcentaje <= 30) {
+                    barra.classList.add('vibrando-alerta');
+                }
+
+                if (tiempoRestante <= 0) {
+                    detenerBarraContrarreloj();
+                    activarVibracionError();
+                    registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
+                    finalizarPartida(false, "⏰ ¡Se acabó el tiempo!");
+                }
+            }, 100);
+        }
+
+        function detenerBarraContrarreloj() {
+            if (intervaloProgreso) {
+                clearInterval(intervaloProgreso);
+                intervaloProgreso = null;
+            }
+            const barra = document.getElementById('barra-progreso-tiempo');
+            if (barra) barra.classList.remove('vibrando-alerta');
+        }
+
+        function iluminarBloque(indice, duracion = 260, contarNota = true) {
+            const bloque = document.getElementById(`bloque-${indice}`);
+            if (!bloque) return;
+            bloque.classList.add('brillar');
+            reproducirSonido(indice, false, contarNota);
+            setTimeout(() => bloque.classList.remove('brillar'), duracion);
+        }
+
+        function manejarClicBloque(indice) {
+            if (modoJuego === 'libre') {
+                iluminarBloque(indice, 220, false);
+                if (esGrabando) {
+                    notasGrabadas.push({ bloque: indice, tiempo: Date.now() - tiempoInicioGrabacion });
+                } else {
+                    toquesLibreSinGrabar++;
+                    if (toquesLibreSinGrabar >= 25) {
+                        desbloquearLogro('tecla_loca');
+                    }
+                }
+                return;
+            }
+
+            if (bloqueado || !partidaEnCurso) return;
+            iluminarBloque(indice, 220, true);
+
+            if (modoJuego === 'hacker') {
+                toquesHacker++;
+                if (toquesHacker >= 10) {
+                    desbloquearLogro('modo_matrix');
+                }
+            }
+
+            if (indice === secuenciaObjetivo[pasoUsuario]) {
+                pasoUsuario++;
+                if (pasoUsuario === secuenciaObjetivo.length) {
+                    bloqueado = true;
+                    reproduciendoSecuenciaActual = false;
+                    actualizarBotonComodin();
+                    detenerBarraContrarreloj();
+                    guardarRecordEstadistica(modoJuego, tamanoCuadricula, nivel);
+
+                    if (modoJuego === 'normal' && nivel >= 3) {
+                        desbloquearLogro('primeros_pasos');
+                    }
+                    if (modoJuego === 'normal' && nivel >= 6) {
+                        desbloquearLogro('cerebro_titanio');
+                    }
+                    if (modoJuego === 'invertido' && nivel >= 6) {
+                        desbloquearLogro('mete_al_reves');
+                    }
+                    if (modoJuego === 'contrarreloj' && nivel >= 8) {
+                        desbloquearLogro('bajo_presion');
+                    }
+
+                    if (nivel >= NIVEL_FINAL) {
+                        lanzarConfeti();
+                        finalizarPartida(true, `🏆 ¡Completaste el Nivel ${NIVEL_FINAL}! ¡Victoria!`);
+                        return;
+                    }
+
+                    if (nivel === 5) {
+                        lanzarConfeti();
+                        document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} alcanzado! Celebrando...`;
+                        const pausaTimeout = setTimeout(() => {
+                            siguienteNivel();
+                        }, 2600);
+                        timeouts.push(pausaTimeout);
+                    } else {
+                        document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} superado!`;
+                        const nextTimeout = setTimeout(() => {
+                            siguienteNivel();
+                        }, 850);
+                        timeouts.push(nextTimeout);
+                    }
+                }
+            } else {
+                reproducirSonido(indice, true, false);
+                activarVibracionError();
+                registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
+                finalizarPartida(false, `❌ ¡Fallaste en el nivel ${nivel}!`);
+            }
+        }
+
+        function finalizarPartida(victoria, textoMensaje) {
+            if (nivel >= 1) {
+                publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
+            }
+            bloqueado = true;
+            reproduciendoSecuenciaActual = false;
+            partidaEnCurso = false;
+            comodinDisponibleEnPartida = false;
+            comodinUsosRestantes = 0;
+            actualizarBrilloNivelAlto();
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+            limpiarTimers();
+            detenerBarraContrarreloj();
+            document.getElementById('mensaje').textContent = textoMensaje;
+            setControlesPartidaActivos(false);
+        }
+
+        function limpiarTimers() {
+            if (timerPartidaInterval) {
+                clearInterval(timerPartidaInterval);
+                timerPartidaInterval = null;
+            }
+            timeouts.forEach(t => {
+                clearInterval(t);
+                clearTimeout(t);
+            });
+            timeouts = [];
+        }
+
+        function limpiarTimersGrabacion() {
+            timeoutsGrabacion.forEach(t => clearTimeout(t));
+            timeoutsGrabacion = [];
+            esReproduciendo = false;
+        }
+
+        function obtenerVelocidadLibre() {
+            const sel = document.getElementById('selector-velocidad-libre');
+            const val = sel ? parseFloat(sel.value) : 1;
+            return (Number.isFinite(val) && val > 0) ? val : 1;
+        }
+
+        function toggleGrabar() {
+            const btn = document.getElementById('btn-grabar');
+            const btnReproducir = document.getElementById('btn-reproducir');
+
+            if (!esGrabando) {
+                limpiarTimersGrabacion();
+                esGrabando = true;
+                notasGrabadas = [];
+                tiempoInicioGrabacion = Date.now();
+                btn.classList.add('grabando');
+                btn.textContent = '⏹️ Detener';
+                btnReproducir.classList.remove('visible');
+                document.getElementById('mensaje').textContent = "🔴 Grabando melodía...";
+            } else {
+                esGrabando = false;
+                btn.classList.remove('grabando');
+                btn.textContent = '🔴 Grabar';
+                if (notasGrabadas.length > 0) {
+                    firmaUltimaGrabacion = notasGrabadas.map(n => n.bloque).join(',');
+                    repeticionesConsecutivas = 0;
+                    btnReproducir.classList.add('visible');
+                    if (notasGrabadas.length >= 15) {
+                        desbloquearLogro('gran_compositor');
+                    }
+                }
+                document.getElementById('mensaje').textContent = `✅ Melodía guardada (${notasGrabadas.length} notas)`;
+            }
+        }
+
+        function reproducirGrabacion() {
+            if (notasGrabadas.length === 0) {
+                document.getElementById('mensaje').textContent = "⚠️ Primero graba una melodía";
+                return;
+            }
+            limpiarTimersGrabacion();
+            esReproduciendo = true;
+
+            const firmaActual = notasGrabadas.map(n => n.bloque).join(',');
+            if (firmaActual === firmaUltimaGrabacion) {
+                repeticionesConsecutivas++;
+            } else {
+                firmaUltimaGrabacion = firmaActual;
+                repeticionesConsecutivas = 1;
+            }
+            if (repeticionesConsecutivas >= 2) {
+                desbloquearLogro('repeticion');
+            }
+
+            desbloquearLogro('compositor');
+            if (notasGrabadas.length >= 15) {
+                desbloquearLogro('gran_compositor');
+            }
+
+            const vel = obtenerVelocidadLibre();
+            const duracionBrillo = Math.max(110, Math.round(220 / vel));
+            document.getElementById('mensaje').textContent = `▶️ Oyendo (${vel}x)...`;
+
+            let maxDelay = 0;
+            notasGrabadas.forEach(n => {
+                const delay = Math.max(0, Math.round(n.tiempo / vel));
+                if (delay > maxDelay) maxDelay = delay;
+                const t = setTimeout(() => iluminarBloque(n.bloque, duracionBrillo, false), delay);
+                timeoutsGrabacion.push(t);
+            });
+
+            const finTimeout = setTimeout(() => {
+                esReproduciendo = false;
+                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+            }, maxDelay + duracionBrillo + 60);
+            timeoutsGrabacion.push(finTimeout);
+        }
+
+        function obtenerDatosStats() {
+            return JSON.parse(localStorage.getItem('memoria_stats_v3') || '{}');
+        }
+
+        function guardarRecordEstadistica(modo, dif, niv) {
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${Number(dif)}`;
+            if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
+            if (niv > stats[clave].record) {
+                stats[clave].record = niv;
+                localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            }
+        }
+
+        function registrarDerrotaEstadistica(modo, dif) {
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${Number(dif)}`;
+            if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
+            stats[clave].derrotas++;
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+        }
+
+        function registrarNotaEstadistica(modo, dif) {
+            const stats = obtenerDatosStats();
+            const clave = `${modo}_${Number(dif)}`;
+            if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
+            stats[clave].notas++;
+            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+        }
+
+        function abrirEstadisticas() {
+            comprobarLogroCurioso();
+            const stats = obtenerDatosStats();
+            const cuerpo = document.getElementById('cuerpo-estadisticas');
+
+            const modosDef = [
+                { id: 'normal', nombre: '▶️ Normal', usaDif: true },
+                { id: 'invertido', nombre: '🔄 Invertido', usaDif: true },
+                { id: 'relampago', nombre: '⚡ Relámpago', usaDif: true },
+                { id: 'contrarreloj', nombre: '⏱️ Contrarreloj', usaDif: true },
+                { id: 'extremo', nombre: '🔥 Extremo', usaDif: true },
+                { id: 'hacker', nombre: '💻 Hacker', usaDif: false, difFija: 2 }
+            ];
+
+            let html = `
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px; text-align: center; margin-bottom: 16px;">
+                    <div style="font-size: 0.85rem; color: var(--subtext-color); margin-bottom: 4px;">🎵 Total de notas tocadas</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">${totalNotasTocadas}</div>
+                </div>
+            `;
+            html += '<div style="display: flex; flex-direction: column; gap: 14px;">';
+
+            modosDef.forEach(m => {
+                html += `
+                    <div style="background: rgba(22, 33, 62, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px;">
+                        <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-align: center; margin-bottom: 10px;">Modo = ${m.nombre}</div>
+                `;
+
+                if (m.usaDif) {
+                    const difs = [
+                        { val: 2, label: '🟢 Fácil' },
+                        { val: 3, label: '🟡 Medio' },
+                        { val: 4, label: '🔴 Difícil' }
+                    ];
+                    html += `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">`;
+                    difs.forEach(d => {
+                        const dat = stats[`${m.id}_${d.val}`] || { record: 0, derrotas: 0, notas: 0 };
+                        html += `
+                            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 0.75rem;">
+                                <div style="font-weight: 600; margin-bottom: 6px; color: #ffffff;">${d.label}</div>
+                                <div style="color: var(--subtext-color); margin-bottom: 2px;">Récord: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
+                                <div style="color: var(--subtext-color); margin-bottom: 2px;">Derrotas: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
+                                <div style="color: var(--subtext-color);">Notas: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                } else {
+                    const dat = stats[`${m.id}_${m.difFija}`] || { record: 0, derrotas: 0, notas: 0 };
+                    html += `
+                        <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; text-align: center; font-size: 0.82rem;">
+                            <div style="color: var(--subtext-color);">Récord: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
+                            <div style="color: var(--subtext-color);">Derrotas: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
+                            <div style="color: var(--subtext-color);">Notas: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+            });
+
+            html += `</div>`;
+            cuerpo.innerHTML = html;
+            document.getElementById('modal-estadisticas').classList.add('activo');
+        }
+
+        function cerrarEstadisticas() {
+            document.getElementById('modal-estadisticas').classList.remove('activo');
+        }
+
+        function abrirConfirmacionBorrar() {
+            document.getElementById('modal-confirmar-borrar').classList.add('activo');
+        }
+
+        function cerrarConfirmacionBorrar() {
+            document.getElementById('modal-confirmar-borrar').classList.remove('activo');
+        }
+
+        function confirmarBorradoDatos() {
+            localStorage.removeItem('memoria_stats_v3');
+            localStorage.removeItem('memoria_total_notas_v1');
+            localStorage.removeItem('memoria_logros_v1');
+            localStorage.removeItem('memoria_estetico_v1');
+            localStorage.removeItem('memoria_dias_jugados_v1');
+            localStorage.removeItem('memoria_prefs_visuales_v1');
+
+            totalNotasTocadas = 0;
+            logrosDesbloqueados = {};
+            progresoEstetico = { sonidos: ['1'], atmosferas: ['1'] };
+            ultimoRecordEnviado = { clave: '', record: 0 };
+
+            aplicarPreferenciasVisualesAlCargar();
+            iniciarAtmosfera();
+
+            cerrarConfirmacionBorrar();
+            abrirEstadisticas();
+        }
+    </script>
+</body>
+</html>
