@@ -1378,15 +1378,54 @@
             document.getElementById('modal-panel-admin').classList.add('activo');
         }
 
-        function adminGuardarPerfilUsuario() {
+        async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
+            const datos = await obtenerClasificacionGlobal();
+            if (!Array.isArray(datos) || datos.length === 0) return;
+
+            const nombrePrevNorm = String(nombreAnterior || '').trim().toLowerCase();
+            const nombreNuevoNorm = String(nuevoNombre || '').trim().toLowerCase();
+
+            const registrosPropios = datos.filter(item => {
+                const n = String(item.nombre || '').trim().toLowerCase();
+                return (nombrePrevNorm && n === nombrePrevNorm) || (nombreNuevoNorm && n === nombreNuevoNorm);
+            });
+
+            if (registrosPropios.length === 0) return;
+
+            await Promise.all(registrosPropios.map(async item => {
+                if (!item._id) return;
+                try {
+                    const res = await fetch(`${URL_RANKING}/${encodeURIComponent(item._id)}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: nuevoNombre,
+                            emoji: nuevoEmoji
+                        })
+                    });
+                    if (res.ok) {
+                        item.nombre = nuevoNombre;
+                        item.emoji = nuevoEmoji;
+                    }
+                } catch (err) {
+                    console.error('No se pudo actualizar un récord global:', err);
+                }
+            }));
+
+            cacheClasificacionGlobal = datos;
+            renderizarClasificacionGlobal();
+        }
+
+        async function adminGuardarPerfilUsuario() {
             if (!esAdminActivo) return;
             const inputNombre = document.getElementById('admin-input-nombre');
             const selectEmoji = document.getElementById('admin-select-emoji');
-            const nuevoNombre = inputNombre ? inputNombre.value.trim() : '';
+            const nuevoNombre = inputNombre ? inputNombre.value.trim().slice(0, 20) : '';
             if (!nuevoNombre) {
                 alert('⚠️ El nombre no puede estar vacío.');
                 return;
             }
+            const nombreAnterior = usuarioActual.nombre || '';
             const nuevoEmoji = selectEmoji ? selectEmoji.value : (usuarioActual.emoji || '🚀');
             usuarioActual = { nombre: nuevoNombre, emoji: nuevoEmoji };
             localStorage.setItem('memoria_usuario_v1', JSON.stringify(usuarioActual));
@@ -1395,7 +1434,9 @@
             if (badgeUsuario) {
                 badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
             }
-            alert('✅ Nombre y emoji actualizados.');
+
+            await actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji);
+            alert('✅ Nombre y emoji actualizados también en tus récords globales.');
         }
 
         function cerrarPanelAdmin() {
@@ -1551,21 +1592,52 @@
             const nivelNum = Number(record);
             if (!Number.isFinite(nivelNum) || nivelNum < 1 || nivelNum > NIVEL_FINAL) return;
 
-            const claveJugador = `${usuarioActual.nombre.trim().toLowerCase()}_${modo}_${Number(dif)}`;
+            const nombreLimpio = usuarioActual.nombre.trim().slice(0, 20);
+            const emojiLimpio = usuarioActual.emoji || '🎮';
+            const difNum = Number(dif);
+            const claveJugador = `${nombreLimpio.toLowerCase()}_${modo}_${difNum}`;
+
             if (ultimoRecordEnviado.clave === claveJugador && nivelNum <= ultimoRecordEnviado.record) {
                 return;
             }
 
-            const entrada = {
-                nombre: usuarioActual.nombre.trim().slice(0, 20),
-                emoji: usuarioActual.emoji || '🎮',
-                record: nivelNum,
-                modo: String(modo),
-                dificultad: Number(dif),
-                fecha: Date.now()
-            };
-
             try {
+                const existentes = await obtenerClasificacionGlobal();
+                const registroPrevio = Array.isArray(existentes)
+                    ? existentes.find(item =>
+                        String(item.nombre || '').trim().toLowerCase() === nombreLimpio.toLowerCase() &&
+                        item.modo === String(modo) &&
+                        Number(item.dificultad) === difNum
+                    )
+                    : null;
+
+                if (registroPrevio && registroPrevio._id) {
+                    const nuevoRecord = Math.max(Number(registroPrevio.record) || 0, nivelNum);
+                    const res = await fetch(`${URL_RANKING}/${encodeURIComponent(registroPrevio._id)}.json`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre: nombreLimpio,
+                            emoji: emojiLimpio,
+                            record: nuevoRecord,
+                            fecha: Date.now()
+                        })
+                    });
+                    if (res.ok) {
+                        ultimoRecordEnviado = { clave: claveJugador, record: nuevoRecord };
+                    }
+                    return;
+                }
+
+                const entrada = {
+                    nombre: nombreLimpio,
+                    emoji: emojiLimpio,
+                    record: nivelNum,
+                    modo: String(modo),
+                    dificultad: difNum,
+                    fecha: Date.now()
+                };
+
                 const res = await fetch(`${URL_RANKING}.json`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
