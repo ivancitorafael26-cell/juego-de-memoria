@@ -1116,6 +1116,14 @@
             </div>
 
             <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🔐 Cambiar Contraseña de Admin</div>
+                <div class="admin-fila-input">
+                    <input type="password" id="admin-input-nuevo-pin" class="admin-input" inputmode="numeric" maxlength="6" style="flex: 1; letter-spacing: 4px;" placeholder="Nuevo PIN (4 a 6 dígitos)">
+                    <button class="btn-mini" type="button" onclick="adminGuardarNuevoPin()" style="background-color: #3742fa; color: #ffffff; border: none;">Guardar PIN</button>
+                </div>
+            </div>
+
+            <div class="admin-seccion">
                 <div class="admin-seccion-titulo">👤 Nombre y Emoji del Usuario</div>
                 <div class="admin-fila-input" style="margin-bottom: 8px;">
                     <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
@@ -1269,7 +1277,8 @@
 
     <script>
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
-        const CLAVE_ADMIN_5_DIGITOS = '3905';
+        const CLAVE_ADMIN_POR_DEFECTO = '3905';
+        let claveAdminActual = localStorage.getItem('memoria_pin_admin_v1') || CLAVE_ADMIN_POR_DEFECTO;
         let esAdminActivo = false;
 
         let cacheClasificacionGlobal = [];
@@ -1317,11 +1326,11 @@
             const pin = input ? input.value.trim() : '';
 
             if (!/^\d{4,6}$/.test(pin)) {
-                if (err) err.textContent = '⚠️ Escribe solo números.';
+                if (err) err.textContent = '⚠️ Escribe solo números (4 a 6 dígitos).';
                 return;
             }
 
-            if (pin !== CLAVE_ADMIN_5_DIGITOS) {
+            if (pin !== claveAdminActual) {
                 if (err) err.textContent = '❌ Contraseña incorrecta.';
                 return;
             }
@@ -1332,8 +1341,27 @@
             abrirPanelAdmin();
         }
 
+        function adminGuardarNuevoPin() {
+            if (!esAdminActivo) return;
+            const inputNuevoPin = document.getElementById('admin-input-nuevo-pin');
+            const nuevoPin = inputNuevoPin ? inputNuevoPin.value.trim() : '';
+
+            if (!/^\d{4,6}$/.test(nuevoPin)) {
+                alert('⚠️ La nueva contraseña debe tener entre 4 y 6 números.');
+                return;
+            }
+
+            claveAdminActual = nuevoPin;
+            localStorage.setItem('memoria_pin_admin_v1', nuevoPin);
+            if (inputNuevoPin) inputNuevoPin.value = '';
+            alert('✅ Contraseña de administrador actualizada.');
+        }
+
         function abrirPanelAdmin() {
             if (!esAdminActivo) return;
+            const inputNuevoPin = document.getElementById('admin-input-nuevo-pin');
+            if (inputNuevoPin) inputNuevoPin.value = '';
+
             const inputNombre = document.getElementById('admin-input-nombre');
             const selectEmoji = document.getElementById('admin-select-emoji');
             if (inputNombre) inputNombre.value = usuarioActual.nombre || '';
