@@ -1032,7 +1032,7 @@
     <div class="modal-overlay" id="modal-configuracion">
         <div class="modal-contenido">
             <div class="modal-header">
-                <button class="btn-ayuda-pin" type="button" onclick="abrirModalPinAdmin()" title="Código">?</button>
+                <button class="btn-ayuda-pin" type="button" onclick="abrirModalPinAdmin()" title="Acceso">🔑</button>
                 <h2>⚙️ Configuración</h2>
                 <button class="btn-cerrar-x" type="button" onclick="cerrarConfiguracion()" title="Cerrar">✕</button>
             </div>
@@ -1261,6 +1261,31 @@
             </div>
 
             <div class="admin-seccion">
+                <div class="admin-seccion-titulo">🚀 Sincronizar Récord Manual a Global</div>
+                <div class="admin-fila-input" style="margin-bottom: 8px;">
+                    <select id="admin-sync-modo" class="admin-select" style="flex: 1;" onchange="actualizarVistaRecordLocalAdmin()">
+                        <option value="normal">▶️ Normal</option>
+                        <option value="invertido">🔄 Invertido</option>
+                        <option value="relampago">⚡ Relámpago</option>
+                        <option value="contrarreloj">⏱️ Contrarreloj</option>
+                        <option value="extremo">🔥 Extremo</option>
+                        <option value="hacker">💻 Hacker</option>
+                    </select>
+                    <select id="admin-sync-dif" class="admin-select" onchange="actualizarVistaRecordLocalAdmin()">
+                        <option value="2">🟢 Fácil</option>
+                        <option value="3">🟡 Medio</option>
+                        <option value="4">🔴 Difícil</option>
+                    </select>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--subtext-color); margin-bottom: 8px;">
+                    Récord local guardado: <strong id="admin-sync-record-actual" style="color: #2ed573;">Nivel 0</strong>
+                </div>
+                <button class="btn-mini" type="button" onclick="adminSincronizarRecordManual()" style="width: 100%; background: linear-gradient(135deg, #2ed573, #1e90ff); color: #ffffff; border: none;">
+                    🚀 Subir / Sincronizar a Global
+                </button>
+            </div>
+
+            <div class="admin-seccion">
                 <div class="admin-seccion-titulo">🌍 Clasificación Global</div>
                 <div class="admin-fila-input">
                     <button class="btn-mini" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
@@ -1306,6 +1331,24 @@
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button class="btn-mini" type="button" onclick="cerrarConfirmacionBorrar()" style="flex: 1; padding: 10px; background-color: rgba(255, 255, 255, 0.15);">Cancelar</button>
                 <button class="btn-mini" type="button" onclick="confirmarBorradoDatos()" style="flex: 1; padding: 10px; background-color: #ff4757; color: white; border: none;">Sí, borrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-fin-partida" style="z-index: 1220;">
+        <div class="modal-contenido" style="text-align: center; max-width: 380px;">
+            <div style="font-size: 2.3rem; margin-bottom: 8px;" id="fin-partida-icono">🏁</div>
+            <h2 style="margin: 0 0 8px 0; font-size: 1.25rem;" id="fin-partida-titulo">Partida Terminada</h2>
+            <p style="color: var(--subtext-color); font-size: 0.92rem; margin-bottom: 18px; line-height: 1.4;" id="fin-partida-detalle">
+                Nivel alcanzado: 0
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-mini" id="btn-subir-global-fin" type="button" onclick="confirmarSubirRecordGlobalFinPartida()" style="padding: 11px 16px; background: linear-gradient(135deg, #2ed573, #20bf6b); color: #ffffff; border: none; font-size: 0.92rem;">
+                    🌍 Subir a Clasificación Global
+                </button>
+                <button class="btn-mini" type="button" onclick="guardarSoloLocalFinPartida()" style="padding: 11px 16px; background-color: rgba(255, 255, 255, 0.14); color: #ffffff; font-size: 0.92rem;">
+                    🔒 Guardar solo para mí
+                </button>
             </div>
         </div>
     </div>
@@ -1365,6 +1408,7 @@
 
         let cacheClasificacionGlobal = [];
         let ultimoRecordEnviado = { clave: '', record: 0 };
+        let recordPendienteGlobal = null;
 
         const ETIQUETAS_MODO = {
             normal: '▶️ Normal',
@@ -1702,6 +1746,12 @@
             if (resetDif) resetDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
             actualizarSelectDifResetDerrotas();
 
+            const syncModo = document.getElementById('admin-sync-modo');
+            const syncDif = document.getElementById('admin-sync-dif');
+            if (syncModo) syncModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
+            if (syncDif) syncDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
+            actualizarVistaRecordLocalAdmin();
+
             const inputNombre = document.getElementById('admin-input-nombre');
             const selectEmoji = document.getElementById('admin-select-emoji');
             if (inputNombre) inputNombre.value = usuarioActual.nombre || '';
@@ -1721,6 +1771,106 @@
             cargarCamposAdminEstadistica();
             renderizarListaAdminLogros();
             document.getElementById('modal-panel-admin').classList.add('activo');
+        }
+
+        function actualizarVistaRecordLocalAdmin() {
+            const selModo = document.getElementById('admin-sync-modo');
+            const selDif = document.getElementById('admin-sync-dif');
+            const txtRecord = document.getElementById('admin-sync-record-actual');
+            if (!selModo || !selDif || !txtRecord) return;
+
+            const modo = selModo.value;
+            const esFijo = modo === 'hacker' || modo === 'extremo';
+            selDif.disabled = esFijo;
+
+            const dif = modo === 'hacker' ? 2 : (modo === 'extremo' ? obtenerDimensionExtremoPorNivel(10) : Number(selDif.value));
+            const stats = obtenerDatosStats();
+            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
+            txtRecord.textContent = `Nivel ${actual.record || 0}`;
+        }
+
+        async function adminSincronizarRecordManual() {
+            if (!esAdminActivo) return;
+            const selModo = document.getElementById('admin-sync-modo');
+            const selDif = document.getElementById('admin-sync-dif');
+            if (!selModo || !selDif) return;
+
+            if (!usuarioActual || !usuarioActual.nombre) {
+                alert('⚠️ Primero configura un nombre de usuario para publicar en la clasificación global.');
+                return;
+            }
+
+            const modo = selModo.value;
+            const dif = modo === 'hacker' ? 2 : (modo === 'extremo' ? obtenerDimensionExtremoPorNivel(10) : Number(selDif.value));
+            const stats = obtenerDatosStats();
+            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
+            const recLocal = Number(actual.record) || 0;
+
+            if (recLocal < 1) {
+                alert('⚠️ No tienes un récord local mayor a Nivel 0 en ese modo/dificultad para subir.');
+                return;
+            }
+
+            ultimoRecordEnviado = { clave: '', record: 0 };
+            await publicarRecordGlobal(recLocal, modo, dif);
+            await cargarYMostrarGlobal(false);
+            alert(`🚀 Récord local (Nivel ${recLocal}) sincronizado con la Clasificación Global.`);
+        }
+
+        function abrirModalDecisionGlobal(nivelAlcanzado, modo, dif, tituloTexto) {
+            if (!usuarioActual || !usuarioActual.nombre || modo === 'libre' || nivelAlcanzado < 1) {
+                return;
+            }
+
+            recordPendienteGlobal = {
+                record: Number(nivelAlcanzado),
+                modo: String(modo),
+                dificultad: Number(dif)
+            };
+
+            const tituloEl = document.getElementById('fin-partida-titulo');
+            const detalleEl = document.getElementById('fin-partida-detalle');
+            const btnSubir = document.getElementById('btn-subir-global-fin');
+
+            if (tituloEl) tituloEl.textContent = tituloTexto || 'Partida Terminada';
+            if (detalleEl) {
+                const nombreModo = ETIQUETAS_MODO[modo] || modo;
+                const difTxt = (modo === 'hacker' || modo === 'extremo') ? '' : ` · ${ETIQUETAS_DIF[dif] || ''}`;
+                detalleEl.textContent = `Alcanzaste el Nivel ${nivelAlcanzado} en ${nombreModo}${difTxt}. ¿Dónde quieres guardar este récord?`;
+            }
+            if (btnSubir) {
+                btnSubir.disabled = false;
+                btnSubir.textContent = '🌍 Subir a Clasificación Global';
+            }
+
+            document.getElementById('modal-fin-partida').classList.add('activo');
+        }
+
+        function cerrarModalDecisionGlobal() {
+            document.getElementById('modal-fin-partida').classList.remove('activo');
+            recordPendienteGlobal = null;
+        }
+
+        function guardarSoloLocalFinPartida() {
+            cerrarModalDecisionGlobal();
+            document.getElementById('mensaje').textContent = '🔒 Récord guardado solo en este dispositivo.';
+        }
+
+        async function confirmarSubirRecordGlobalFinPartida() {
+            if (!recordPendienteGlobal) return;
+            const { record, modo, dificultad } = recordPendienteGlobal;
+            const btnSubir = document.getElementById('btn-subir-global-fin');
+            if (btnSubir) {
+                btnSubir.disabled = true;
+                btnSubir.textContent = '⏳ Subiendo...';
+            }
+
+            ultimoRecordEnviado = { clave: '', record: 0 };
+            await publicarRecordGlobal(record, modo, dificultad);
+            await cargarYMostrarGlobal(false);
+
+            cerrarModalDecisionGlobal();
+            document.getElementById('mensaje').textContent = `🌍 ¡Nivel ${record} publicado en la Clasificación Global!`;
         }
 
         async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
@@ -1840,6 +1990,7 @@
                 notas: previa.notas || 0
             };
             localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
+            actualizarVistaRecordLocalAdmin();
             alert(`✅ Nivel récord guardado en ${rec}.`);
         }
 
@@ -2127,8 +2278,12 @@
         function terminarPartidaManualmente() {
             if (!partidaEnCurso || modoJuego === 'libre') return;
 
-            if (nivel >= 1) {
-                publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
+            const nivelAlcanzado = nivel;
+            const modoAlcanzado = modoJuego;
+            const difAlcanzada = tamanoCuadricula;
+
+            if (nivelAlcanzado >= 1) {
+                guardarRecordEstadistica(modoAlcanzado, difAlcanzada, nivelAlcanzado);
             }
 
             limpiarTimers();
@@ -2165,6 +2320,10 @@
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
             document.getElementById('mensaje').textContent = '🛑 Partida terminada';
+
+            if (nivelAlcanzado >= 1) {
+                abrirModalDecisionGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada, '🛑 Partida Terminada');
+            }
         }
 
         function aplicarPreferenciasVisualesAlCargar() {
@@ -3136,9 +3295,14 @@
         }
 
         function finalizarPartida(victoria, textoMensaje) {
-            if (nivel >= 1) {
-                publicarRecordGlobal(nivel, modoJuego, tamanoCuadricula);
+            const nivelAlcanzado = nivel;
+            const modoAlcanzado = modoJuego;
+            const difAlcanzada = tamanoCuadricula;
+
+            if (nivelAlcanzado >= 1) {
+                guardarRecordEstadistica(modoAlcanzado, difAlcanzada, nivelAlcanzado);
             }
+
             bloqueado = true;
             reproduciendoSecuenciaActual = false;
             partidaEnCurso = false;
@@ -3151,6 +3315,10 @@
             detenerBarraContrarreloj();
             document.getElementById('mensaje').textContent = textoMensaje;
             setControlesPartidaActivos(false);
+
+            if (nivelAlcanzado >= 1) {
+                abrirModalDecisionGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada, textoMensaje);
+            }
         }
 
         function limpiarTimers() {
