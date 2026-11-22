@@ -958,6 +958,39 @@
             background: rgba(255, 255, 255, 0.05);
             font-size: 0.84rem;
         }
+
+        .admin-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .admin-tab-btn {
+            flex: 1;
+            padding: 8px 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(0, 0, 0, 0.28);
+            color: var(--subtext-color);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .admin-tab-btn.activa {
+            background: rgba(255, 215, 0, 0.22);
+            color: #ffd700;
+            border-color: #ffd700;
+        }
+
+        .admin-tab-panel {
+            display: none;
+        }
+
+        .admin-tab-panel.activa {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -1137,94 +1170,106 @@
                 <button class="btn-cerrar-x" id="btn-cerrar-admin" type="button" onclick="cerrarPanelAdmin()" title="Cerrar">✕</button>
             </div>
 
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo" id="admin-sec-comodin">🔁 Comodín Repetir</div>
-                <div class="admin-fila-input">
-                    <select id="admin-select-comodin-cant" class="admin-select" style="width: 115px;" onchange="sincronizarInputComodin()">
-                        <option value="1">1 uso</option>
-                        <option value="10">10 usos</option>
-                        <option value="100">100 usos</option>
-                        <option value="custom">Personalizado</option>
-                    </select>
-                    <input type="number" id="admin-input-comodin-cant" class="admin-input" min="1" max="999" value="1" style="width: 90px;" placeholder="Cant.">
-                    <button class="btn-mini" id="btn-admin-recargar-comodin" type="button" onclick="adminRecargarComodin()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Recargar Comodín</button>
+            <div class="admin-tabs">
+                <button class="admin-tab-btn activa" id="tab-admin-juego" type="button" onclick="cambiarPestanaAdmin('juego')">🎮 Juego</button>
+                <button class="admin-tab-btn" id="tab-admin-global" type="button" onclick="cambiarPestanaAdmin('global')">🌍 Perfil y Global</button>
+                <button class="admin-tab-btn" id="tab-admin-logros" type="button" onclick="cambiarPestanaAdmin('logros')">🏆 Logros</button>
+            </div>
+
+            <div class="admin-tab-panel activa" id="panel-admin-juego">
+                <div class="admin-seccion">
+                    <div class="admin-seccion-titulo" id="admin-sec-comodin">🔁 Comodín Repetir</div>
+                    <div class="admin-fila-input">
+                        <select id="admin-select-comodin-cant" class="admin-select" style="width: 115px;" onchange="sincronizarInputComodin()">
+                            <option value="1">1 uso</option>
+                            <option value="10">10 usos</option>
+                            <option value="100">100 usos</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                        <input type="number" id="admin-input-comodin-cant" class="admin-input" min="1" max="999" value="1" style="width: 90px;" placeholder="Cant.">
+                        <button class="btn-mini" id="btn-admin-recargar-comodin" type="button" onclick="adminRecargarComodin()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Recargar Comodín</button>
+                    </div>
+                </div>
+
+                <div class="admin-seccion">
+                    <div class="admin-seccion-titulo" id="admin-sec-notas">🎵 Total de Notas</div>
+                    <div class="admin-fila-input">
+                        <input type="number" id="admin-input-notas" class="admin-input" min="0" max="9999999" style="flex: 1;" placeholder="Ej. 1500">
+                        <button class="btn-mini" id="btn-admin-guardar-notas" type="button" onclick="adminGuardarNotas()" style="background-color: #2ed573; color: #ffffff; border: none;">Guardar Notas</button>
+                    </div>
+                </div>
+
+                <div class="admin-seccion" style="margin-bottom: 0;">
+                    <div class="admin-seccion-titulo" id="admin-sec-derrotas">💀 Resetear Derrotas</div>
+                    <div class="admin-fila-input" style="margin-bottom: 8px;">
+                        <select id="admin-reset-derrotas-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifResetDerrotas()">
+                            <option value="normal">▶️ Normal</option>
+                            <option value="invertido">🔄 Invertido</option>
+                            <option value="relampago">⚡ Relámpago</option>
+                            <option value="contrarreloj">⏱️ Contrarreloj</option>
+                            <option value="extremo">🔥 Extremo</option>
+                            <option value="hacker">💻 Hacker</option>
+                        </select>
+                        <select id="admin-reset-derrotas-dif" class="admin-select">
+                            <option value="2">🟢 Fácil</option>
+                            <option value="3">🟡 Medio</option>
+                            <option value="4">🔴 Difícil</option>
+                        </select>
+                    </div>
+                    <div class="admin-fila-input">
+                        <button class="btn-mini" id="btn-admin-reset-modo" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
+                        <button class="btn-mini" id="btn-admin-reset-todas" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo" id="admin-sec-perfil">👤 Nombre y Emoji del Usuario</div>
-                <div class="admin-fila-input" style="margin-bottom: 8px;">
-                    <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
-                    <select id="admin-select-emoji" class="admin-select" style="width: 84px; text-align: center;">
-                        <option value="🚀">🚀</option>
-                        <option value="🐱">🐱</option>
-                        <option value="🌟">🌟</option>
-                        <option value="🎮">🎮</option>
-                        <option value="🔥">🔥</option>
-                        <option value="⚡">⚡</option>
-                        <option value="🤖">🤖</option>
-                        <option value="👑">👑</option>
-                        <option value="🍕">🍕</option>
-                        <option value="🎸">🎸</option>
-                        <option value="🦄">🦄</option>
-                        <option value="💎">💎</option>
-                        <option value="🍀">🍀</option>
-                        <option value="🎯">🎯</option>
-                        <option value="🐉">🐉</option>
-                    </select>
+            <div class="admin-tab-panel" id="panel-admin-global">
+                <div class="admin-seccion">
+                    <div class="admin-seccion-titulo" id="admin-sec-perfil">👤 Nombre y Emoji del Usuario</div>
+                    <div class="admin-fila-input" style="margin-bottom: 8px;">
+                        <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
+                        <select id="admin-select-emoji" class="admin-select" style="width: 84px; text-align: center;">
+                            <option value="🚀">🚀</option>
+                            <option value="🐱">🐱</option>
+                            <option value="🌟">🌟</option>
+                            <option value="🎮">🎮</option>
+                            <option value="🔥">🔥</option>
+                            <option value="⚡">⚡</option>
+                            <option value="🤖">🤖</option>
+                            <option value="👑">👑</option>
+                            <option value="🍕">🍕</option>
+                            <option value="🎸">🎸</option>
+                            <option value="🦄">🦄</option>
+                            <option value="💎">💎</option>
+                            <option value="🍀">🍀</option>
+                            <option value="🎯">🎯</option>
+                            <option value="🐉">🐉</option>
+                        </select>
+                    </div>
+                    <button class="btn-mini" id="btn-admin-guardar-perfil" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
                 </div>
-                <button class="btn-mini" id="btn-admin-guardar-perfil" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
-            </div>
 
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo" id="admin-sec-notas">🎵 Total de Notas</div>
-                <div class="admin-fila-input">
-                    <input type="number" id="admin-input-notas" class="admin-input" min="0" max="9999999" style="flex: 1;" placeholder="Ej. 1500">
-                    <button class="btn-mini" id="btn-admin-guardar-notas" type="button" onclick="adminGuardarNotas()" style="background-color: #2ed573; color: #ffffff; border: none;">Guardar Notas</button>
-                </div>
-            </div>
-
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo" id="admin-sec-derrotas">💀 Resetear Derrotas</div>
-                <div class="admin-fila-input" style="margin-bottom: 8px;">
-                    <select id="admin-reset-derrotas-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifResetDerrotas()">
-                        <option value="normal">▶️ Normal</option>
-                        <option value="invertido">🔄 Invertido</option>
-                        <option value="relampago">⚡ Relámpago</option>
-                        <option value="contrarreloj">⏱️ Contrarreloj</option>
-                        <option value="extremo">🔥 Extremo</option>
-                        <option value="hacker">💻 Hacker</option>
-                    </select>
-                    <select id="admin-reset-derrotas-dif" class="admin-select">
-                        <option value="2">🟢 Fácil</option>
-                        <option value="3">🟡 Medio</option>
-                        <option value="4">🔴 Difícil</option>
-                    </select>
-                </div>
-                <div class="admin-fila-input">
-                    <button class="btn-mini" id="btn-admin-reset-modo" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
-                    <button class="btn-mini" id="btn-admin-reset-todas" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
+                <div class="admin-seccion" style="margin-bottom: 0;">
+                    <div class="admin-seccion-titulo" id="admin-sec-global">🌍 Clasificación Global</div>
+                    <div class="admin-fila-input">
+                        <button class="btn-mini" id="btn-admin-borrar-filas" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
+                        <button class="btn-mini" id="btn-admin-borrar-todos" type="button" onclick="borrarTodosRecordsGlobalAdmin()" style="flex: 1; background-color: rgba(255, 71, 87, 0.55); color: #ffffff;">💥 Borrar Todos los Récords</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo" id="admin-sec-global">🌍 Clasificación Global</div>
-                <div class="admin-fila-input">
-                    <button class="btn-mini" id="btn-admin-borrar-filas" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
-                    <button class="btn-mini" id="btn-admin-borrar-todos" type="button" onclick="borrarTodosRecordsGlobalAdmin()" style="flex: 1; background-color: rgba(255, 71, 87, 0.55); color: #ffffff;">💥 Borrar Todos los Récords</button>
+            <div class="admin-tab-panel" id="panel-admin-logros">
+                <div class="admin-seccion" style="margin-bottom: 0;">
+                    <div class="admin-seccion-titulo" id="admin-sec-logros">🏆 Control de Logros</div>
+                    <div class="admin-fila-input" style="margin-bottom: 10px;">
+                        <button class="btn-mini" id="btn-admin-poner-logros" type="button" onclick="adminToggleTodosLogros(true)" style="flex: 1; background-color: rgba(46, 213, 115, 0.35);">✅ Poner Todos</button>
+                        <button class="btn-mini" id="btn-admin-quitar-logros" type="button" onclick="adminToggleTodosLogros(false)" style="flex: 1; background-color: rgba(255, 71, 87, 0.35);">❌ Quitar Todos</button>
+                    </div>
+                    <div class="admin-lista-logros" id="admin-lista-logros"></div>
                 </div>
             </div>
 
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo" id="admin-sec-logros">🏆 Control de Logros</div>
-                <div class="admin-fila-input" style="margin-bottom: 10px;">
-                    <button class="btn-mini" id="btn-admin-poner-logros" type="button" onclick="adminToggleTodosLogros(true)" style="flex: 1; background-color: rgba(46, 213, 115, 0.35);">✅ Poner Todos</button>
-                    <button class="btn-mini" id="btn-admin-quitar-logros" type="button" onclick="adminToggleTodosLogros(false)" style="flex: 1; background-color: rgba(255, 71, 87, 0.35);">❌ Quitar Todos</button>
-                </div>
-                <div class="admin-lista-logros" id="admin-lista-logros"></div>
-            </div>
-
-            <div class="admin-fila-input">
+            <div class="admin-fila-input" style="margin-top: 14px;">
                 <button class="btn-mini" id="btn-admin-salir" type="button" onclick="desactivarModoAdmin()" style="width: 100%; background-color: rgba(255, 71, 87, 0.45);">Salir del Modo Admin</button>
             </div>
         </div>
@@ -1392,6 +1437,9 @@
                 pinFormatoError: '⚠️ Escribe solo números (4 a 6 dígitos).',
                 pinIncorrecto: '❌ Contraseña incorrecta.',
                 tituloAdmin: '🛡️ Administrador',
+                tabAdminJuego: '🎮 Juego',
+                tabAdminGlobal: '🌍 Perfil y Global',
+                tabAdminLogros: '🏆 Logros',
                 adminSecComodin: '🔁 Comodín Repetir',
                 usoSingular: '1 uso',
                 usosPlural: (n) => `${n} usos`,
@@ -1570,6 +1618,9 @@
                 pinFormatoError: '⚠️ Enter numbers only (4 to 6 digits).',
                 pinIncorrecto: '❌ Incorrect password.',
                 tituloAdmin: '🛡️ Admin Panel',
+                tabAdminJuego: '🎮 Game',
+                tabAdminGlobal: '🌍 Profile & Global',
+                tabAdminLogros: '🏆 Achievements',
                 adminSecComodin: '🔁 Repeat Wildcard',
                 usoSingular: '1 use',
                 usosPlural: (n) => `${n} uses`,
@@ -1820,6 +1871,9 @@
             setText('btn-comprobar-pin', t('btnComprobar'));
 
             setText('titulo-panel-admin', t('tituloAdmin'));
+            setText('tab-admin-juego', t('tabAdminJuego'));
+            setText('tab-admin-global', t('tabAdminGlobal'));
+            setText('tab-admin-logros', t('tabAdminLogros'));
             setText('admin-sec-comodin', t('adminSecComodin'));
             setSelectOptionText('admin-select-comodin-cant', '1', t('usoSingular'));
             setSelectOptionText('admin-select-comodin-cant', '10', t('usosPlural', 10));
@@ -2133,7 +2187,19 @@
             const inputNotas = document.getElementById('admin-input-notas');
             if (inputNotas) inputNotas.value = totalNotasTocadas;
             renderizarListaAdminLogros();
+            cambiarPestanaAdmin('juego');
             document.getElementById('modal-panel-admin').classList.add('activo');
+        }
+
+        function cambiarPestanaAdmin(pestana) {
+            const pestanas = ['juego', 'global', 'logros'];
+            pestanas.forEach(nombre => {
+                const btn = document.getElementById(`tab-admin-${nombre}`);
+                const panel = document.getElementById(`panel-admin-${nombre}`);
+                const activa = nombre === pestana;
+                if (btn) btn.classList.toggle('activa', activa);
+                if (panel) panel.classList.toggle('activa', activa);
+            });
         }
 
         async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
