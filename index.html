@@ -2210,6 +2210,7 @@
 
             if (nivelAlcanzado >= 1) {
                 guardarRecordEstadistica(modoAlcanzado, difAlcanzada, nivelAlcanzado);
+                publicarRecordGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada);
             }
 
             limpiarTimers();
@@ -2246,7 +2247,7 @@
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
             document.getElementById('mensaje').textContent = nivelAlcanzado >= 1
-                ? `🛑 Partida terminada · Récord local guardado (Nivel ${nivelAlcanzado})`
+                ? `🛑 Partida terminada · Récord guardado (Nivel ${nivelAlcanzado})`
                 : '🛑 Partida terminada';
         }
 
@@ -3253,6 +3254,7 @@
 
             if (nivelAlcanzado >= 1) {
                 guardarRecordEstadistica(modoAlcanzado, difAlcanzada, nivelAlcanzado);
+                publicarRecordGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada);
             }
 
             bloqueado = true;
