@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego de Memoria - Update 1.2</title>
+    <title>Juego de Memoria</title>
     <link rel="icon" type="image/png" href="logo.png">
     
     <style>
@@ -1021,6 +1021,98 @@
             align-items: center;
             justify-content: center;
         }
+
+        #btn-diario-top {
+            display: inline-block;
+            background: linear-gradient(135deg, #05d9e8, #3742fa);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .badge-titulo-jugador {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            background: rgba(255, 215, 0, 0.16);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.45);
+            letter-spacing: 0.3px;
+        }
+
+        .badge-titulo-rank {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            background: rgba(255, 215, 0, 0.16);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            vertical-align: middle;
+        }
+
+        .diario-resumen-box {
+            background: rgba(0, 0, 0, 0.32);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .diario-fila-dato {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+            font-size: 0.88rem;
+        }
+
+        .diario-fila-dato:last-child {
+            border-bottom: none;
+        }
+
+        .historial-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .historial-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.32);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.82rem;
+        }
+
+        .historial-principal {
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .historial-sub {
+            font-size: 0.74rem;
+            color: var(--subtext-color);
+        }
+
+        .historial-duracion {
+            font-weight: 800;
+            color: #05d9e8;
+            white-space: nowrap;
+        }
+
     </style>
 </head>
 <body>
@@ -1130,6 +1222,7 @@
                     <option value="libre">🎵 Libre (5x5)</option>
                     <option value="extremo">🔥 Extremo</option>
                     <option value="hacker">💻 Hacker</option>
+                    <option value="automatico">🤖 Automático</option>
                 </select>
             </div>
 
@@ -1151,6 +1244,9 @@
                     <option value="5">🎸 Guitarra</option>
                     <option value="7">⚡ Láser</option>
                     <option value="8">👾 Arcade</option>
+                    <option value="9">🔮 Cristal</option>
+                    <option value="10">🎺 Trompeta</option>
+                    <option value="11">💧 Agua</option>
                 </select>
             </div>
 
@@ -1158,10 +1254,12 @@
                 <label id="label-tema">🎨 Tema de Colores</label>
                 <select id="selector-color-bloques" class="btn-mini" onchange="actualizarColoresTablero()">
                     <option value="0">🌈 Neón</option>
-                    <option value="1">🧁 Pastel</option>
                     <option value="2">🌅 Atardecer</option>
                     <option value="3">🌊 Océano</option>
                     <option value="4">🌲 Bosque</option>
+                    <option value="5">🤖 Silver Punk</option>
+                    <option value="6">🌋 Lava</option>
+                    <option value="7">🍬 Caramelo</option>
                 </select>
             </div>
 
@@ -1240,6 +1338,7 @@
                             <option value="contrarreloj">⏱️ Contrarreloj</option>
                             <option value="extremo">🔥 Extremo</option>
                             <option value="hacker">💻 Hacker</option>
+                            <option value="automatico">🤖 Automático</option>
                         </select>
                         <select id="admin-reset-derrotas-dif" class="admin-select">
                             <option value="2">🟢 Fácil</option>
@@ -1276,6 +1375,17 @@
                             <option value="🎯">🎯</option>
                             <option value="🐉">🐉</option>
                         </select>
+                    </div>
+                    <div class="admin-fila-input" style="margin-bottom: 8px;">
+                        <select id="admin-select-titulo" class="admin-select" style="flex: 1;" onchange="adminCambiarTitulo()">
+                            <option value="auto">✨ Automático por Logros</option>
+                            <option value="0">🌱 Principiante</option>
+                            <option value="1">⚡ Aprendiz</option>
+                            <option value="2">🎯 Estratega</option>
+                            <option value="3">👑 Maestro</option>
+                            <option value="4">🌟 Líder</option>
+                        </select>
+                        <button class="btn-mini" id="btn-admin-reset-titulo" type="button" onclick="adminResetTituloAuto()" style="padding: 8px 10px;">🔄 Auto</button>
                     </div>
                     <button class="btn-mini" id="btn-admin-guardar-perfil" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
                 </div>
@@ -1335,8 +1445,7 @@
 
     <div class="app-contenedor" id="app-contenedor">
         <div class="titulo-wrapper">
-            <h1 id="titulo-principal">Juego de Memoria</h1>
-            <span class="badge-version">Update 1.2</span>
+            <h1 id="titulo-principal" style="display: none;"></h1>
         </div>
         <div class="contenedor-info-partida">
             <div class="badge-modo" id="badge-modo">Modo = ▶️ Normal</div>
@@ -1383,7 +1492,7 @@
     <script>
         const TRADUCCIONES = {
             es: {
-                docTitle: 'Juego de Memoria - Update 1.2',
+                docTitle: 'Juego de Memoria',
                 tituloPrincipal: 'Juego de Memoria',
                 sinNombre: '👤 Sin nombre',
                 btnGlobal: '🌍 Global',
@@ -1437,6 +1546,7 @@
                 modoLibre: '🎵 Libre (5x5)',
                 modoExtremo: '🔥 Extremo',
                 modoHacker: '💻 Hacker',
+                modoAutomatico: '🤖 Automático',
                 badgeModo: (m) => `Modo = ${m}`,
                 labelAtmosfera: '🍃 Efectos Atmosféricos',
                 atmos0: '❌ Ninguno',
@@ -1449,12 +1559,17 @@
                 sonido5: '🎸 Guitarra',
                 sonido7: '⚡ Láser',
                 sonido8: '👾 Arcade',
+                sonido9: '🔮 Cristal',
+                sonido10: '🎺 Trompeta',
+                sonido11: '💧 Agua',
                 labelTema: '🎨 Tema de Colores',
                 tema0: '🌈 Neón',
-                tema1: '🧁 Pastel',
                 tema2: '🌅 Atardecer',
                 tema3: '🌊 Océano',
                 tema4: '🌲 Bosque',
+                tema5: '🤖 Silver Punk',
+                tema6: '🌋 Lava',
+                tema7: '🍬 Caramelo',
                 labelFondo: '🖼️ Fondo de Pantalla',
                 btnFondo: '🖼️ Cambiar Color de Fondo',
                 fondoDefault: '🌌 Azul Noche (Por defecto)',
@@ -1532,7 +1647,10 @@
                 tuTurnoInvertido: '🔄 ¡Tu turno! Repite AL REVÉS',
                 tuTurno: '👉 ¡Tu turno!',
                 tiempoAgotado: '⏰ ¡Se acabó el tiempo!',
-                victoriaFinal: (niv) => `🏆 ¡Completaste el Nivel ${niv}! ¡Victoria!`,
+                victoriaFinal: (niv) => `🏆 ¡Felicidades! ¡Completaste el Nivel ${niv} y superaste el juego!`,
+                autoObservando: (niv, total) => `🤖 Nivel ${niv}/${total} — Escucha y observa la secuencia`,
+                autoRepitiendo: (niv, total) => `🤖 Nivel ${niv}/${total} — Robot repitiendo secuencia...`,
+                autoCompletado: (niv) => `🏆 ¡Secuencia automática completada hasta el Nivel ${niv}!`,
                 nivelCelebrando: (niv) => `🎉 ¡Nivel ${niv} alcanzado! Celebrando...`,
                 nivelSuperado: (niv) => `🎉 ¡Nivel ${niv} superado!`,
                 falloNivel: (niv) => `❌ ¡Fallaste en el nivel ${niv}!`,
@@ -1544,6 +1662,39 @@
                 statRecord: 'Récord',
                 statDerrotas: 'Derrotas',
                 statNotas: 'Notas',
+                labelBotonDiario: '📅 Botón del Día',
+                btnMostrarDiario: '📅 Mostrar botón Diario',
+                btnOcultarDiario: '🙈 Ocultar botón Diario',
+                btnDiarioTop: '📅 Diario',
+                titleDiarioTop: 'Reto del Día',
+                tituloModalDiario: '📅 Reto del Día',
+                diarioFecha: '📆 Fecha',
+                diarioModo: '🎮 Modo',
+                diarioDificultad: '🧩 Dificultad',
+                diarioAtmosfera: '🍃 Atmósfera',
+                diarioSonido: '🎹 Instrumento',
+                diarioTema: '🎨 Tema',
+                diarioFondo: '🖼️ Fondo',
+                diarioEstado: '📌 Estado',
+                diarioCompletado: '✅ Completado hoy',
+                diarioPendiente: '⏳ Pendiente hoy',
+                btnAplicarDiario: '🚀 Aplicar configuración del día y jugar',
+                diarioAplicadoMsg: '📅 ¡Configuración del día aplicada! Presiona "Jugar" o inicia el reto.',
+                diarioVictoriaMsg: '🏆 ¡Reto del día completado!',
+                tituloHistorialReciente: '🕒 Últimas 5 partidas',
+                historialVacio: 'Aún no hay partidas registradas.',
+                historialDuracion: (d) => `⏱️ ${d}`,
+                historialNivel: (n) => `Nivel ${n}`,
+                historialVictoria: '🏆 Victoria',
+                historialDerrota: '❌ Derrota',
+                historialTerminada: '🛑 Terminada',
+                titulos: [
+                    { minLogros: 0, texto: '🌱 Principiante' },
+                    { minLogros: 3, texto: '⚡ Aprendiz' },
+                    { minLogros: 7, texto: '🎯 Estratega' },
+                    { minLogros: 12, texto: '👑 Maestro' },
+                    { minLogros: 17, texto: '🌟 Líder' }
+                ],
                 logros: {
                     primeros_pasos: { nombre: 'Primeros Pasos', desc: 'Supera el nivel 3 en modo Normal.' },
                     cerebro_titanio: { nombre: 'Cerebro de Titanio', desc: 'Supera el nivel 6 en modo Normal.' },
@@ -1567,7 +1718,7 @@
                 }
             },
             en: {
-                docTitle: 'Memory Game - Update 1.2',
+                docTitle: 'Memory Game',
                 tituloPrincipal: 'Memory Game',
                 sinNombre: '👤 No name',
                 btnGlobal: '🌍 Global',
@@ -1621,6 +1772,7 @@
                 modoLibre: '🎵 Free Play (5x5)',
                 modoExtremo: '🔥 Extreme',
                 modoHacker: '💻 Hacker',
+                modoAutomatico: '🤖 Automatic',
                 badgeModo: (m) => `Mode = ${m}`,
                 labelAtmosfera: '🍃 Atmospheric Effects',
                 atmos0: '❌ None',
@@ -1633,12 +1785,17 @@
                 sonido5: '🎸 Guitar',
                 sonido7: '⚡ Laser',
                 sonido8: '👾 Arcade',
+                sonido9: '🔮 Crystal',
+                sonido10: '🎺 Trumpet',
+                sonido11: '💧 Water',
                 labelTema: '🎨 Color Theme',
                 tema0: '🌈 Neon',
-                tema1: '🧁 Pastel',
                 tema2: '🌅 Sunset',
                 tema3: '🌊 Ocean',
                 tema4: '🌲 Forest',
+                tema5: '🤖 Silver Punk',
+                tema6: '🌋 Lava',
+                tema7: '🍬 Candy',
                 labelFondo: '🖼️ Background',
                 btnFondo: '🖼️ Change Background Color',
                 fondoDefault: '🌌 Midnight Blue (Default)',
@@ -1716,7 +1873,10 @@
                 tuTurnoInvertido: '🔄 Your turn! Repeat IN REVERSE',
                 tuTurno: '👉 Your turn!',
                 tiempoAgotado: "⏰ Time's up!",
-                victoriaFinal: (niv) => `🏆 You beat Level ${niv}! Victory!`,
+                victoriaFinal: (niv) => `🏆 Congratulations! You beat Level ${niv} and cleared the game!`,
+                autoObservando: (niv, total) => `🤖 Level ${niv}/${total} — Watch and listen to the sequence`,
+                autoRepitiendo: (niv, total) => `🤖 Level ${niv}/${total} — Robot repeating sequence...`,
+                autoCompletado: (niv) => `🏆 Automatic sequence completed up to Level ${niv}!`,
                 nivelCelebrando: (niv) => `🎉 Level ${niv} reached! Celebrating...`,
                 nivelSuperado: (niv) => `🎉 Level ${niv} cleared!`,
                 falloNivel: (niv) => `❌ Failed at level ${niv}!`,
@@ -1728,6 +1888,39 @@
                 statRecord: 'Best',
                 statDerrotas: 'Losses',
                 statNotas: 'Notes',
+                labelBotonDiario: '📅 Daily Button',
+                btnMostrarDiario: '📅 Show Daily button',
+                btnOcultarDiario: '🙈 Hide Daily button',
+                btnDiarioTop: '📅 Daily',
+                titleDiarioTop: 'Daily Challenge',
+                tituloModalDiario: '📅 Daily Challenge',
+                diarioFecha: '📆 Date',
+                diarioModo: '🎮 Mode',
+                diarioDificultad: '🧩 Difficulty',
+                diarioAtmosfera: '🍃 Atmosphere',
+                diarioSonido: '🎹 Instrument',
+                diarioTema: '🎨 Theme',
+                diarioFondo: '🖼️ Background',
+                diarioEstado: '📌 Status',
+                diarioCompletado: '✅ Completed today',
+                diarioPendiente: '⏳ Pending today',
+                btnAplicarDiario: '🚀 Apply daily setup & play',
+                diarioAplicadoMsg: '📅 Daily setup applied! Press "Play" to start.',
+                diarioVictoriaMsg: '🏆 Daily challenge completed!',
+                tituloHistorialReciente: '🕒 Last 5 matches',
+                historialVacio: 'No matches recorded yet.',
+                historialDuracion: (d) => `⏱️ ${d}`,
+                historialNivel: (n) => `Level ${n}`,
+                historialVictoria: '🏆 Victory',
+                historialDerrota: '❌ Defeat',
+                historialTerminada: '🛑 Ended',
+                titulos: [
+                    { minLogros: 0, texto: '🌱 Beginner' },
+                    { minLogros: 3, texto: '⚡ Apprentice' },
+                    { minLogros: 7, texto: '🎯 Strategist' },
+                    { minLogros: 12, texto: '👑 Master' },
+                    { minLogros: 17, texto: '🌟 Leader' }
+                ],
                 logros: {
                     primeros_pasos: { nombre: 'First Steps', desc: 'Beat level 3 in Normal mode.' },
                     cerebro_titanio: { nombre: 'Titanium Brain', desc: 'Beat level 6 in Normal mode.' },
@@ -1840,6 +2033,7 @@
             setAttr('btn-cerrar-pin', 'title', t('cerrar'));
             setAttr('btn-cerrar-admin', 'title', t('cerrar'));
             setAttr('btn-cerrar-estadisticas', 'title', t('cerrar'));
+            actualizarBadgeTituloJugador();
             setAttr('btn-ayuda-pin', 'title', t('accesoTitle'));
 
             setText('titulo-modal-logros', t('tituloLogros'));
@@ -1860,7 +2054,8 @@
                 ['contrarreloj', t('modoContrarreloj')],
                 ['libre', t('modoLibre')],
                 ['extremo', t('modoExtremo')],
-                ['hacker', t('modoHacker')]
+                ['hacker', t('modoHacker')],
+                ['automatico', t('modoAutomatico')]
             ];
             modosOpciones.forEach(([val, lbl]) => {
                 setSelectOptionText('selector-modo', val, lbl);
@@ -1886,13 +2081,18 @@
             setSelectOptionText('selector-sonido', '5', t('sonido5'));
             setSelectOptionText('selector-sonido', '7', t('sonido7'));
             setSelectOptionText('selector-sonido', '8', t('sonido8'));
+            setSelectOptionText('selector-sonido', '9', t('sonido9'));
+            setSelectOptionText('selector-sonido', '10', t('sonido10'));
+            setSelectOptionText('selector-sonido', '11', t('sonido11'));
 
             setText('label-tema', t('labelTema'));
             setSelectOptionText('selector-color-bloques', '0', t('tema0'));
-            setSelectOptionText('selector-color-bloques', '1', t('tema1'));
             setSelectOptionText('selector-color-bloques', '2', t('tema2'));
             setSelectOptionText('selector-color-bloques', '3', t('tema3'));
             setSelectOptionText('selector-color-bloques', '4', t('tema4'));
+            setSelectOptionText('selector-color-bloques', '5', t('tema5'));
+            setSelectOptionText('selector-color-bloques', '6', t('tema6'));
+            setSelectOptionText('selector-color-bloques', '7', t('tema7'));
 
             setText('label-fondo', t('labelFondo'));
             setText('btn-toggle-fondo', t('btnFondo'));
@@ -1977,6 +2177,7 @@
                 renderizarClasificacionGlobal();
             }
             if (document.getElementById('modal-panel-admin').classList.contains('activo')) {
+                sincronizarSelectTituloAdmin();
                 renderizarListaAdminLogros();
             }
         }
@@ -2001,7 +2202,8 @@
                 relampago: t('modoRelampago'),
                 contrarreloj: t('modoContrarreloj'),
                 extremo: t('modoExtremo'),
-                hacker: t('modoHacker')
+                hacker: t('modoHacker'),
+                automatico: t('modoAutomatico')
             };
         }
 
@@ -2125,6 +2327,7 @@
 
             esAdminActivo = true;
             actualizarVisibilidadControlesAdmin();
+            actualizarBadgeTituloJugador();
             cerrarModalPinAdmin();
             cerrarConfiguracion();
             abrirPanelAdmin();
@@ -2224,6 +2427,7 @@
 
             const inputNotas = document.getElementById('admin-input-notas');
             if (inputNotas) inputNotas.value = totalNotasTocadas;
+            sincronizarSelectTituloAdmin();
             renderizarListaAdminLogros();
             cambiarPestanaAdmin('juego');
             document.getElementById('modal-panel-admin').classList.add('activo');
@@ -2348,6 +2552,7 @@
                 localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
             }
             renderizarListaAdminLogros();
+            actualizarBadgeTituloJugador();
         }
 
         function adminToggleTodosLogros(activar) {
@@ -2364,6 +2569,7 @@
         }
 
         function renderizarListaAdminLogros() {
+            actualizarBadgeTituloJugador();
             const cont = document.getElementById('admin-lista-logros');
             if (!cont) return;
             cont.innerHTML = DEFINICION_LOGROS.map(l => {
@@ -2416,7 +2622,7 @@
         }
 
         async function publicarRecordGlobal(record, modo, dif) {
-            if (!usuarioActual || !usuarioActual.nombre || modo === 'libre') return;
+            if (!usuarioActual || !usuarioActual.nombre || modo === 'libre' || modo === 'automatico') return;
             const nivelNum = Number(record);
             if (!Number.isFinite(nivelNum) || nivelNum < 1 || nivelNum > NIVEL_FINAL) return;
 
@@ -2559,7 +2765,7 @@
                     <div class="fila-ranking ${claseTop} ${claseUsuario}">
                         <div class="ranking-pos">${medalla}</div>
                         <div class="ranking-jugador">
-                            <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}${badgeTu}</div>
+                            <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}${badgeTu}<span class="badge-titulo-rank">${escaparTextoHTML(obtenerTituloPorLogros())}</span></div>
                             <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
                         </div>
                         <div class="ranking-puntaje">${escaparTextoHTML(t('nivelRank', Number(item.record)))}</div>
@@ -2567,6 +2773,131 @@
                     </div>
                 `;
             }).join('');
+        }
+
+
+        let tituloForzadoIndice = localStorage.getItem('memoria_titulo_forzado_v1');
+        if (tituloForzadoIndice !== null && !['0', '1', '2', '3', '4'].includes(String(tituloForzadoIndice))) {
+            tituloForzadoIndice = null;
+        } else if (tituloForzadoIndice !== null) {
+            tituloForzadoIndice = Number(tituloForzadoIndice);
+        }
+
+        let ultimoIndiceTituloLogros = null;
+        let toastAscensoTimeout = null;
+
+        function mostrarNotificacionAscensoTitulo(textoTitulo) {
+            const toast = document.getElementById('toast-logro');
+            if (!toast) return;
+            const icono = document.getElementById('toast-logro-icono');
+            const titulo = document.getElementById('toast-logro-titulo');
+            const nombre = document.getElementById('toast-logro-nombre');
+
+            if (icono) icono.textContent = '🏅';
+            if (titulo) titulo.textContent = idiomaActual === 'en' ? 'Title Promoted!' : '¡Ascenso de Título!';
+            if (nombre) nombre.textContent = textoTitulo;
+
+            if (toastAscensoTimeout) clearTimeout(toastAscensoTimeout);
+            toast.classList.add('mostrar');
+            toastAscensoTimeout = setTimeout(() => {
+                toast.classList.remove('mostrar');
+            }, 3200);
+        }
+
+        function obtenerIndiceTituloPorLogros() {
+            const dict = TRADUCCIONES[idiomaActual] || TRADUCCIONES.es;
+            const escala = Array.isArray(dict.titulos) ? dict.titulos : TRADUCCIONES.es.titulos;
+            const cantidadLogros = DEFINICION_LOGROS.reduce((acc, l) => acc + (logrosDesbloqueados[l.id] ? 1 : 0), 0);
+
+            let elegidoIdx = 0;
+            for (let i = 0; i < escala.length; i++) {
+                if (cantidadLogros >= escala[i].minLogros) {
+                    elegidoIdx = i;
+                }
+            }
+            return elegidoIdx;
+        }
+
+        function obtenerTituloPorLogros() {
+            const dict = TRADUCCIONES[idiomaActual] || TRADUCCIONES.es;
+            const escala = Array.isArray(dict.titulos) ? dict.titulos : TRADUCCIONES.es.titulos;
+            if (tituloForzadoIndice !== null && escala[tituloForzadoIndice]) {
+                return escala[tituloForzadoIndice].texto;
+            }
+            const idx = obtenerIndiceTituloPorLogros();
+            return escala[idx] ? escala[idx].texto : '🌱 Principiante';
+        }
+
+        function comprobarAscensoTituloPorLogros() {
+            const idxActual = obtenerIndiceTituloPorLogros();
+            if (ultimoIndiceTituloLogros === null) {
+                ultimoIndiceTituloLogros = idxActual;
+                return;
+            }
+            if (idxActual > ultimoIndiceTituloLogros) {
+                ultimoIndiceTituloLogros = idxActual;
+                if (tituloForzadoIndice === null) {
+                    const dict = TRADUCCIONES[idiomaActual] || TRADUCCIONES.es;
+                    const escala = Array.isArray(dict.titulos) ? dict.titulos : TRADUCCIONES.es.titulos;
+                    if (escala[idxActual]) {
+                        mostrarNotificacionAscensoTitulo(escala[idxActual].texto);
+                    }
+                }
+            } else if (idxActual < ultimoIndiceTituloLogros) {
+                ultimoIndiceTituloLogros = idxActual;
+            }
+        }
+
+        function actualizarBadgeTituloJugador() {
+            comprobarAscensoTituloPorLogros();
+            const badge = document.getElementById('badge-titulo-jugador');
+            if (badge) {
+                badge.textContent = obtenerTituloPorLogros();
+            }
+            if (document.getElementById('modal-global').classList.contains('activo')) {
+                renderizarClasificacionGlobal();
+            }
+        }
+
+        function sincronizarSelectTituloAdmin() {
+            const sel = document.getElementById('admin-select-titulo');
+            if (!sel) return;
+            const dict = TRADUCCIONES[idiomaActual] || TRADUCCIONES.es;
+            const escala = Array.isArray(dict.titulos) ? dict.titulos : TRADUCCIONES.es.titulos;
+            const optAuto = [...sel.options].find(o => o.value === 'auto');
+            if (optAuto) {
+                optAuto.textContent = idiomaActual === 'en' ? '✨ Auto by Achievements' : '✨ Automático por Logros';
+            }
+            escala.forEach((item, idx) => {
+                const opt = [...sel.options].find(o => o.value === String(idx));
+                if (opt) opt.textContent = item.texto;
+            });
+            sel.value = tituloForzadoIndice !== null ? String(tituloForzadoIndice) : 'auto';
+        }
+
+        function adminCambiarTitulo() {
+            if (!esAdminActivo) return;
+            const sel = document.getElementById('admin-select-titulo');
+            if (!sel) return;
+            if (sel.value === 'auto') {
+                adminResetTituloAuto();
+                return;
+            }
+            const idx = Number(sel.value);
+            if ([0, 1, 2, 3, 4].includes(idx)) {
+                tituloForzadoIndice = idx;
+                localStorage.setItem('memoria_titulo_forzado_v1', String(idx));
+                actualizarBadgeTituloJugador();
+            }
+        }
+
+        function adminResetTituloAuto() {
+            if (!esAdminActivo) return;
+            tituloForzadoIndice = null;
+            localStorage.removeItem('memoria_titulo_forzado_v1');
+            ultimoIndiceTituloLogros = obtenerIndiceTituloPorLogros();
+            sincronizarSelectTituloAdmin();
+            actualizarBadgeTituloJugador();
         }
 
         const PREFS_DEFAULT = {
@@ -2622,6 +2953,7 @@
 
             if (nivelAlcanzado >= 1) {
                 guardarRecordEstadistica(modoAlcanzado, difAlcanzada, nivelAlcanzado);
+            
                 publicarRecordGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada);
             }
 
@@ -2686,7 +3018,7 @@
             document.body.style.backgroundColor = prefs.fondo;
             actualizarColoresTablero(false);
 
-            const modosValidos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker'];
+            const modosValidos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker', 'automatico'];
             const modoGuardado = modosValidos.includes(prefs.modo) ? prefs.modo : 'normal';
             if (selModo) {
                 selModo.value = modoGuardado;
@@ -2802,9 +3134,11 @@
         }
 
         function desbloquearLogro(id) {
+            if (modoJuego === 'automatico') return;
             if (logrosDesbloqueados[id]) return;
             logrosDesbloqueados[id] = true;
             localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
+            actualizarBadgeTituloJugador();
 
             const info = obtenerInfoLogro(id);
             if (info) {
@@ -2844,7 +3178,7 @@
         }
 
         function verificarProgresoEstetico() {
-            const todosSonidos = ['1', '3', '5', '7', '8'].every(s => progresoEstetico.sonidos.includes(s));
+            const todosSonidos = ['1', '3', '5', '7', '8', '9', '10', '11'].every(s => progresoEstetico.sonidos.includes(s));
             const todasAtmosferas = ['0', '1', '2', '3'].every(a => progresoEstetico.atmosferas.includes(a));
             if (todosSonidos && todasAtmosferas) {
                 desbloquearLogro('estetico');
@@ -2982,6 +3316,7 @@
 
             try { aplicarPreferenciasVisualesAlCargar(); } catch (e) { console.error(e); }
             try { actualizarBadgeRacha(); } catch (e) { console.error(e); }
+            ultimoIndiceTituloLogros = obtenerIndiceTituloPorLogros();
             try { verificarLogrosDeNotas(); } catch (e) { console.error(e); }
             try { iniciarAtmosfera(); } catch (e) { console.error(e); }
             try { verificarProgresoEstetico(); } catch (e) { console.error(e); }
@@ -3252,7 +3587,7 @@
         }
 
         function reproducirSonido(indice, esError = false, contarNota = true) {
-            if (!esError && contarNota && modoJuego !== 'libre') {
+            if (!esError && contarNota && modoJuego !== 'libre' && modoJuego !== 'automatico') {
                 totalNotasTocadas++;
                 localStorage.setItem('memoria_total_notas_v1', totalNotasTocadas);
                 registrarNotaEstadistica(modoJuego, tamanoCuadricula);
@@ -3263,52 +3598,193 @@
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
 
+            const compresor = audioCtx.createDynamicsCompressor();
+            compresor.threshold.setValueAtTime(-14, audioCtx.currentTime);
+            compresor.knee.setValueAtTime(18, audioCtx.currentTime);
+            compresor.ratio.setValueAtTime(8, audioCtx.currentTime);
+            compresor.attack.setValueAtTime(0.003, audioCtx.currentTime);
+            compresor.release.setValueAtTime(0.15, audioCtx.currentTime);
+
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(1.45, audioCtx.currentTime);
+            compresor.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             const tipoSonido = parseInt(document.getElementById('selector-sonido').value, 10);
+            const ahora = audioCtx.currentTime;
 
             if (esError) {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(140, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(75, audioCtx.currentTime + 0.45);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
+                osc.frequency.setValueAtTime(175, ahora);
+                osc.frequency.linearRampToValueAtTime(85, ahora + 0.45);
+                gain.gain.setValueAtTime(0.65, ahora);
+                gain.gain.exponentialRampToValueAtTime(0.005, ahora + 0.45);
                 osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.45);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.45);
                 return;
             }
 
             const frecuencias = [
-                261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25,
-                587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 1174.66,
-                1244.51, 1318.51, 1396.91, 1479.98, 1567.98, 1661.22, 1760.00, 1864.66, 1975.53
+                392.00, 440.00, 493.88, 523.25, 587.33, 659.25, 698.46, 783.99,
+                880.00, 987.77, 1046.50, 1174.66, 1244.51, 1318.51, 1396.91, 1479.98,
+                1567.98, 1661.22, 1760.00, 1864.66, 1975.53, 2093.00, 2217.46, 2349.32, 2489.02
             ];
-            osc.frequency.value = frecuencias[indice % frecuencias.length];
+            const freqBase = frecuencias[indice % frecuencias.length];
 
-            if (tipoSonido === 3) osc.type = 'sawtooth';
-            else if (tipoSonido === 5) osc.type = 'triangle';
-            else if (tipoSonido === 7) osc.type = 'square';
-            else if (tipoSonido === 8) osc.type = 'square';
+            if (tipoSonido === 9) {
+                // Cristal: tono cristalino brillante con armónico agudo
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freqBase * 1.25, ahora);
+                gain.gain.setValueAtTime(0.62, ahora);
+                gain.gain.exponentialRampToValueAtTime(0.004, ahora + 0.28);
+
+                const armonico = audioCtx.createOscillator();
+                const gainArm = audioCtx.createGain();
+                armonico.type = 'triangle';
+                armonico.frequency.setValueAtTime(freqBase * 2.5, ahora);
+                gainArm.gain.setValueAtTime(0.35, ahora);
+                gainArm.gain.exponentialRampToValueAtTime(0.003, ahora + 0.16);
+                armonico.connect(gainArm);
+                gainArm.connect(compresor);
+                armonico.start(ahora);
+                armonico.stop(ahora + 0.17);
+
+                osc.connect(gain);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.29);
+                return;
+            }
+
+            if (tipoSonido === 10) {
+                // Trompeta: metal con filtro pasa-bajos que abre rápido
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freqBase, ahora);
+
+                const filtro = audioCtx.createBiquadFilter();
+                filtro.type = 'lowpass';
+                filtro.Q.setValueAtTime(4.5, ahora);
+                filtro.frequency.setValueAtTime(freqBase * 1.4, ahora);
+                filtro.frequency.exponentialRampToValueAtTime(Math.min(7500, freqBase * 5.2), ahora + 0.08);
+                filtro.frequency.exponentialRampToValueAtTime(freqBase * 2.2, ahora + 0.34);
+
+                gain.gain.setValueAtTime(0.05, ahora);
+                gain.gain.linearRampToValueAtTime(0.72, ahora + 0.045);
+                gain.gain.exponentialRampToValueAtTime(0.005, ahora + 0.36);
+
+                osc.connect(filtro);
+                filtro.connect(gain);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.37);
+                return;
+            }
+
+            if (tipoSonido === 11) {
+                // Agua: burbuja/gota que sube rápido de tono
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freqBase * 0.72, ahora);
+                osc.frequency.exponentialRampToValueAtTime(freqBase * 1.65, ahora + 0.13);
+
+                gain.gain.setValueAtTime(0.72, ahora);
+                gain.gain.exponentialRampToValueAtTime(0.004, ahora + 0.18);
+
+                osc.connect(gain);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.19);
+                return;
+            }
+
+            if (tipoSonido === 7) {
+                // Láser: barrido rápido descendente de frecuencia con timbre claro
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freqBase * 1.85, ahora);
+                osc.frequency.exponentialRampToValueAtTime(Math.max(140, freqBase * 0.42), ahora + 0.17);
+
+                const filtroLaser = audioCtx.createBiquadFilter();
+                filtroLaser.type = 'bandpass';
+                filtroLaser.Q.setValueAtTime(2.2, ahora);
+                filtroLaser.frequency.setValueAtTime(freqBase * 1.6, ahora);
+
+                gain.gain.setValueAtTime(0.56, ahora);
+                gain.gain.exponentialRampToValueAtTime(0.004, ahora + 0.18);
+
+                osc.connect(filtroLaser);
+                filtroLaser.connect(gain);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.19);
+                return;
+            }
+
+            if (tipoSonido === 8) {
+                // Arcade: salto escalonado de dos tonos tipo chip de consola
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(freqBase, ahora);
+                osc.frequency.setValueAtTime(freqBase * 1.5, ahora + 0.065);
+
+                const filtroArcade = audioCtx.createBiquadFilter();
+                filtroArcade.type = 'lowpass';
+                filtroArcade.frequency.setValueAtTime(3400, ahora);
+
+                gain.gain.setValueAtTime(0.45, ahora);
+                gain.gain.exponentialRampToValueAtTime(0.005, ahora + 0.22);
+
+                osc.connect(filtroArcade);
+                filtroArcade.connect(gain);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.23);
+                return;
+            }
+
+            if (tipoSonido === 3) {
+                // Retro: suavizado con filtro pasa-bajos y menor ganancia para no sonar tan fuerte/áspero
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freqBase, ahora);
+
+                const filtroRetro = audioCtx.createBiquadFilter();
+                filtroRetro.type = 'lowpass';
+                filtroRetro.frequency.setValueAtTime(1650, ahora);
+
+                gain.gain.setValueAtTime(0.32, ahora);
+                gain.gain.exponentialRampToValueAtTime(0.004, ahora + 0.28);
+
+                osc.connect(filtroRetro);
+                filtroRetro.connect(gain);
+                gain.connect(compresor);
+                osc.start(ahora);
+                osc.stop(ahora + 0.29);
+                return;
+            }
+
+            osc.frequency.value = freqBase;
+            if (tipoSonido === 5) osc.type = 'triangle';
             else osc.type = 'sine';
 
-            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+            gain.gain.setValueAtTime(0.62, ahora);
+            gain.gain.exponentialRampToValueAtTime(0.005, ahora + 0.35);
 
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.35);
+            gain.connect(compresor);
+            osc.start(ahora);
+            osc.stop(ahora + 0.36);
         }
 
-        const temasColores = [
-            ['#ff4757', '#05d9e8', '#2ed573', '#ffa502', '#7700a6', '#ff6b81', '#1e90ff', '#32ff7e', '#fffa65'],
-            ['#ffb3ba', '#bae1ff', '#baffc9', '#ffffba', '#ffdfba', '#e0bbe4', '#957dad', '#d291bc', '#fec8d8'],
-            ['#ff5e57', '#ff9f43', '#feca57', '#ff6b6b', '#ee5253', '#ff9ff3', '#f368e0', '#ff793f', '#ffb142'],
-            ['#00a8ff', '#0097e6', '#4cd137', '#487eb0', '#00d2d3', '#54a0ff', '#2e86de', '#1dd1a1', '#10ac84'],
-            ['#2ed573', '#7bed9f', '#ffa502', '#eccc68', '#26de81', '#20bf6b', '#fed330', '#f7b731', '#a3cb38']
-        ];
+        const temasColores = {
+            0: ['#ff4757', '#05d9e8', '#2ed573', '#ffa502', '#7700a6', '#ff6b81', '#1e90ff', '#32ff7e', '#fffa65'],
+            2: ['#ff5e57', '#ff9f43', '#feca57', '#ff6b6b', '#ee5253', '#ff9ff3', '#f368e0', '#ff793f', '#ffb142'],
+            3: ['#00a8ff', '#0097e6', '#4cd137', '#487eb0', '#00d2d3', '#54a0ff', '#2e86de', '#1dd1a1', '#10ac84'],
+            4: ['#2ed573', '#7bed9f', '#ffa502', '#eccc68', '#26de81', '#20bf6b', '#fed330', '#f7b731', '#a3cb38'],
+            5: ['#e2e8f0', '#94a3b8', '#00f5d4', '#ff007f', '#cbd5e1', '#38bdf8', '#f472b6', '#a855f7', '#f8fafc'],
+            6: ['#ff2a00', '#ff5400', '#ff7b00', '#ffaa00', '#ffd000', '#d00000', '#e85d04', '#f48c06', '#faa307'],
+            7: ['#ff5d8f', '#ff97b7', '#72efdd', '#ffd166', '#c77dff', '#4cc9f0', '#ff8fa3', '#80ffdb', '#f72585']
+        };
 
         function actualizarColoresTablero(guardar = true) {
             const selTema = document.getElementById('selector-color-bloques');
@@ -3316,7 +3792,7 @@
             if (guardar && selTema) {
                 guardarPreferenciaVisual('temaColor', selTema.value);
             }
-            const paleta = temasColores[temaIdx] || temasColores[0];
+            const paleta = temasColores[temaIdx] || temasColores[2];
             for (let i = 0; i < totalBloques; i++) {
                 const bloque = document.getElementById(`bloque-${i}`);
                 if (bloque) {
@@ -3344,7 +3820,7 @@
 
             const selTema = document.getElementById('selector-color-bloques');
             const temaIdx = selTema ? parseInt(selTema.value, 10) : 0;
-            const paleta = temasColores[temaIdx] || temasColores[0];
+            const paleta = temasColores[temaIdx] || temasColores[2];
 
             for (let i = 0; i < totalBloques; i++) {
                 const color = paleta[i % paleta.length];
@@ -3477,6 +3953,9 @@
             } else if (modoJuego === 'hacker') {
                 difSelect.disabled = true;
                 construirTablero(2);
+            } else if (modoJuego === 'automatico') {
+                difSelect.disabled = false;
+                construirTablero(parseInt(difSelect.value, 10));
             } else {
                 difSelect.disabled = false;
                 construirTablero(parseInt(difSelect.value, 10));
@@ -3491,9 +3970,11 @@
                 return;
             }
 
-            haJugadoPartida = true;
             partidaEnCurso = true;
-            registrarDiaJugado();
+            if (modoJuego !== 'automatico') {
+                haJugadoPartida = true;
+                registrarDiaJugado();
+            }
 
             limpiarTimers();
             secuencia = [];
@@ -3538,21 +4019,25 @@
                 }
             }
 
-            if (nivel >= 8) {
-                desbloquearLogro('memoria_fotografica');
-            }
-            if (modoJuego === 'hacker' && nivel >= 6) {
-                desbloquearLogro('hacker_maestro');
+            if (modoJuego !== 'automatico') {
+                if (nivel >= 8) {
+                    desbloquearLogro('memoria_fotografica');
+                }
+                if (modoJuego === 'hacker' && nivel >= 6) {
+                    desbloquearLogro('hacker_maestro');
+                }
             }
 
             const prefijoExtremo = (modoJuego === 'extremo') ? ` (${tamanoCuadricula}x${tamanoCuadricula})` : '';
-            document.getElementById('mensaje').textContent = t('observaSecuencia', nivel, NIVEL_FINAL, prefijoExtremo);
+            document.getElementById('mensaje').textContent = modoJuego === 'automatico'
+                ? t('autoObservando', nivel, NIVEL_FINAL)
+                : t('observaSecuencia', nivel, NIVEL_FINAL, prefijoExtremo);
             const nuevoBloque = Math.floor(Math.random() * totalBloques);
             secuencia.push(nuevoBloque);
 
             secuenciaObjetivo = (modoJuego === 'invertido') ? [...secuencia].reverse() : [...secuencia];
 
-            const velocidad = modoJuego === 'relampago' ? 260 : (modoJuego === 'extremo' ? 350 : 580);
+            const velocidad = modoJuego === 'relampago' ? 260 : (modoJuego === 'extremo' ? 350 : (modoJuego === 'automatico' ? 480 : 580));
             reproducirSecuencia(velocidad);
         }
 
@@ -3574,6 +4059,48 @@
                 } else {
                     clearInterval(intervalo);
                     if (!partidaEnCurso) return;
+
+                    if (modoJuego === 'automatico') {
+                        document.getElementById('mensaje').textContent = t('autoRepitiendo', nivel, NIVEL_FINAL);
+                        const robotTimeout = setTimeout(() => {
+                            if (!partidaEnCurso || modoJuego !== 'automatico') return;
+                            let idxRobot = 0;
+                            const velRobot = 340;
+                            const intervaloRobot = setInterval(() => {
+                                if (!partidaEnCurso || modoJuego !== 'automatico') {
+                                    clearInterval(intervaloRobot);
+                                    return;
+                                }
+                                if (idxRobot < secuencia.length) {
+                                    iluminarBloque(secuencia[idxRobot], velRobot * 0.55, false);
+                                    idxRobot++;
+                                } else {
+                                    clearInterval(intervaloRobot);
+                                    if (!partidaEnCurso || modoJuego !== 'automatico') return;
+                                    reproduciendoSecuenciaActual = false;
+                                    bloqueado = true;
+                                    actualizarBotonComodin();
+
+                                    if (nivel >= NIVEL_FINAL) {
+                                        lanzarConfeti();
+                                        finalizarPartida(true, t('autoCompletado', NIVEL_FINAL));
+                                    } else {
+                                        document.getElementById('mensaje').textContent = t('nivelSuperado', nivel);
+                                        const nextAutoTimeout = setTimeout(() => {
+                                            if (partidaEnCurso && modoJuego === 'automatico') {
+                                                siguienteNivel();
+                                            }
+                                        }, 750);
+                                        timeouts.push(nextAutoTimeout);
+                                    }
+                                }
+                            }, velRobot);
+                            timeouts.push(intervaloRobot);
+                        }, 550);
+                        timeouts.push(robotTimeout);
+                        return;
+                    }
+
                     bloqueado = false;
                     reproduciendoSecuenciaActual = false;
                     actualizarBotonComodin();
@@ -3720,6 +4247,7 @@
                 guardarRecordEstadistica(modoAlcanzado, difAlcanzada, nivelAlcanzado);
                 publicarRecordGlobal(nivelAlcanzado, modoAlcanzado, difAlcanzada);
             }
+            
 
             bloqueado = true;
             reproduciendoSecuenciaActual = false;
@@ -3833,6 +4361,7 @@
         }
 
         function guardarRecordEstadistica(modo, dif, niv) {
+            if (modo === 'automatico') return;
             const stats = obtenerDatosStats();
             const clave = `${modo}_${Number(dif)}`;
             if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
@@ -3843,6 +4372,7 @@
         }
 
         function registrarDerrotaEstadistica(modo, dif) {
+            if (modo === 'automatico') return;
             const stats = obtenerDatosStats();
             const clave = `${modo}_${Number(dif)}`;
             if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
@@ -3851,6 +4381,7 @@
         }
 
         function registrarNotaEstadistica(modo, dif) {
+            if (modo === 'automatico') return;
             const stats = obtenerDatosStats();
             const clave = `${modo}_${Number(dif)}`;
             if (!stats[clave]) stats[clave] = { record: 0, derrotas: 0, notas: 0 };
