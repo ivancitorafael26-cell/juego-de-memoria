@@ -991,6 +991,36 @@
         .admin-tab-panel.activa {
             display: block;
         }
+
+        .fila-ranking.es-usuario-actual {
+            border-color: #05d9e8;
+            background: rgba(5, 217, 232, 0.14);
+            box-shadow: 0 0 0 1px rgba(5, 217, 232, 0.35) inset;
+        }
+
+        .badge-tu-ranking {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            background: rgba(5, 217, 232, 0.25);
+            color: #05d9e8;
+            border: 1px solid rgba(5, 217, 232, 0.6);
+            vertical-align: middle;
+        }
+
+        #btn-pantalla-completa {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -1029,6 +1059,7 @@
             <button class="btn-mini" id="btn-confeti-admin-top" type="button" onclick="lanzarConfeti()" title="Probar Confeti">🎉 Confeti</button>
             <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
+            <button class="btn-mini" id="btn-pantalla-completa" type="button" onclick="alternarPantallaCompleta()" title="Pantalla completa">⛶</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
             <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;">⚙️ Configuración</button>
         </div>
@@ -1381,6 +1412,9 @@
                 vacioGlobal: 'Aún no hay récords registrados en este modo. ¡Sé el primero!',
                 nivelRank: (n) => `Nivel ${n}`,
                 borrarRegistroTitle: 'Borrar registro',
+                etiquetaTu: 'Tú',
+                titlePantallaCompleta: 'Pantalla completa',
+                titleSalirPantallaCompleta: 'Salir de pantalla completa',
                 tituloLogros: '🏆 Logros',
                 tituloConfig: '⚙️ Configuración',
                 labelIdioma: '🌐 Idioma / Language',
@@ -1562,6 +1596,9 @@
                 vacioGlobal: 'No records in this mode yet. Be the first!',
                 nivelRank: (n) => `Level ${n}`,
                 borrarRegistroTitle: 'Delete entry',
+                etiquetaTu: 'You',
+                titlePantallaCompleta: 'Fullscreen',
+                titleSalirPantallaCompleta: 'Exit fullscreen',
                 tituloLogros: '🏆 Achievements',
                 tituloConfig: '⚙️ Settings',
                 labelIdioma: '🌐 Idioma / Language',
@@ -1782,6 +1819,7 @@
             setText('btn-estadisticas-top', t('btnEstadisticas'));
             setAttr('btn-estadisticas-top', 'title', t('titleEstadisticas'));
             setAttr('btn-silenciar', 'title', t('titleSilenciar'));
+            actualizarIconoPantallaCompleta();
             setText('btn-config', t('btnConfig'));
 
             setText('usuario-titulo', t('usuarioTitulo'));
@@ -2513,11 +2551,15 @@
                     ? `<button class="btn-borrar-fila-global" type="button" onclick="borrarRegistroGlobalAdmin('${escaparTextoHTML(item._id)}')" title="${escaparTextoHTML(t('borrarRegistroTitle'))}">🗑️</button>`
                     : '';
 
+                const esMio = !!(usuarioActual && usuarioActual.nombre && String(item.nombre || '').trim().toLowerCase() === usuarioActual.nombre.trim().toLowerCase());
+                const claseUsuario = esMio ? 'es-usuario-actual' : '';
+                const badgeTu = esMio ? `<span class="badge-tu-ranking">${escaparTextoHTML(t('etiquetaTu'))}</span>` : '';
+
                 return `
-                    <div class="fila-ranking ${claseTop}">
+                    <div class="fila-ranking ${claseTop} ${claseUsuario}">
                         <div class="ranking-pos">${medalla}</div>
                         <div class="ranking-jugador">
-                            <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}</div>
+                            <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}${badgeTu}</div>
                             <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
                         </div>
                         <div class="ranking-puntaje">${escaparTextoHTML(t('nivelRank', Number(item.record)))}</div>
@@ -3143,6 +3185,54 @@
             ctxAtmos.globalAlpha = 1;
             atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
         }
+
+        function esPantallaCompletaActiva() {
+            return !!(
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement
+            );
+        }
+
+        function actualizarIconoPantallaCompleta() {
+            const btn = document.getElementById('btn-pantalla-completa');
+            if (!btn) return;
+            const activa = esPantallaCompletaActiva();
+            btn.textContent = activa ? '🗗' : '⛶';
+            btn.setAttribute('title', activa ? t('titleSalirPantallaCompleta') : t('titlePantallaCompleta'));
+        }
+
+        async function alternarPantallaCompleta() {
+            const el = document.documentElement;
+            try {
+                if (!esPantallaCompletaActiva()) {
+                    if (el.requestFullscreen) {
+                        await el.requestFullscreen();
+                    } else if (el.webkitRequestFullscreen) {
+                        el.webkitRequestFullscreen();
+                    } else if (el.msRequestFullscreen) {
+                        el.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            } catch (err) {
+                console.warn('Pantalla completa no disponible en este navegador:', err);
+            } finally {
+                actualizarIconoPantallaCompleta();
+            }
+        }
+
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(ev => {
+            document.addEventListener(ev, actualizarIconoPantallaCompleta);
+        });
 
         function toggleSilenciar() {
             estaSilenciado = !estaSilenciado;
