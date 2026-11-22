@@ -460,8 +460,15 @@
         }
 
         @keyframes aparecerBloque {
-            from { transform: scale(0.5); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0.55) translateY(8px); opacity: 0; }
+            75% { transform: scale(1.03) translateY(0); opacity: 1; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .tablero.cuadricula-animada .bloque {
+            opacity: 0;
+            animation: aparecerBloque 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: var(--delay-bloque, 0ms);
         }
 
         .bloque {
@@ -3484,8 +3491,45 @@
             animarAtmosfera(tipo);
         }
 
+        let atmosResizeTimeout = null;
+
+        function ajustarTamanoAtmosfera() {
+            if (!canvasAtmos) return;
+            const anchoPrev = canvasAtmos.width || window.innerWidth;
+            const altoPrev = canvasAtmos.height || window.innerHeight;
+            const nuevoAncho = window.innerWidth;
+            const nuevoAlto = window.innerHeight;
+
+            canvasAtmos.width = nuevoAncho;
+            canvasAtmos.height = nuevoAlto;
+
+            if (anchoPrev > 0 && altoPrev > 0 && atmosParticles.length > 0) {
+                const escX = nuevoAncho / anchoPrev;
+                const escY = nuevoAlto / altoPrev;
+                for (let i = 0; i < atmosParticles.length; i++) {
+                    atmosParticles[i].x = Math.min(nuevoAncho, Math.max(0, atmosParticles[i].x * escX));
+                    atmosParticles[i].y = Math.min(nuevoAlto, Math.max(0, atmosParticles[i].y * escY));
+                }
+            }
+        }
+
+        function manejarCambioOrientacionAtmosfera() {
+            ajustarTamanoAtmosfera();
+            if (atmosResizeTimeout) clearTimeout(atmosResizeTimeout);
+            atmosResizeTimeout = setTimeout(() => {
+                ajustarTamanoAtmosfera();
+                atmosResizeTimeout = null;
+            }, 180);
+        }
+
+        window.addEventListener('resize', manejarCambioOrientacionAtmosfera);
+        window.addEventListener('orientationchange', manejarCambioOrientacionAtmosfera);
+
         function animarAtmosfera(tipo) {
             ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
+
+            const esHorizontal = window.innerWidth > window.innerHeight;
+            const factorProporcionHoja = esHorizontal ? 0.85 : 1;
 
             for (let i = 0; i < atmosParticles.length; i++) {
                 const p = atmosParticles[i];
@@ -3497,7 +3541,15 @@
                     ctxAtmos.translate(p.x, p.y);
                     ctxAtmos.rotate(Math.sin(p.angle) * 0.45);
                     ctxAtmos.beginPath();
-                    ctxAtmos.ellipse(0, 0, p.size * 1.25, p.size * 0.55, 0, 0, Math.PI * 2);
+                    ctxAtmos.ellipse(
+                        0,
+                        0,
+                        p.size * 1.15 * factorProporcionHoja,
+                        p.size * 0.62 * factorProporcionHoja,
+                        0,
+                        0,
+                        Math.PI * 2
+                    );
                     ctxAtmos.fill();
                     ctxAtmos.restore();
                 } else {
@@ -3810,6 +3862,8 @@
             construirTablero(tamanoCuadricula);
         }
 
+        let escalonadoTimeoutId = null;
+
         function construirTablero(dimension) {
             tamanoCuadricula = dimension;
             totalBloques = dimension * dimension;
@@ -3819,9 +3873,17 @@
             tablero.style.gridTemplateRows = `repeat(${dimension}, ${sizePx}px)`;
             tablero.innerHTML = '';
 
+            if (escalonadoTimeoutId) {
+                clearTimeout(escalonadoTimeoutId);
+                escalonadoTimeoutId = null;
+            }
+            tablero.classList.remove('cuadricula-animada');
+
             const selTema = document.getElementById('selector-color-bloques');
             const temaIdx = selTema ? parseInt(selTema.value, 10) : 0;
             const paleta = temasColores[temaIdx] || temasColores[2];
+
+            const pasoDelay = totalBloques >= 25 ? 16 : (totalBloques >= 16 ? 22 : 35);
 
             for (let i = 0; i < totalBloques; i++) {
                 const color = paleta[i % paleta.length];
@@ -3830,9 +3892,26 @@
                 div.id = `bloque-${i}`;
                 div.style.backgroundColor = color;
                 div.style.color = color;
+                div.style.setProperty('--delay-bloque', `${i * pasoDelay}ms`);
                 div.onclick = () => manejarClicBloque(i);
                 tablero.appendChild(div);
             }
+
+            void tablero.offsetWidth;
+            tablero.classList.add('cuadricula-animada');
+
+            const duracionTotal = totalBloques * pasoDelay + 340;
+            escalonadoTimeoutId = setTimeout(() => {
+                tablero.classList.remove('cuadricula-animada');
+                for (let i = 0; i < totalBloques; i++) {
+                    const b = document.getElementById(`bloque-${i}`);
+                    if (b) {
+                        b.style.opacity = '1';
+                        b.style.removeProperty('--delay-bloque');
+                    }
+                }
+                escalonadoTimeoutId = null;
+            }, duracionTotal);
         }
 
         function obtenerDimensionExtremoPorNivel(niv) {
