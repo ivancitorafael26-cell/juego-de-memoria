@@ -724,6 +724,11 @@
             border-color: rgba(255, 255, 255, 0.4);
         }
 
+        .btn-idioma-config {
+            background: linear-gradient(135deg, rgba(55, 66, 250, 0.35), rgba(46, 213, 115, 0.25)) !important;
+            border-color: rgba(255, 255, 255, 0.28) !important;
+        }
+
         .selector-fondo-oscuro {
             display: none;
             margin-top: 4px;
@@ -964,20 +969,20 @@
     <div class="toast-logro" id="toast-logro">
         <div class="toast-logro-icono" id="toast-logro-icono">🏆</div>
         <div class="toast-logro-texto">
-            <span class="toast-logro-titulo">¡Logro Desbloqueado!</span>
+            <span class="toast-logro-titulo" id="toast-logro-titulo">¡Logro Desbloqueado!</span>
             <span class="toast-logro-nombre" id="toast-logro-nombre">Nombre del logro</span>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-usuario">
         <div class="modal-contenido" style="text-align: center;">
-            <h2 style="margin-top: 0;">👋 ¡Bienvenido al Juego de Memoria!</h2>
-            <p style="color: var(--subtext-color); font-size: 0.9rem; margin-bottom: 10px;">Ingresa tu nombre de usuario para comenzar:</p>
+            <h2 id="usuario-titulo" style="margin-top: 0;">👋 ¡Bienvenido al Juego de Memoria!</h2>
+            <p id="usuario-subtitulo" style="color: var(--subtext-color); font-size: 0.9rem; margin-bottom: 10px;">Ingresa tu nombre de usuario para comenzar:</p>
             <input type="text" id="input-nombre-usuario" placeholder="Escribe tu nombre aquí..." maxlength="16" style="width: 80%; padding: 10px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.35); color: white; font-size: 1rem; text-align: center; outline: none; margin-bottom: 8px;">
             <div id="aviso-nombre-obligatorio" style="color: #ff4757; font-size: 0.82rem; font-weight: bold; margin-bottom: 12px; min-height: 18px;">⚠️ Debes escribir un nombre para continuar</div>
-            <div style="color: #ffa502; font-size: 0.78rem; font-weight: bold; margin-bottom: 15px;">⚠️ No podrás cambiarlo después</div>
+            <div id="aviso-no-cambiar" style="color: #ffa502; font-size: 0.78rem; font-weight: bold; margin-bottom: 15px;">⚠️ No podrás cambiarlo después</div>
             <br>
-            <button class="btn-mini" type="button" onclick="guardarUsuario()" style="padding: 10px 25px; font-size: 0.95rem; background-color: #2ed573; color: white; border: none; border-radius: 20px;">¡Empezar a Jugar!</button>
+            <button id="btn-empezar-usuario" class="btn-mini" type="button" onclick="guardarUsuario()" style="padding: 10px 25px; font-size: 0.95rem; background-color: #2ed573; color: white; border: none; border-radius: 20px;">¡Empezar a Jugar!</button>
         </div>
     </div>
 
@@ -999,8 +1004,8 @@
     <div class="modal-overlay" id="modal-global">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2>🌍 Clasificación Global</h2>
-                <button class="btn-cerrar-x" type="button" onclick="cerrarClasificacionGlobal()" title="Cerrar">✕</button>
+                <h2 id="titulo-modal-global">🌍 Clasificación Global</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-global" type="button" onclick="cerrarClasificacionGlobal()" title="Cerrar">✕</button>
             </div>
             <div class="barra-filtro-global">
                 <select id="filtro-modo-global" onchange="renderizarClasificacionGlobal()">
@@ -1011,7 +1016,7 @@
                     <option value="extremo">🔥 Extremo</option>
                     <option value="hacker">💻 Hacker</option>
                 </select>
-                <button class="btn-mini" type="button" onclick="cargarYMostrarGlobal(true)">🔄 Actualizar</button>
+                <button class="btn-mini" id="btn-actualizar-global" type="button" onclick="cargarYMostrarGlobal(true)">🔄 Actualizar</button>
             </div>
             <div class="lista-ranking" id="lista-ranking-global">
                 <div style="text-align: center; color: var(--subtext-color); padding: 16px;">Cargando clasificación...</div>
@@ -1022,8 +1027,8 @@
     <div class="modal-overlay" id="modal-logros">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2>🏆 Logros (<span id="contador-logros">0/19</span>)</h2>
-                <button class="btn-cerrar-x" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
+                <h2><span id="titulo-modal-logros">🏆 Logros</span> (<span id="contador-logros">0/19</span>)</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-logros" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
             </div>
             <div class="lista-logros" id="lista-logros"></div>
         </div>
@@ -1032,13 +1037,18 @@
     <div class="modal-overlay" id="modal-configuracion">
         <div class="modal-contenido">
             <div class="modal-header">
-                <button class="btn-ayuda-pin" type="button" onclick="abrirModalPinAdmin()" title="Acceso">🔑</button>
-                <h2>⚙️ Configuración</h2>
-                <button class="btn-cerrar-x" type="button" onclick="cerrarConfiguracion()" title="Cerrar">✕</button>
+                <button class="btn-ayuda-pin" id="btn-ayuda-pin" type="button" onclick="abrirModalPinAdmin()" title="Acceso">🔑</button>
+                <h2 id="titulo-modal-config">⚙️ Configuración</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-config" type="button" onclick="cerrarConfiguracion()" title="Cerrar">✕</button>
+            </div>
+
+            <div class="grupo-opcion-config">
+                <label id="label-idioma">🌐 Idioma / Language</label>
+                <button class="btn-mini btn-idioma-config" id="btn-cambiar-idioma" type="button" onclick="alternarIdioma()">🌐 Español (ES)</button>
             </div>
             
             <div class="grupo-opcion-config">
-                <label>🟢 Dificultad</label>
+                <label id="label-dificultad">🟢 Dificultad</label>
                 <select id="selector-dificultad" class="btn-mini" onchange="cambiarDificultad(this)">
                     <option value="2">🟢 Fácil (2x2)</option>
                     <option value="3">🟡 Medio (3x3)</option>
@@ -1047,7 +1057,7 @@
             </div>
 
             <div class="grupo-opcion-config">
-                <label>🎮 Modo de Juego</label>
+                <label id="label-modo">🎮 Modo de Juego</label>
                 <select id="selector-modo" class="btn-mini" onchange="cambiarModoJuego(this)">
                     <option value="normal">▶️ Normal</option>
                     <option value="invertido">🔄 Invertido</option>
@@ -1060,7 +1070,7 @@
             </div>
 
             <div class="grupo-opcion-config">
-                <label>🍃 Efectos Atmosféricos</label>
+                <label id="label-atmosfera">🍃 Efectos Atmosféricos</label>
                 <select id="selector-atmosfera" class="btn-mini" onchange="cambiarAtmosfera()">
                     <option value="0">❌ Ninguno</option>
                     <option value="1" selected>🍃 Hojas</option>
@@ -1070,7 +1080,7 @@
             </div>
 
             <div class="grupo-opcion-config">
-                <label>🎹 Instrumento / Sonido</label>
+                <label id="label-sonido">🎹 Instrumento / Sonido</label>
                 <select id="selector-sonido" class="btn-mini" onchange="cambiarSonidoSeleccionado(this)">
                     <option value="1" selected>🔔 Campanas</option>
                     <option value="3">🕹️ Retro</option>
@@ -1081,7 +1091,7 @@
             </div>
 
             <div class="grupo-opcion-config">
-                <label>🎨 Tema de Colores</label>
+                <label id="label-tema">🎨 Tema de Colores</label>
                 <select id="selector-color-bloques" class="btn-mini" onchange="actualizarColoresTablero()">
                     <option value="0">🌈 Neón</option>
                     <option value="1">🧁 Pastel</option>
@@ -1092,8 +1102,8 @@
             </div>
 
             <div class="grupo-opcion-config" style="margin-bottom: 0;">
-                <label>🖼️ Fondo de Pantalla</label>
-                <button class="btn-mini" type="button" onclick="toggleListaFondo()">🖼️ Cambiar Color de Fondo</button>
+                <label id="label-fondo">🖼️ Fondo de Pantalla</label>
+                <button class="btn-mini" id="btn-toggle-fondo" type="button" onclick="toggleListaFondo()">🖼️ Cambiar Color de Fondo</button>
                 <select id="selector-fondo-oscuro" class="btn-mini selector-fondo-oscuro" onchange="aplicarFondoOscuro(this)">
                     <option value="#1a1a2e">🌌 Azul Noche (Por defecto)</option>
                     <option value="#450a0a">🟥 Rojo Oscuro</option>
@@ -1110,25 +1120,25 @@
     <div class="modal-overlay" id="modal-pin-admin" style="z-index: 1250;">
         <div class="modal-contenido" style="text-align: center; max-width: 350px;">
             <div class="modal-header">
-                <h2>🔐 Código</h2>
-                <button class="btn-cerrar-x" type="button" onclick="cerrarModalPinAdmin()" title="Cerrar">✕</button>
+                <h2 id="titulo-modal-pin">🔐 Código</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-pin" type="button" onclick="cerrarModalPinAdmin()" title="Cerrar">✕</button>
             </div>
-            <p style="color: var(--subtext-color); font-size: 0.88rem; margin-bottom: 12px;">Ingresa la contraseña:</p>
+            <p id="texto-pin-admin" style="color: var(--subtext-color); font-size: 0.88rem; margin-bottom: 12px;">Ingresa la contraseña:</p>
             <input type="password" id="input-pin-admin" inputmode="numeric" maxlength="6" placeholder="••••" style="width: 140px; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.4); color: #ffffff; font-size: 1.2rem; letter-spacing: 6px; text-align: center; outline: none; margin-bottom: 10px;">
             <div id="mensaje-error-pin" style="color: #ff4757; font-size: 0.8rem; font-weight: 700; min-height: 18px; margin-bottom: 12px;"></div>
-            <button class="btn-mini" type="button" onclick="verificarPinAdmin()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none; padding: 10px;">Comprobar</button>
+            <button class="btn-mini" id="btn-comprobar-pin" type="button" onclick="verificarPinAdmin()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none; padding: 10px;">Comprobar</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-panel-admin" style="z-index: 1260;">
         <div class="modal-contenido" style="max-width: 480px;">
             <div class="modal-header">
-                <h2>🛡️ Administrador</h2>
-                <button class="btn-cerrar-x" type="button" onclick="cerrarPanelAdmin()" title="Cerrar">✕</button>
+                <h2 id="titulo-panel-admin">🛡️ Administrador</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-admin" type="button" onclick="cerrarPanelAdmin()" title="Cerrar">✕</button>
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🔁 Comodín Repetir</div>
+                <div class="admin-seccion-titulo" id="admin-sec-comodin">🔁 Comodín Repetir</div>
                 <div class="admin-fila-input">
                     <select id="admin-select-comodin-cant" class="admin-select" style="width: 115px;" onchange="sincronizarInputComodin()">
                         <option value="1">1 uso</option>
@@ -1137,12 +1147,12 @@
                         <option value="custom">Personalizado</option>
                     </select>
                     <input type="number" id="admin-input-comodin-cant" class="admin-input" min="1" max="999" value="1" style="width: 90px;" placeholder="Cant.">
-                    <button class="btn-mini" type="button" onclick="adminRecargarComodin()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Recargar Comodín</button>
+                    <button class="btn-mini" id="btn-admin-recargar-comodin" type="button" onclick="adminRecargarComodin()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Recargar Comodín</button>
                 </div>
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">👤 Nombre y Emoji del Usuario</div>
+                <div class="admin-seccion-titulo" id="admin-sec-perfil">👤 Nombre y Emoji del Usuario</div>
                 <div class="admin-fila-input" style="margin-bottom: 8px;">
                     <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
                     <select id="admin-select-emoji" class="admin-select" style="width: 84px; text-align: center;">
@@ -1163,19 +1173,19 @@
                         <option value="🐉">🐉</option>
                     </select>
                 </div>
-                <button class="btn-mini" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
+                <button class="btn-mini" id="btn-admin-guardar-perfil" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🎵 Total de Notas</div>
+                <div class="admin-seccion-titulo" id="admin-sec-notas">🎵 Total de Notas</div>
                 <div class="admin-fila-input">
                     <input type="number" id="admin-input-notas" class="admin-input" min="0" max="9999999" style="flex: 1;" placeholder="Ej. 1500">
-                    <button class="btn-mini" type="button" onclick="adminGuardarNotas()" style="background-color: #2ed573; color: #ffffff; border: none;">Guardar Notas</button>
+                    <button class="btn-mini" id="btn-admin-guardar-notas" type="button" onclick="adminGuardarNotas()" style="background-color: #2ed573; color: #ffffff; border: none;">Guardar Notas</button>
                 </div>
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">💀 Resetear Derrotas</div>
+                <div class="admin-seccion-titulo" id="admin-sec-derrotas">💀 Resetear Derrotas</div>
                 <div class="admin-fila-input" style="margin-bottom: 8px;">
                     <select id="admin-reset-derrotas-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifResetDerrotas()">
                         <option value="normal">▶️ Normal</option>
@@ -1192,30 +1202,30 @@
                     </select>
                 </div>
                 <div class="admin-fila-input">
-                    <button class="btn-mini" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
-                    <button class="btn-mini" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
+                    <button class="btn-mini" id="btn-admin-reset-modo" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
+                    <button class="btn-mini" id="btn-admin-reset-todas" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
                 </div>
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🌍 Clasificación Global</div>
+                <div class="admin-seccion-titulo" id="admin-sec-global">🌍 Clasificación Global</div>
                 <div class="admin-fila-input">
-                    <button class="btn-mini" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
-                    <button class="btn-mini" type="button" onclick="borrarTodosRecordsGlobalAdmin()" style="flex: 1; background-color: rgba(255, 71, 87, 0.55); color: #ffffff;">💥 Borrar Todos los Récords</button>
+                    <button class="btn-mini" id="btn-admin-borrar-filas" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
+                    <button class="btn-mini" id="btn-admin-borrar-todos" type="button" onclick="borrarTodosRecordsGlobalAdmin()" style="flex: 1; background-color: rgba(255, 71, 87, 0.55); color: #ffffff;">💥 Borrar Todos los Récords</button>
                 </div>
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🏆 Control de Logros</div>
+                <div class="admin-seccion-titulo" id="admin-sec-logros">🏆 Control de Logros</div>
                 <div class="admin-fila-input" style="margin-bottom: 10px;">
-                    <button class="btn-mini" type="button" onclick="adminToggleTodosLogros(true)" style="flex: 1; background-color: rgba(46, 213, 115, 0.35);">✅ Poner Todos</button>
-                    <button class="btn-mini" type="button" onclick="adminToggleTodosLogros(false)" style="flex: 1; background-color: rgba(255, 71, 87, 0.35);">❌ Quitar Todos</button>
+                    <button class="btn-mini" id="btn-admin-poner-logros" type="button" onclick="adminToggleTodosLogros(true)" style="flex: 1; background-color: rgba(46, 213, 115, 0.35);">✅ Poner Todos</button>
+                    <button class="btn-mini" id="btn-admin-quitar-logros" type="button" onclick="adminToggleTodosLogros(false)" style="flex: 1; background-color: rgba(255, 71, 87, 0.35);">❌ Quitar Todos</button>
                 </div>
                 <div class="admin-lista-logros" id="admin-lista-logros"></div>
             </div>
 
             <div class="admin-fila-input">
-                <button class="btn-mini" type="button" onclick="desactivarModoAdmin()" style="width: 100%; background-color: rgba(255, 71, 87, 0.45);">Salir del Modo Admin</button>
+                <button class="btn-mini" id="btn-admin-salir" type="button" onclick="desactivarModoAdmin()" style="width: 100%; background-color: rgba(255, 71, 87, 0.45);">Salir del Modo Admin</button>
             </div>
         </div>
     </div>
@@ -1223,12 +1233,12 @@
     <div class="modal-overlay" id="modal-estadisticas">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2>📊 Estadísticas</h2>
-                <button class="btn-cerrar-x" type="button" onclick="cerrarEstadisticas()" title="Cerrar">✕</button>
+                <h2 id="titulo-modal-estadisticas">📊 Estadísticas</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-estadisticas" type="button" onclick="cerrarEstadisticas()" title="Cerrar">✕</button>
             </div>
             <div id="cuerpo-estadisticas"></div>
             <div style="margin-top: 15px;">
-                <button class="btn-mini" type="button" onclick="abrirConfirmacionBorrar()" style="width: 100%; background-color: rgba(255, 71, 87, 0.7); color: white; padding: 9px;">🗑️ Borrar Datos</button>
+                <button class="btn-mini" id="btn-borrar-datos" type="button" onclick="abrirConfirmacionBorrar()" style="width: 100%; background-color: rgba(255, 71, 87, 0.7); color: white; padding: 9px;">🗑️ Borrar Datos</button>
             </div>
         </div>
     </div>
@@ -1236,13 +1246,13 @@
     <div class="modal-overlay" id="modal-confirmar-borrar" style="z-index: 1200;">
         <div class="modal-contenido" style="text-align: center; max-width: 360px;">
             <div style="font-size: 2.5rem; margin-bottom: 10px;">⚠️</div>
-            <h2 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #ff4757;">Advertencia</h2>
-            <p style="color: #ffffff; font-size: 0.95rem; font-weight: 600; margin-bottom: 20px; line-height: 1.4;">
+            <h2 id="titulo-confirmar-borrar" style="margin: 0 0 10px 0; font-size: 1.2rem; color: #ff4757;">Advertencia</h2>
+            <p id="texto-confirmar-borrar" style="color: #ffffff; font-size: 0.95rem; font-weight: 600; margin-bottom: 20px; line-height: 1.4;">
                 Vas a borrar tus datos de notas y logros
             </p>
             <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="btn-mini" type="button" onclick="cerrarConfirmacionBorrar()" style="flex: 1; padding: 10px; background-color: rgba(255, 255, 255, 0.15);">Cancelar</button>
-                <button class="btn-mini" type="button" onclick="confirmarBorradoDatos()" style="flex: 1; padding: 10px; background-color: #ff4757; color: white; border: none;">Sí, borrar</button>
+                <button class="btn-mini" id="btn-cancelar-borrar" type="button" onclick="cerrarConfirmacionBorrar()" style="flex: 1; padding: 10px; background-color: rgba(255, 255, 255, 0.15);">Cancelar</button>
+                <button class="btn-mini" id="btn-confirmar-borrar" type="button" onclick="confirmarBorradoDatos()" style="flex: 1; padding: 10px; background-color: #ff4757; color: white; border: none;">Sí, borrar</button>
             </div>
         </div>
     </div>
@@ -1295,6 +1305,594 @@
     </div>
 
     <script>
+        const TRADUCCIONES = {
+            es: {
+                docTitle: 'Juego de Memoria - Update 1.2',
+                tituloPrincipal: 'Juego de Memoria',
+                sinNombre: '👤 Sin nombre',
+                btnGlobal: '🌍 Global',
+                titleGlobal: 'Clasificación Global',
+                btnConfeti: '🎉 Confeti',
+                titleConfeti: 'Probar Confeti',
+                btnLogros: '🏆 Logros',
+                titleLogros: 'Ver Logros',
+                btnEstadisticas: '📊 Estadísticas',
+                titleEstadisticas: 'Ver Estadísticas',
+                titleSilenciar: 'Silenciar / Activar sonido',
+                btnConfig: '⚙️ Configuración',
+                cerrar: 'Cerrar',
+                toastTitulo: '¡Logro Desbloqueado!',
+                usuarioTitulo: '👋 ¡Bienvenido al Juego de Memoria!',
+                usuarioSubtitulo: 'Ingresa tu nombre de usuario para comenzar:',
+                usuarioPlaceholder: 'Escribe tu nombre aquí...',
+                avisoNombreObligatorio: '⚠️ Debes escribir un nombre para continuar',
+                avisoNombreVacio: '⚠️ ¡Tienes que escribir un nombre! No puede quedar vacío.',
+                avisoNoCambiar: '⚠️ No podrás cambiarlo después',
+                btnEmpezar: '¡Empezar a Jugar!',
+                tituloGlobal: '🌍 Clasificación Global',
+                btnActualizar: '🔄 Actualizar',
+                cargandoGlobal: 'Cargando clasificación...',
+                errorGlobal: '⚠️ No se pudo conectar con la clasificación global.',
+                vacioGlobal: 'Aún no hay récords registrados en este modo. ¡Sé el primero!',
+                nivelRank: (n) => `Nivel ${n}`,
+                borrarRegistroTitle: 'Borrar registro',
+                tituloLogros: '🏆 Logros',
+                tituloConfig: '⚙️ Configuración',
+                labelIdioma: '🌐 Idioma / Language',
+                btnIdioma: '🌐 Español (ES)',
+                labelDificultad: '🟢 Dificultad',
+                dif2: '🟢 Fácil (2x2)',
+                dif3: '🟡 Medio (3x3)',
+                dif4: '🔴 Difícil (4x4)',
+                difFacil: 'Fácil',
+                difMedio: 'Medio',
+                difDificil: 'Difícil',
+                difFacilBadge: '🟢 Fácil',
+                difMedioBadge: '🟡 Medio',
+                difDificilBadge: '🔴 Difícil',
+                labelModo: '🎮 Modo de Juego',
+                modoNormal: '▶️ Normal',
+                modoInvertido: '🔄 Invertido',
+                modoRelampago: '⚡ Relámpago',
+                modoContrarreloj: '⏱️ Contrarreloj',
+                modoLibre: '🎵 Libre (5x5)',
+                modoExtremo: '🔥 Extremo',
+                modoHacker: '💻 Hacker',
+                badgeModo: (m) => `Modo = ${m}`,
+                labelAtmosfera: '🍃 Efectos Atmosféricos',
+                atmos0: '❌ Ninguno',
+                atmos1: '🍃 Hojas',
+                atmos2: '❄️ Nieve',
+                atmos3: '✨ Brillitos',
+                labelSonido: '🎹 Instrumento / Sonido',
+                sonido1: '🔔 Campanas',
+                sonido3: '🕹️ Retro',
+                sonido5: '🎸 Guitarra',
+                sonido7: '⚡ Láser',
+                sonido8: '👾 Arcade',
+                labelTema: '🎨 Tema de Colores',
+                tema0: '🌈 Neón',
+                tema1: '🧁 Pastel',
+                tema2: '🌅 Atardecer',
+                tema3: '🌊 Océano',
+                tema4: '🌲 Bosque',
+                labelFondo: '🖼️ Fondo de Pantalla',
+                btnFondo: '🖼️ Cambiar Color de Fondo',
+                fondoDefault: '🌌 Azul Noche (Por defecto)',
+                fondoRojo: '🟥 Rojo Oscuro',
+                fondoNaranja: '🟧 Naranja Oscuro',
+                fondoAmarillo: '🟨 Amarillo Oscuro',
+                fondoVerde: '🟩 Verde Oscuro',
+                fondoAzul: '🟦 Azul Oscuro',
+                fondoMorado: '🟪 Morado Oscuro',
+                accesoTitle: 'Acceso',
+                tituloPin: '🔐 Código',
+                textoPin: 'Ingresa la contraseña:',
+                btnComprobar: 'Comprobar',
+                pinFormatoError: '⚠️ Escribe solo números (4 a 6 dígitos).',
+                pinIncorrecto: '❌ Contraseña incorrecta.',
+                tituloAdmin: '🛡️ Administrador',
+                adminSecComodin: '🔁 Comodín Repetir',
+                usoSingular: '1 uso',
+                usosPlural: (n) => `${n} usos`,
+                usoPersonalizado: 'Personalizado',
+                placeholderCant: 'Cant.',
+                btnRecargarComodin: 'Recargar Comodín',
+                alertaComodinRecargado: (n) => `✅ Comodín recargado con ${n} uso(s).`,
+                adminSecPerfil: '👤 Nombre y Emoji del Usuario',
+                placeholderNuevoNombre: 'Nuevo nombre',
+                btnGuardarPerfil: 'Guardar Nombre y Emoji',
+                alertaNombreVacio: '⚠️ El nombre no puede estar vacío.',
+                alertaPerfilGuardado: '✅ Nombre y emoji actualizados también en tus récords globales.',
+                adminSecNotas: '🎵 Total de Notas',
+                placeholderNotas: 'Ej. 1500',
+                btnGuardarNotas: 'Guardar Notas',
+                alertaNotasGuardadas: (n) => `✅ Total de notas actualizado a ${n}.`,
+                adminSecDerrotas: '💀 Resetear Derrotas',
+                btnResetModo: 'Resetear Modo',
+                btnResetTodas: 'Resetear Todas',
+                alertaDerrotasModo: (m) => `✅ Derrotas reseteadas en ${m}.`,
+                alertaDerrotasTodas: '✅ Todas las derrotas han sido reseteadas a 0.',
+                adminSecGlobal: '🌍 Clasificación Global',
+                btnBorrarFilasGlobal: '🗑️ Borrar Filas en Global',
+                btnBorrarTodosGlobal: '💥 Borrar Todos los Récords',
+                confirmBorrarTodosGlobal: '⚠️ ¿Seguro que quieres borrar TODOS los récords de la clasificación global?',
+                alertaTodosGlobalBorrados: '💥 Se borraron todos los récords de la clasificación global.',
+                errorBorrarGlobal: '⚠️ No se pudo borrar el registro. Revisa las reglas de Firebase.',
+                errorBorrarTodosGlobal: '⚠️ No se pudieron borrar todos los récords. Revisa las reglas de Firebase.',
+                adminSecLogros: '🏆 Control de Logros',
+                btnPonerTodos: '✅ Poner Todos',
+                btnQuitarTodos: '❌ Quitar Todos',
+                logroActivo: '✅ Activo',
+                logroQuitar: '🔒 Quitar',
+                btnSalirAdmin: 'Salir del Modo Admin',
+                tituloEstadisticas: '📊 Estadísticas',
+                btnBorrarDatos: '🗑️ Borrar Datos',
+                tituloConfirmarBorrar: 'Advertencia',
+                textoConfirmarBorrar: 'Vas a borrar tus datos de notas y logros',
+                btnCancelar: 'Cancelar',
+                btnSiBorrar: 'Sí, borrar',
+                racha: (n) => `🔥 Racha: ${n} ${n === 1 ? 'día' : 'días'}`,
+                mensajeInicial: 'Presiona "Jugar" para empezar',
+                mensajeLibre: '🎹 Toca libremente o graba tu melodía',
+                btnGrabar: '🔴 Grabar',
+                btnDetener: '⏹️ Detener',
+                btnReproducir: '▶️ Oír',
+                titleVelocidad: 'Velocidad de reproducción',
+                btnJugar: 'Jugar',
+                btnJugarDeNuevo: 'Jugar de nuevo',
+                btnTerminarPartida: '🛑 Terminar partida',
+                btnComodin: (n) => `🔁 Repetir (${n})`,
+                repitiendoSecuencia: '🔁 Repitiendo secuencia...',
+                partidaTerminadaRecord: (n) => `🛑 Partida terminada · Récord guardado (Nivel ${n})`,
+                partidaTerminada: '🛑 Partida terminada',
+                observaSecuencia: (niv, total, ext) => `Nivel ${niv}/${total}${ext} — Observa la secuencia`,
+                tuTurnoInvertido: '🔄 ¡Tu turno! Repite AL REVÉS',
+                tuTurno: '👉 ¡Tu turno!',
+                tiempoAgotado: '⏰ ¡Se acabó el tiempo!',
+                victoriaFinal: (niv) => `🏆 ¡Completaste el Nivel ${niv}! ¡Victoria!`,
+                nivelCelebrando: (niv) => `🎉 ¡Nivel ${niv} alcanzado! Celebrando...`,
+                nivelSuperado: (niv) => `🎉 ¡Nivel ${niv} superado!`,
+                falloNivel: (niv) => `❌ ¡Fallaste en el nivel ${niv}!`,
+                grabandoMelodia: '🔴 Grabando melodía...',
+                melodiaGuardada: (n) => `✅ Melodía guardada (${n} notas)`,
+                primeroGraba: '⚠️ Primero graba una melodía',
+                oyendoVelocidad: (v) => `▶️ Oyendo (${v}x)...`,
+                totalNotasTocadas: '🎵 Total de notas tocadas',
+                statRecord: 'Récord',
+                statDerrotas: 'Derrotas',
+                statNotas: 'Notas',
+                logros: {
+                    primeros_pasos: { nombre: 'Primeros Pasos', desc: 'Supera el nivel 3 en modo Normal.' },
+                    cerebro_titanio: { nombre: 'Cerebro de Titanio', desc: 'Supera el nivel 6 en modo Normal.' },
+                    memoria_fotografica: { nombre: 'Memoria Fotográfica', desc: 'Llega al nivel 8 en cualquier modo.' },
+                    hacker_maestro: { nombre: 'Hacker Maestro', desc: 'Llega al nivel 6 en modo Hacker.' },
+                    mete_al_reves: { nombre: 'Mente al Revés', desc: 'Supera el nivel 6 en modo Invertido.' },
+                    bajo_presion: { nombre: 'Bajo Presión', desc: 'Gana el modo Contrarreloj llegando hasta el nivel 8.' },
+                    estetico: { nombre: 'Estético', desc: 'Prueba todos los sonidos y atmósferas.' },
+                    jugador_frecuente: { nombre: 'Jugador Frecuente', desc: 'Juega el juego 2 días seguidos.' },
+                    compositor: { nombre: 'Compositor', desc: 'Graba y reproduce una melodía en el Modo Libre.' },
+                    gran_compositor: { nombre: 'Gran Compositor', desc: 'Graba una melodía de 15 notas o más en el Modo Libre.' },
+                    cien_notas: { nombre: 'Cien Notas', desc: 'Llega a 100 notas tocadas en total.' },
+                    quinientas_notas: { nombre: 'Quinientas Notas', desc: 'Llega a 500 notas tocadas en total.' },
+                    mil_notas: { nombre: 'Mil Notas', desc: 'Toca 1,000 notas en total entre tus partidas.' },
+                    cinco_mil_notas: { nombre: 'Cinco Mil Notas', desc: 'Toca 5,000 notas en total entre tus partidas.' },
+                    tecla_loca: { nombre: 'Tecla Loca', desc: 'Toca 25 bloques en el Modo Libre sin estar grabando.' },
+                    repeticion: { nombre: 'Repetición', desc: 'Reproduce tu misma melodía grabada 2 veces seguidas.' },
+                    modo_matrix: { nombre: 'Modo Matrix', desc: 'Activa el modo Hacker y toca al menos 10 bloques.' },
+                    curioso: { nombre: 'Curioso', desc: 'Abre Estadísticas o Logros después de jugar una partida.' },
+                    cien_por_ciento: { nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
+                }
+            },
+            en: {
+                docTitle: 'Memory Game - Update 1.2',
+                tituloPrincipal: 'Memory Game',
+                sinNombre: '👤 No name',
+                btnGlobal: '🌍 Global',
+                titleGlobal: 'Global Leaderboard',
+                btnConfeti: '🎉 Confetti',
+                titleConfeti: 'Test Confetti',
+                btnLogros: '🏆 Achievements',
+                titleLogros: 'View Achievements',
+                btnEstadisticas: '📊 Stats',
+                titleEstadisticas: 'View Stats',
+                titleSilenciar: 'Mute / Unmute sound',
+                btnConfig: '⚙️ Settings',
+                cerrar: 'Close',
+                toastTitulo: 'Achievement Unlocked!',
+                usuarioTitulo: '👋 Welcome to Memory Game!',
+                usuarioSubtitulo: 'Enter your username to get started:',
+                usuarioPlaceholder: 'Type your name here...',
+                avisoNombreObligatorio: '⚠️ You must enter a name to continue',
+                avisoNombreVacio: '⚠️ You have to enter a name! It cannot be blank.',
+                avisoNoCambiar: '⚠️ You will not be able to change it later',
+                btnEmpezar: 'Start Playing!',
+                tituloGlobal: '🌍 Global Leaderboard',
+                btnActualizar: '🔄 Refresh',
+                cargandoGlobal: 'Loading leaderboard...',
+                errorGlobal: '⚠️ Could not connect to the global leaderboard.',
+                vacioGlobal: 'No records in this mode yet. Be the first!',
+                nivelRank: (n) => `Level ${n}`,
+                borrarRegistroTitle: 'Delete entry',
+                tituloLogros: '🏆 Achievements',
+                tituloConfig: '⚙️ Settings',
+                labelIdioma: '🌐 Idioma / Language',
+                btnIdioma: '🌐 English (EN)',
+                labelDificultad: '🟢 Difficulty',
+                dif2: '🟢 Easy (2x2)',
+                dif3: '🟡 Medium (3x3)',
+                dif4: '🔴 Hard (4x4)',
+                difFacil: 'Easy',
+                difMedio: 'Medium',
+                difDificil: 'Hard',
+                difFacilBadge: '🟢 Easy',
+                difMedioBadge: '🟡 Medium',
+                difDificilBadge: '🔴 Hard',
+                labelModo: '🎮 Game Mode',
+                modoNormal: '▶️ Normal',
+                modoInvertido: '🔄 Reverse',
+                modoRelampago: '⚡ Lightning',
+                modoContrarreloj: '⏱️ Time Attack',
+                modoLibre: '🎵 Free Play (5x5)',
+                modoExtremo: '🔥 Extreme',
+                modoHacker: '💻 Hacker',
+                badgeModo: (m) => `Mode = ${m}`,
+                labelAtmosfera: '🍃 Atmospheric Effects',
+                atmos0: '❌ None',
+                atmos1: '🍃 Leaves',
+                atmos2: '❄️ Snow',
+                atmos3: '✨ Sparkles',
+                labelSonido: '🎹 Instrument / Sound',
+                sonido1: '🔔 Bells',
+                sonido3: '🕹️ Retro',
+                sonido5: '🎸 Guitar',
+                sonido7: '⚡ Laser',
+                sonido8: '👾 Arcade',
+                labelTema: '🎨 Color Theme',
+                tema0: '🌈 Neon',
+                tema1: '🧁 Pastel',
+                tema2: '🌅 Sunset',
+                tema3: '🌊 Ocean',
+                tema4: '🌲 Forest',
+                labelFondo: '🖼️ Background',
+                btnFondo: '🖼️ Change Background Color',
+                fondoDefault: '🌌 Midnight Blue (Default)',
+                fondoRojo: '🟥 Dark Red',
+                fondoNaranja: '🟧 Dark Orange',
+                fondoAmarillo: '🟨 Dark Yellow',
+                fondoVerde: '🟩 Dark Green',
+                fondoAzul: '🟦 Dark Blue',
+                fondoMorado: '🟪 Dark Purple',
+                accesoTitle: 'Access',
+                tituloPin: '🔐 Passcode',
+                textoPin: 'Enter password:',
+                btnComprobar: 'Verify',
+                pinFormatoError: '⚠️ Enter numbers only (4 to 6 digits).',
+                pinIncorrecto: '❌ Incorrect password.',
+                tituloAdmin: '🛡️ Admin Panel',
+                adminSecComodin: '🔁 Repeat Wildcard',
+                usoSingular: '1 use',
+                usosPlural: (n) => `${n} uses`,
+                usoPersonalizado: 'Custom',
+                placeholderCant: 'Qty.',
+                btnRecargarComodin: 'Reload Wildcard',
+                alertaComodinRecargado: (n) => `✅ Wildcard reloaded with ${n} use(s).`,
+                adminSecPerfil: '👤 User Name & Emoji',
+                placeholderNuevoNombre: 'New name',
+                btnGuardarPerfil: 'Save Name & Emoji',
+                alertaNombreVacio: '⚠️ Name cannot be empty.',
+                alertaPerfilGuardado: '✅ Name and emoji updated on your global records as well.',
+                adminSecNotas: '🎵 Total Notes',
+                placeholderNotas: 'E.g. 1500',
+                btnGuardarNotas: 'Save Notes',
+                alertaNotasGuardadas: (n) => `✅ Total notes updated to ${n}.`,
+                adminSecDerrotas: '💀 Reset Losses',
+                btnResetModo: 'Reset Mode',
+                btnResetTodas: 'Reset All',
+                alertaDerrotasModo: (m) => `✅ Losses reset in ${m}.`,
+                alertaDerrotasTodas: '✅ All losses have been reset to 0.',
+                adminSecGlobal: '🌍 Global Leaderboard',
+                btnBorrarFilasGlobal: '🗑️ Delete Rows in Global',
+                btnBorrarTodosGlobal: '💥 Delete All Records',
+                confirmBorrarTodosGlobal: '⚠️ Are you sure you want to delete ALL global leaderboard records?',
+                alertaTodosGlobalBorrados: '💥 All global leaderboard records were deleted.',
+                errorBorrarGlobal: '⚠️ Could not delete entry. Check Firebase rules.',
+                errorBorrarTodosGlobal: '⚠️ Could not delete all records. Check Firebase rules.',
+                adminSecLogros: '🏆 Achievements Control',
+                btnPonerTodos: '✅ Unlock All',
+                btnQuitarTodos: '❌ Lock All',
+                logroActivo: '✅ Unlocked',
+                logroQuitar: '🔒 Lock',
+                btnSalirAdmin: 'Exit Admin Mode',
+                tituloEstadisticas: '📊 Stats',
+                btnBorrarDatos: '🗑️ Delete Data',
+                tituloConfirmarBorrar: 'Warning',
+                textoConfirmarBorrar: 'You are about to delete your notes and achievements data',
+                btnCancelar: 'Cancel',
+                btnSiBorrar: 'Yes, delete',
+                racha: (n) => `🔥 Streak: ${n} ${n === 1 ? 'day' : 'days'}`,
+                mensajeInicial: 'Press "Play" to start',
+                mensajeLibre: '🎹 Play freely or record your melody',
+                btnGrabar: '🔴 Record',
+                btnDetener: '⏹️ Stop',
+                btnReproducir: '▶️ Play',
+                titleVelocidad: 'Playback speed',
+                btnJugar: 'Play',
+                btnJugarDeNuevo: 'Play again',
+                btnTerminarPartida: '🛑 End game',
+                btnComodin: (n) => `🔁 Repeat (${n})`,
+                repitiendoSecuencia: '🔁 Replaying sequence...',
+                partidaTerminadaRecord: (n) => `🛑 Game ended · Record saved (Level ${n})`,
+                partidaTerminada: '🛑 Game ended',
+                observaSecuencia: (niv, total, ext) => `Level ${niv}/${total}${ext} — Watch the sequence`,
+                tuTurnoInvertido: '🔄 Your turn! Repeat IN REVERSE',
+                tuTurno: '👉 Your turn!',
+                tiempoAgotado: "⏰ Time's up!",
+                victoriaFinal: (niv) => `🏆 You beat Level ${niv}! Victory!`,
+                nivelCelebrando: (niv) => `🎉 Level ${niv} reached! Celebrating...`,
+                nivelSuperado: (niv) => `🎉 Level ${niv} cleared!`,
+                falloNivel: (niv) => `❌ Failed at level ${niv}!`,
+                grabandoMelodia: '🔴 Recording melody...',
+                melodiaGuardada: (n) => `✅ Melody saved (${n} notes)`,
+                primeroGraba: '⚠️ Record a melody first',
+                oyendoVelocidad: (v) => `▶️ Playing (${v}x)...`,
+                totalNotasTocadas: '🎵 Total notes played',
+                statRecord: 'Best',
+                statDerrotas: 'Losses',
+                statNotas: 'Notes',
+                logros: {
+                    primeros_pasos: { nombre: 'First Steps', desc: 'Beat level 3 in Normal mode.' },
+                    cerebro_titanio: { nombre: 'Titanium Brain', desc: 'Beat level 6 in Normal mode.' },
+                    memoria_fotografica: { nombre: 'Photographic Memory', desc: 'Reach level 8 in any mode.' },
+                    hacker_maestro: { nombre: 'Master Hacker', desc: 'Reach level 6 in Hacker mode.' },
+                    mete_al_reves: { nombre: 'Mind Flip', desc: 'Beat level 6 in Reverse mode.' },
+                    bajo_presion: { nombre: 'Under Pressure', desc: 'Win Time Attack by reaching level 8.' },
+                    estetico: { nombre: 'Aesthetic', desc: 'Try all sounds and atmospheres.' },
+                    jugador_frecuente: { nombre: 'Frequent Player', desc: 'Play the game 2 days in a row.' },
+                    compositor: { nombre: 'Composer', desc: 'Record and play back a melody in Free Play.' },
+                    gran_compositor: { nombre: 'Grand Composer', desc: 'Record a melody of 15 notes or more in Free Play.' },
+                    cien_notas: { nombre: 'Hundred Notes', desc: 'Reach 100 total notes played.' },
+                    quinientas_notas: { nombre: 'Five Hundred Notes', desc: 'Reach 500 total notes played.' },
+                    mil_notas: { nombre: 'Thousand Notes', desc: 'Play 1,000 total notes across your games.' },
+                    cinco_mil_notas: { nombre: 'Five Thousand Notes', desc: 'Play 5,000 total notes across your games.' },
+                    tecla_loca: { nombre: 'Button Masher', desc: 'Tap 25 blocks in Free Play without recording.' },
+                    repeticion: { nombre: 'Replay', desc: 'Play your same recorded melody 2 times in a row.' },
+                    modo_matrix: { nombre: 'Matrix Mode', desc: 'Activate Hacker mode and tap at least 10 blocks.' },
+                    curioso: { nombre: 'Curious', desc: 'Open Stats or Achievements after playing a game.' },
+                    cien_por_ciento: { nombre: '100 Percent', desc: 'Unlock all previous achievements.' }
+                }
+            }
+        };
+
+        let idiomaActual = localStorage.getItem('memoria_idioma_v1') === 'en' ? 'en' : 'es';
+
+        function t(clave, ...args) {
+            const dict = TRADUCCIONES[idiomaActual] || TRADUCCIONES.es;
+            const val = dict[clave];
+            if (typeof val === 'function') return val(...args);
+            return val !== undefined ? val : (TRADUCCIONES.es[clave] || clave);
+        }
+
+        function obtenerInfoLogro(id) {
+            const base = DEFINICION_LOGROS.find(l => l.id === id);
+            const trad = (TRADUCCIONES[idiomaActual] && TRADUCCIONES[idiomaActual].logros && TRADUCCIONES[idiomaActual].logros[id]) || null;
+            return {
+                id,
+                icono: base ? base.icono : '🏆',
+                nombre: trad ? trad.nombre : (base ? base.nombre : id),
+                desc: trad ? trad.desc : (base ? base.desc : '')
+            };
+        }
+
+        function setSelectOptionText(selectId, value, text) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const opt = [...sel.options].find(o => o.value === value);
+            if (opt) opt.textContent = text;
+        }
+
+        function aplicarIdioma(lang) {
+            idiomaActual = lang === 'en' ? 'en' : 'es';
+            localStorage.setItem('memoria_idioma_v1', idiomaActual);
+            document.documentElement.lang = idiomaActual;
+            document.title = t('docTitle');
+
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            };
+            const setAttr = (id, attr, val) => {
+                const el = document.getElementById(id);
+                if (el) el.setAttribute(attr, val);
+            };
+            const setProp = (id, prop, val) => {
+                const el = document.getElementById(id);
+                if (el) el[prop] = val;
+            };
+
+            setText('titulo-principal', t('tituloPrincipal'));
+            setText('toast-logro-titulo', t('toastTitulo'));
+            if (mostrandoToast && toastLogroIdActual) {
+                setText('toast-logro-nombre', obtenerInfoLogro(toastLogroIdActual).nombre);
+            }
+
+            if (usuarioActual && usuarioActual.nombre) {
+                setText('badge-usuario', `${usuarioActual.emoji || '🚀'} ${usuarioActual.nombre}`);
+            } else {
+                setText('badge-usuario', t('sinNombre'));
+            }
+
+            setText('btn-global-top', t('btnGlobal'));
+            setAttr('btn-global-top', 'title', t('titleGlobal'));
+            setText('btn-confeti-admin-top', t('btnConfeti'));
+            setAttr('btn-confeti-admin-top', 'title', t('titleConfeti'));
+            setText('btn-logros-top', t('btnLogros'));
+            setAttr('btn-logros-top', 'title', t('titleLogros'));
+            setText('btn-estadisticas-top', t('btnEstadisticas'));
+            setAttr('btn-estadisticas-top', 'title', t('titleEstadisticas'));
+            setAttr('btn-silenciar', 'title', t('titleSilenciar'));
+            setText('btn-config', t('btnConfig'));
+
+            setText('usuario-titulo', t('usuarioTitulo'));
+            setText('usuario-subtitulo', t('usuarioSubtitulo'));
+            setProp('input-nombre-usuario', 'placeholder', t('usuarioPlaceholder'));
+            const inpUsr = document.getElementById('input-nombre-usuario');
+            if (inpUsr && inpUsr.value.trim().length === 0) {
+                setText('aviso-nombre-obligatorio', t('avisoNombreObligatorio'));
+            }
+            setText('aviso-no-cambiar', t('avisoNoCambiar'));
+            setText('btn-empezar-usuario', t('btnEmpezar'));
+
+            setText('titulo-modal-global', t('tituloGlobal'));
+            setText('btn-actualizar-global', t('btnActualizar'));
+            setAttr('btn-cerrar-global', 'title', t('cerrar'));
+            setAttr('btn-cerrar-logros', 'title', t('cerrar'));
+            setAttr('btn-cerrar-config', 'title', t('cerrar'));
+            setAttr('btn-cerrar-pin', 'title', t('cerrar'));
+            setAttr('btn-cerrar-admin', 'title', t('cerrar'));
+            setAttr('btn-cerrar-estadisticas', 'title', t('cerrar'));
+            setAttr('btn-ayuda-pin', 'title', t('accesoTitle'));
+
+            setText('titulo-modal-logros', t('tituloLogros'));
+            setText('titulo-modal-config', t('tituloConfig'));
+            setText('label-idioma', t('labelIdioma'));
+            setText('btn-cambiar-idioma', t('btnIdioma'));
+
+            setText('label-dificultad', t('labelDificultad'));
+            setSelectOptionText('selector-dificultad', '2', t('dif2'));
+            setSelectOptionText('selector-dificultad', '3', t('dif3'));
+            setSelectOptionText('selector-dificultad', '4', t('dif4'));
+
+            setText('label-modo', t('labelModo'));
+            const modosOpciones = [
+                ['normal', t('modoNormal')],
+                ['invertido', t('modoInvertido')],
+                ['relampago', t('modoRelampago')],
+                ['contrarreloj', t('modoContrarreloj')],
+                ['libre', t('modoLibre')],
+                ['extremo', t('modoExtremo')],
+                ['hacker', t('modoHacker')]
+            ];
+            modosOpciones.forEach(([val, lbl]) => {
+                setSelectOptionText('selector-modo', val, lbl);
+                setSelectOptionText('filtro-modo-global', val, lbl);
+                setSelectOptionText('admin-reset-derrotas-modo', val, lbl);
+            });
+
+            const selModo = document.getElementById('selector-modo');
+            const textoModoActual = selModo && selModo.selectedIndex >= 0
+                ? selModo.options[selModo.selectedIndex].text
+                : t('modoNormal');
+            setText('badge-modo', t('badgeModo', textoModoActual));
+
+            setText('label-atmosfera', t('labelAtmosfera'));
+            setSelectOptionText('selector-atmosfera', '0', t('atmos0'));
+            setSelectOptionText('selector-atmosfera', '1', t('atmos1'));
+            setSelectOptionText('selector-atmosfera', '2', t('atmos2'));
+            setSelectOptionText('selector-atmosfera', '3', t('atmos3'));
+
+            setText('label-sonido', t('labelSonido'));
+            setSelectOptionText('selector-sonido', '1', t('sonido1'));
+            setSelectOptionText('selector-sonido', '3', t('sonido3'));
+            setSelectOptionText('selector-sonido', '5', t('sonido5'));
+            setSelectOptionText('selector-sonido', '7', t('sonido7'));
+            setSelectOptionText('selector-sonido', '8', t('sonido8'));
+
+            setText('label-tema', t('labelTema'));
+            setSelectOptionText('selector-color-bloques', '0', t('tema0'));
+            setSelectOptionText('selector-color-bloques', '1', t('tema1'));
+            setSelectOptionText('selector-color-bloques', '2', t('tema2'));
+            setSelectOptionText('selector-color-bloques', '3', t('tema3'));
+            setSelectOptionText('selector-color-bloques', '4', t('tema4'));
+
+            setText('label-fondo', t('labelFondo'));
+            setText('btn-toggle-fondo', t('btnFondo'));
+            setSelectOptionText('selector-fondo-oscuro', '#1a1a2e', t('fondoDefault'));
+            setSelectOptionText('selector-fondo-oscuro', '#450a0a', t('fondoRojo'));
+            setSelectOptionText('selector-fondo-oscuro', '#431407', t('fondoNaranja'));
+            setSelectOptionText('selector-fondo-oscuro', '#422006', t('fondoAmarillo'));
+            setSelectOptionText('selector-fondo-oscuro', '#052e16', t('fondoVerde'));
+            setSelectOptionText('selector-fondo-oscuro', '#172554', t('fondoAzul'));
+            setSelectOptionText('selector-fondo-oscuro', '#2e1065', t('fondoMorado'));
+
+            setText('titulo-modal-pin', t('tituloPin'));
+            setText('texto-pin-admin', t('textoPin'));
+            setText('btn-comprobar-pin', t('btnComprobar'));
+
+            setText('titulo-panel-admin', t('tituloAdmin'));
+            setText('admin-sec-comodin', t('adminSecComodin'));
+            setSelectOptionText('admin-select-comodin-cant', '1', t('usoSingular'));
+            setSelectOptionText('admin-select-comodin-cant', '10', t('usosPlural', 10));
+            setSelectOptionText('admin-select-comodin-cant', '100', t('usosPlural', 100));
+            setSelectOptionText('admin-select-comodin-cant', 'custom', t('usoPersonalizado'));
+            setProp('admin-input-comodin-cant', 'placeholder', t('placeholderCant'));
+            setText('btn-admin-recargar-comodin', t('btnRecargarComodin'));
+
+            setText('admin-sec-perfil', t('adminSecPerfil'));
+            setProp('admin-input-nombre', 'placeholder', t('placeholderNuevoNombre'));
+            setText('btn-admin-guardar-perfil', t('btnGuardarPerfil'));
+
+            setText('admin-sec-notas', t('adminSecNotas'));
+            setProp('admin-input-notas', 'placeholder', t('placeholderNotas'));
+            setText('btn-admin-guardar-notas', t('btnGuardarNotas'));
+
+            setText('admin-sec-derrotas', t('adminSecDerrotas'));
+            setSelectOptionText('admin-reset-derrotas-dif', '2', t('difFacilBadge'));
+            setSelectOptionText('admin-reset-derrotas-dif', '3', t('difMedioBadge'));
+            setSelectOptionText('admin-reset-derrotas-dif', '4', t('difDificilBadge'));
+            setText('btn-admin-reset-modo', t('btnResetModo'));
+            setText('btn-admin-reset-todas', t('btnResetTodas'));
+
+            setText('admin-sec-global', t('adminSecGlobal'));
+            setText('btn-admin-borrar-filas', t('btnBorrarFilasGlobal'));
+            setText('btn-admin-borrar-todos', t('btnBorrarTodosGlobal'));
+
+            setText('admin-sec-logros', t('adminSecLogros'));
+            setText('btn-admin-poner-logros', t('btnPonerTodos'));
+            setText('btn-admin-quitar-logros', t('btnQuitarTodos'));
+            setText('btn-admin-salir', t('btnSalirAdmin'));
+
+            setText('titulo-modal-estadisticas', t('tituloEstadisticas'));
+            setText('btn-borrar-datos', t('btnBorrarDatos'));
+            setText('titulo-confirmar-borrar', t('tituloConfirmarBorrar'));
+            setText('texto-confirmar-borrar', t('textoConfirmarBorrar'));
+            setText('btn-cancelar-borrar', t('btnCancelar'));
+            setText('btn-confirmar-borrar', t('btnSiBorrar'));
+
+            setAttr('selector-velocidad-libre', 'title', t('titleVelocidad'));
+            const btnGrabar = document.getElementById('btn-grabar');
+            if (btnGrabar) {
+                btnGrabar.textContent = esGrabando ? t('btnDetener') : t('btnGrabar');
+            }
+            setText('btn-reproducir', t('btnReproducir'));
+            setText('btn-terminar-partida', t('btnTerminarPartida'));
+
+            actualizarBadgeRacha();
+            actualizarBotonComodin();
+            actualizarBotonesPartida();
+
+            if (!partidaEnCurso) {
+                setText('mensaje', modoJuego === 'libre' ? t('mensajeLibre') : t('mensajeInicial'));
+            }
+
+            if (document.getElementById('modal-logros').classList.contains('activo')) {
+                abrirLogros();
+            }
+            if (document.getElementById('modal-estadisticas').classList.contains('activo')) {
+                abrirEstadisticas();
+            }
+            if (document.getElementById('modal-global').classList.contains('activo')) {
+                renderizarClasificacionGlobal();
+            }
+            if (document.getElementById('modal-panel-admin').classList.contains('activo')) {
+                renderizarListaAdminLogros();
+            }
+        }
+
+        function alternarIdioma() {
+            aplicarIdioma(idiomaActual === 'es' ? 'en' : 'es');
+        }
+
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
         const URL_CONFIG_PIN = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/config/pinAdmin.json';
         const CLAVE_ADMIN_POR_DEFECTO = '3905';
@@ -1304,20 +1902,24 @@
         let cacheClasificacionGlobal = [];
         let ultimoRecordEnviado = { clave: '', record: 0 };
 
-        const ETIQUETAS_MODO = {
-            normal: '▶️ Normal',
-            invertido: '🔄 Invertido',
-            relampago: '⚡ Relámpago',
-            contrarreloj: '⏱️ Contrarreloj',
-            extremo: '🔥 Extremo',
-            hacker: '💻 Hacker'
-        };
+        function getEtiquetasModo() {
+            return {
+                normal: t('modoNormal'),
+                invertido: t('modoInvertido'),
+                relampago: t('modoRelampago'),
+                contrarreloj: t('modoContrarreloj'),
+                extremo: t('modoExtremo'),
+                hacker: t('modoHacker')
+            };
+        }
 
-        const ETIQUETAS_DIF = {
-            2: 'Fácil',
-            3: 'Medio',
-            4: 'Difícil'
-        };
+        function getEtiquetasDif() {
+            return {
+                2: t('difFacil'),
+                3: t('difMedio'),
+                4: t('difDificil')
+            };
+        }
 
         const MODOS_CON_COMODIN = ['normal', 'invertido', 'relampago'];
         let comodinDisponibleEnPartida = false;
@@ -1412,7 +2014,7 @@
             const pin = input ? input.value.trim() : '';
 
             if (!/^\d{4,6}$/.test(pin)) {
-                if (err) err.textContent = '⚠️ Escribe solo números (4 a 6 dígitos).';
+                if (err) err.textContent = t('pinFormatoError');
                 return;
             }
 
@@ -1425,7 +2027,7 @@
             }
 
             if (pin !== pinValido) {
-                if (err) err.textContent = '❌ Contraseña incorrecta.';
+                if (err) err.textContent = t('pinIncorrecto');
                 return;
             }
 
@@ -1453,7 +2055,7 @@
             comodinUsosRestantes = cant;
             comodinDisponibleEnPartida = true;
             actualizarBotonComodin();
-            alert(`✅ Comodín recargado con ${cant} uso(s).`);
+            alert(t('alertaComodinRecargado', cant));
         }
 
         function actualizarSelectDifResetDerrotas() {
@@ -1477,7 +2079,8 @@
                 stats[clave].derrotas = 0;
                 localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
             }
-            alert(`✅ Derrotas reseteadas en ${ETIQUETAS_MODO[modo] || modo}.`);
+            const modosMap = getEtiquetasModo();
+            alert(t('alertaDerrotasModo', modosMap[modo] || modo));
         }
 
         function adminResetearTodasDerrotas() {
@@ -1489,7 +2092,7 @@
                 }
             });
             localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
-            alert('✅ Todas las derrotas han sido reseteadas a 0.');
+            alert(t('alertaDerrotasTodas'));
         }
 
         function abrirPanelAdmin() {
@@ -1577,7 +2180,7 @@
             const selectEmoji = document.getElementById('admin-select-emoji');
             const nuevoNombre = inputNombre ? inputNombre.value.trim().slice(0, 20) : '';
             if (!nuevoNombre) {
-                alert('⚠️ El nombre no puede estar vacío.');
+                alert(t('alertaNombreVacio'));
                 return;
             }
             const nombreAnterior = usuarioActual.nombre || '';
@@ -1591,7 +2194,7 @@
             }
 
             await actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji);
-            alert('✅ Nombre y emoji actualizados también en tus récords globales.');
+            alert(t('alertaPerfilGuardado'));
         }
 
         function cerrarPanelAdmin() {
@@ -1614,7 +2217,7 @@
             totalNotasTocadas = val;
             localStorage.setItem('memoria_total_notas_v1', String(totalNotasTocadas));
             verificarLogrosDeNotas();
-            alert(`✅ Total de notas actualizado a ${totalNotasTocadas}.`);
+            alert(t('alertaNotasGuardadas', totalNotasTocadas));
         }
 
         function verificarLogroCienPorCientoAuto() {
@@ -1660,12 +2263,13 @@
             const cont = document.getElementById('admin-lista-logros');
             if (!cont) return;
             cont.innerHTML = DEFINICION_LOGROS.map(l => {
+                const info = obtenerInfoLogro(l.id);
                 const tiene = !!logrosDesbloqueados[l.id];
                 return `
                     <div class="admin-item-logro">
-                        <span>${l.icono} ${escaparTextoHTML(l.nombre)}</span>
+                        <span>${info.icono} ${escaparTextoHTML(info.nombre)}</span>
                         <button class="btn-mini" type="button" onclick="adminToggleLogroIndividual('${l.id}')" style="padding: 5px 10px; font-size: 0.78rem; background-color: ${tiene ? 'rgba(46, 213, 115, 0.35)' : 'rgba(255, 255, 255, 0.12)'};">
-                            ${tiene ? '✅ Activo' : '🔒 Quitar'}
+                            ${tiene ? t('logroActivo') : t('logroQuitar')}
                         </button>
                     </div>
                 `;
@@ -1683,13 +2287,13 @@
                 renderizarClasificacionGlobal();
             } catch (err) {
                 console.error('No se pudo borrar el registro:', err);
-                alert('⚠️ No se pudo borrar el registro. Revisa las reglas de Firebase.');
+                alert(t('errorBorrarGlobal'));
             }
         }
 
         async function borrarTodosRecordsGlobalAdmin() {
             if (!esAdminActivo) return;
-            const confirmar = confirm('⚠️ ¿Seguro que quieres borrar TODOS los récords de la clasificación global?');
+            const confirmar = confirm(t('confirmBorrarTodosGlobal'));
             if (!confirmar) return;
 
             try {
@@ -1700,10 +2304,10 @@
                 cacheClasificacionGlobal = [];
                 ultimoRecordEnviado = { clave: '', record: 0 };
                 renderizarClasificacionGlobal();
-                alert('💥 Se borraron todos los récords de la clasificación global.');
+                alert(t('alertaTodosGlobalBorrados'));
             } catch (err) {
                 console.error('No se pudieron borrar todos los récords:', err);
-                alert('⚠️ No se pudieron borrar todos los récords. Revisa las reglas de Firebase.');
+                alert(t('errorBorrarTodosGlobal'));
             }
         }
 
@@ -1801,12 +2405,12 @@
             const lista = document.getElementById('lista-ranking-global');
             if (!lista) return;
             if (forzarMensaje || cacheClasificacionGlobal.length === 0) {
-                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Cargando clasificación...</div>';
+                lista.innerHTML = `<div style="text-align: center; color: var(--subtext-color); padding: 16px;">${escaparTextoHTML(t('cargandoGlobal'))}</div>`;
             }
 
             const datos = await obtenerClasificacionGlobal();
             if (datos === null) {
-                lista.innerHTML = '<div style="text-align: center; color: #ff4757; padding: 16px;">⚠️ No se pudo conectar con la clasificación global.</div>';
+                lista.innerHTML = `<div style="text-align: center; color: #ff4757; padding: 16px;">${escaparTextoHTML(t('errorGlobal'))}</div>`;
                 return;
             }
 
@@ -1826,18 +2430,21 @@
                 .slice(0, 10);
 
             if (filtrados.length === 0) {
-                lista.innerHTML = '<div style="text-align: center; color: var(--subtext-color); padding: 16px;">Aún no hay récords registrados en este modo. ¡Sé el primero!</div>';
+                lista.innerHTML = `<div style="text-align: center; color: var(--subtext-color); padding: 16px;">${escaparTextoHTML(t('vacioGlobal'))}</div>`;
                 return;
             }
+
+            const modosMap = getEtiquetasModo();
+            const difsMap = getEtiquetasDif();
 
             lista.innerHTML = filtrados.map((item, idx) => {
                 const pos = idx + 1;
                 const medalla = pos === 1 ? '🥇' : (pos === 2 ? '🥈' : (pos === 3 ? '🥉' : `#${pos}`));
                 const claseTop = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
-                const modoTxt = ETIQUETAS_MODO[item.modo] || item.modo || 'Normal';
-                const difTxt = item.modo === 'hacker' || item.modo === 'extremo' ? '' : ` · ${ETIQUETAS_DIF[item.dificultad] || ''}`;
+                const modoTxt = modosMap[item.modo] || item.modo || 'Normal';
+                const difTxt = item.modo === 'hacker' || item.modo === 'extremo' ? '' : ` · ${difsMap[item.dificultad] || ''}`;
                 const btnBorrar = esAdminActivo && item._id
-                    ? `<button class="btn-borrar-fila-global" type="button" onclick="borrarRegistroGlobalAdmin('${escaparTextoHTML(item._id)}')" title="Borrar registro">🗑️</button>`
+                    ? `<button class="btn-borrar-fila-global" type="button" onclick="borrarRegistroGlobalAdmin('${escaparTextoHTML(item._id)}')" title="${escaparTextoHTML(t('borrarRegistroTitle'))}">🗑️</button>`
                     : '';
 
                 return `
@@ -1847,7 +2454,7 @@
                             <div class="ranking-nombre">${escaparTextoHTML(item.emoji || '🎮')} ${escaparTextoHTML(item.nombre)}</div>
                             <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
                         </div>
-                        <div class="ranking-puntaje">Nivel ${Number(item.record)}</div>
+                        <div class="ranking-puntaje">${escaparTextoHTML(t('nivelRank', Number(item.record)))}</div>
                         ${btnBorrar}
                     </div>
                 `;
@@ -1889,7 +2496,7 @@
 
             if (btnJugar) {
                 btnJugar.style.display = modoJuego === 'libre' || partidaEnCurso ? 'none' : 'inline-block';
-                btnJugar.textContent = haJugadoPartida ? 'Jugar de nuevo' : 'Jugar';
+                btnJugar.textContent = haJugadoPartida ? t('btnJugarDeNuevo') : t('btnJugar');
                 btnJugar.disabled = partidaEnCurso;
             }
 
@@ -1944,8 +2551,8 @@
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
             document.getElementById('mensaje').textContent = nivelAlcanzado >= 1
-                ? `🛑 Partida terminada · Récord guardado (Nivel ${nivelAlcanzado})`
-                : '🛑 Partida terminada';
+                ? t('partidaTerminadaRecord', nivelAlcanzado)
+                : t('partidaTerminada');
         }
 
         function aplicarPreferenciasVisualesAlCargar() {
@@ -2071,6 +2678,7 @@
 
         let colaToasts = [];
         let mostrandoToast = false;
+        let toastLogroIdActual = null;
 
         function verificarLogrosDeNotas() {
             if (totalNotasTocadas >= 100) desbloquearLogro('cien_notas');
@@ -2090,7 +2698,7 @@
             logrosDesbloqueados[id] = true;
             localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
 
-            const info = DEFINICION_LOGROS.find(l => l.id === id);
+            const info = obtenerInfoLogro(id);
             if (info) {
                 colaToasts.push(info);
                 procesarColaToasts();
@@ -2110,14 +2718,17 @@
             mostrandoToast = true;
 
             const logro = colaToasts.shift();
+            toastLogroIdActual = logro.id;
             const toast = document.getElementById('toast-logro');
             document.getElementById('toast-logro-icono').textContent = logro.icono;
+            document.getElementById('toast-logro-titulo').textContent = t('toastTitulo');
             document.getElementById('toast-logro-nombre').textContent = logro.nombre;
 
             toast.classList.add('mostrar');
             setTimeout(() => {
                 toast.classList.remove('mostrar');
                 setTimeout(() => {
+                    toastLogroIdActual = null;
                     mostrandoToast = false;
                     procesarColaToasts();
                 }, 400);
@@ -2151,8 +2762,7 @@
             const badge = document.getElementById('badge-racha');
             if (!badge) return;
             const racha = obtenerRachaActual();
-            const palabraDia = racha === 1 ? 'día' : 'días';
-            badge.textContent = `🔥 Racha: ${racha} ${palabraDia}`;
+            badge.textContent = t('racha', racha);
         }
 
         function registrarDiaJugado() {
@@ -2194,16 +2804,17 @@
             lista.innerHTML = '';
 
             DEFINICION_LOGROS.forEach(logro => {
+                const info = obtenerInfoLogro(logro.id);
                 const desb = !!logrosDesbloqueados[logro.id];
                 if (desb) totalDesbloqueados++;
 
                 const div = document.createElement('div');
                 div.className = `item-logro ${desb ? 'desbloqueado' : ''}`;
                 div.innerHTML = `
-                    <div class="logro-icono">${logro.icono}</div>
+                    <div class="logro-icono">${info.icono}</div>
                     <div class="logro-info">
-                        <div class="logro-nombre">${logro.nombre}</div>
-                        <div class="logro-desc">${logro.desc}</div>
+                        <div class="logro-nombre">${escaparTextoHTML(info.nombre)}</div>
+                        <div class="logro-desc">${escaparTextoHTML(info.desc)}</div>
                     </div>
                     <div class="logro-estado">${desb ? '✅' : '🔒'}</div>
                 `;
@@ -2256,7 +2867,7 @@
                 inputNombre.addEventListener('input', () => {
                     const aviso = document.getElementById('aviso-nombre-obligatorio');
                     if (aviso) {
-                        aviso.textContent = inputNombre.value.trim().length > 0 ? '' : '⚠️ Debes escribir un nombre para continuar';
+                        aviso.textContent = inputNombre.value.trim().length > 0 ? '' : t('avisoNombreObligatorio');
                     }
                 });
             }
@@ -2266,6 +2877,7 @@
             try { verificarLogrosDeNotas(); } catch (e) { console.error(e); }
             try { iniciarAtmosfera(); } catch (e) { console.error(e); }
             try { verificarProgresoEstetico(); } catch (e) { console.error(e); }
+            aplicarIdioma(idiomaActual);
             actualizarVisibilidadControlesAdmin();
             actualizarBotonComodin();
             actualizarBotonesPartida();
@@ -2280,7 +2892,7 @@
             const nombreVal = input ? input.value.trim() : '';
             if (!nombreVal) {
                 if (aviso) {
-                    aviso.textContent = '⚠️ ¡Tienes que escribir un nombre! No puede quedar vacío.';
+                    aviso.textContent = t('avisoNombreVacio');
                 }
                 if (input) {
                     input.focus();
@@ -2601,7 +3213,7 @@
             if (!btn) return;
             const modoPermitido = MODOS_CON_COMODIN.includes(modoJuego);
             const cantMostrar = Math.max(0, comodinUsosRestantes);
-            btn.textContent = `🔁 Repetir (${cantMostrar})`;
+            btn.textContent = t('btnComodin', cantMostrar);
             btn.classList.toggle('visible', modoPermitido);
             btn.disabled = !modoPermitido || !comodinDisponibleEnPartida || cantMostrar <= 0 || bloqueado || reproduciendoSecuenciaActual || secuencia.length === 0;
         }
@@ -2618,7 +3230,7 @@
             actualizarBotonComodin();
 
             const velocidad = modoJuego === 'relampago' ? 260 : 580;
-            document.getElementById('mensaje').textContent = '🔁 Repitiendo secuencia...';
+            document.getElementById('mensaje').textContent = t('repitiendoSecuencia');
             reproducirSecuencia(velocidad);
         }
 
@@ -2655,7 +3267,7 @@
             const btnReproducir = document.getElementById('btn-reproducir');
             if (btnGrabar) {
                 btnGrabar.classList.remove('grabando');
-                btnGrabar.textContent = '🔴 Grabar';
+                btnGrabar.textContent = t('btnGrabar');
             }
             if (btnReproducir) {
                 btnReproducir.classList.remove('visible');
@@ -2664,7 +3276,7 @@
             actualizarBotonComodin();
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
-            document.getElementById('mensaje').textContent = 'Presiona "Jugar" para empezar';
+            document.getElementById('mensaje').textContent = t('mensajeInicial');
         }
 
         function cambiarModoJuego(select, guardar = true) {
@@ -2673,7 +3285,7 @@
                 guardarPreferenciaVisual('modo', modoJuego);
             }
             const nombreModo = select.options[select.selectedIndex].text;
-            document.getElementById('badge-modo').textContent = `Modo = ${nombreModo}`;
+            document.getElementById('badge-modo').textContent = t('badgeModo', nombreModo);
 
             resetearEstadoAlCambiarModo();
 
@@ -2702,7 +3314,7 @@
             if (modoJuego === 'libre') {
                 difSelect.disabled = true;
                 construirTablero(5);
-                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+                document.getElementById('mensaje').textContent = t('mensajeLibre');
             } else if (modoJuego === 'extremo') {
                 difSelect.disabled = true;
                 construirTablero(2);
@@ -2719,7 +3331,7 @@
 
         function iniciarJuego() {
             if (modoJuego === 'libre') {
-                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+                document.getElementById('mensaje').textContent = t('mensajeLibre');
                 return;
             }
 
@@ -2778,7 +3390,7 @@
             }
 
             const prefijoExtremo = (modoJuego === 'extremo') ? ` (${tamanoCuadricula}x${tamanoCuadricula})` : '';
-            document.getElementById('mensaje').textContent = `Nivel ${nivel}/${NIVEL_FINAL}${prefijoExtremo} — Observa la secuencia`;
+            document.getElementById('mensaje').textContent = t('observaSecuencia', nivel, NIVEL_FINAL, prefijoExtremo);
             const nuevoBloque = Math.floor(Math.random() * totalBloques);
             secuencia.push(nuevoBloque);
 
@@ -2811,8 +3423,8 @@
                     actualizarBotonComodin();
 
                     document.getElementById('mensaje').textContent = modoJuego === 'invertido'
-                        ? "🔄 ¡Tu turno! Repite AL REVÉS"
-                        : "👉 ¡Tu turno!";
+                        ? t('tuTurnoInvertido')
+                        : t('tuTurno');
 
                     if (modoJuego === 'contrarreloj') {
                         iniciarBarraContrarreloj();
@@ -2846,7 +3458,7 @@
                     detenerBarraContrarreloj();
                     activarVibracionError();
                     registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
-                    finalizarPartida(false, "⏰ ¡Se acabó el tiempo!");
+                    finalizarPartida(false, t('tiempoAgotado'));
                 }
             }, 100);
         }
@@ -2916,19 +3528,19 @@
 
                     if (nivel >= NIVEL_FINAL) {
                         lanzarConfeti();
-                        finalizarPartida(true, `🏆 ¡Completaste el Nivel ${NIVEL_FINAL}! ¡Victoria!`);
+                        finalizarPartida(true, t('victoriaFinal', NIVEL_FINAL));
                         return;
                     }
 
                     if (nivel === 5) {
                         lanzarConfeti();
-                        document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} alcanzado! Celebrando...`;
+                        document.getElementById('mensaje').textContent = t('nivelCelebrando', nivel);
                         const pausaTimeout = setTimeout(() => {
                             siguienteNivel();
                         }, 2600);
                         timeouts.push(pausaTimeout);
                     } else {
-                        document.getElementById('mensaje').textContent = `🎉 ¡Nivel ${nivel} superado!`;
+                        document.getElementById('mensaje').textContent = t('nivelSuperado', nivel);
                         const nextTimeout = setTimeout(() => {
                             siguienteNivel();
                         }, 850);
@@ -2939,7 +3551,7 @@
                 reproducirSonido(indice, true, false);
                 activarVibracionError();
                 registrarDerrotaEstadistica(modoJuego, tamanoCuadricula);
-                finalizarPartida(false, `❌ ¡Fallaste en el nivel ${nivel}!`);
+                finalizarPartida(false, t('falloNivel', nivel));
             }
         }
 
@@ -3000,13 +3612,13 @@
                 notasGrabadas = [];
                 tiempoInicioGrabacion = Date.now();
                 btn.classList.add('grabando');
-                btn.textContent = '⏹️ Detener';
+                btn.textContent = t('btnDetener');
                 btnReproducir.classList.remove('visible');
-                document.getElementById('mensaje').textContent = "🔴 Grabando melodía...";
+                document.getElementById('mensaje').textContent = t('grabandoMelodia');
             } else {
                 esGrabando = false;
                 btn.classList.remove('grabando');
-                btn.textContent = '🔴 Grabar';
+                btn.textContent = t('btnGrabar');
                 if (notasGrabadas.length > 0) {
                     firmaUltimaGrabacion = notasGrabadas.map(n => n.bloque).join(',');
                     repeticionesConsecutivas = 0;
@@ -3015,13 +3627,13 @@
                         desbloquearLogro('gran_compositor');
                     }
                 }
-                document.getElementById('mensaje').textContent = `✅ Melodía guardada (${notasGrabadas.length} notas)`;
+                document.getElementById('mensaje').textContent = t('melodiaGuardada', notasGrabadas.length);
             }
         }
 
         function reproducirGrabacion() {
             if (notasGrabadas.length === 0) {
-                document.getElementById('mensaje').textContent = "⚠️ Primero graba una melodía";
+                document.getElementById('mensaje').textContent = t('primeroGraba');
                 return;
             }
             limpiarTimersGrabacion();
@@ -3044,7 +3656,7 @@
 
             const vel = obtenerVelocidadLibre();
             const duracionBrillo = Math.max(110, Math.round(220 / vel));
-            document.getElementById('mensaje').textContent = `▶️ Oyendo (${vel}x)...`;
+            document.getElementById('mensaje').textContent = t('oyendoVelocidad', vel);
 
             let maxDelay = 0;
             notasGrabadas.forEach(n => {
@@ -3055,7 +3667,7 @@
             });
 
             const finTimeout = setTimeout(() => {
-                document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
+                document.getElementById('mensaje').textContent = t('mensajeLibre');
             }, maxDelay + duracionBrillo + 60);
             timeoutsGrabacion.push(finTimeout);
         }
@@ -3096,17 +3708,17 @@
             const cuerpo = document.getElementById('cuerpo-estadisticas');
 
             const modosDef = [
-                { id: 'normal', nombre: '▶️ Normal', usaDif: true },
-                { id: 'invertido', nombre: '🔄 Invertido', usaDif: true },
-                { id: 'relampago', nombre: '⚡ Relámpago', usaDif: true },
-                { id: 'contrarreloj', nombre: '⏱️ Contrarreloj', usaDif: true },
-                { id: 'extremo', nombre: '🔥 Extremo', usaDif: true },
-                { id: 'hacker', nombre: '💻 Hacker', usaDif: false, difFija: 2 }
+                { id: 'normal', nombre: t('modoNormal'), usaDif: true },
+                { id: 'invertido', nombre: t('modoInvertido'), usaDif: true },
+                { id: 'relampago', nombre: t('modoRelampago'), usaDif: true },
+                { id: 'contrarreloj', nombre: t('modoContrarreloj'), usaDif: true },
+                { id: 'extremo', nombre: t('modoExtremo'), usaDif: true },
+                { id: 'hacker', nombre: t('modoHacker'), usaDif: false, difFija: 2 }
             ];
 
             let html = `
                 <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px; text-align: center; margin-bottom: 16px;">
-                    <div style="font-size: 0.85rem; color: var(--subtext-color); margin-bottom: 4px;">🎵 Total de notas tocadas</div>
+                    <div style="font-size: 0.85rem; color: var(--subtext-color); margin-bottom: 4px;">${escaparTextoHTML(t('totalNotasTocadas'))}</div>
                     <div style="font-size: 1.8rem; font-weight: 800; color: #ffffff;">${totalNotasTocadas}</div>
                 </div>
             `;
@@ -3115,24 +3727,24 @@
             modosDef.forEach(m => {
                 html += `
                     <div style="background: rgba(22, 33, 62, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px;">
-                        <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-align: center; margin-bottom: 10px;">Modo = ${m.nombre}</div>
+                        <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-align: center; margin-bottom: 10px;">${escaparTextoHTML(t('badgeModo', m.nombre))}</div>
                 `;
 
                 if (m.usaDif) {
                     const difs = [
-                        { val: 2, label: '🟢 Fácil' },
-                        { val: 3, label: '🟡 Medio' },
-                        { val: 4, label: '🔴 Difícil' }
+                        { val: 2, label: t('difFacilBadge') },
+                        { val: 3, label: t('difMedioBadge') },
+                        { val: 4, label: t('difDificilBadge') }
                     ];
                     html += `<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">`;
                     difs.forEach(d => {
                         const dat = stats[`${m.id}_${d.val}`] || { record: 0, derrotas: 0, notas: 0 };
                         html += `
                             <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 0.75rem;">
-                                <div style="font-weight: 600; margin-bottom: 6px; color: #ffffff;">${d.label}</div>
-                                <div style="color: var(--subtext-color); margin-bottom: 2px;">Récord: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
-                                <div style="color: var(--subtext-color); margin-bottom: 2px;">Derrotas: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
-                                <div style="color: var(--subtext-color);">Notas: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
+                                <div style="font-weight: 600; margin-bottom: 6px; color: #ffffff;">${escaparTextoHTML(d.label)}</div>
+                                <div style="color: var(--subtext-color); margin-bottom: 2px;">${escaparTextoHTML(t('statRecord'))}: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
+                                <div style="color: var(--subtext-color); margin-bottom: 2px;">${escaparTextoHTML(t('statDerrotas'))}: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
+                                <div style="color: var(--subtext-color);">${escaparTextoHTML(t('statNotas'))}: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
                             </div>
                         `;
                     });
@@ -3141,9 +3753,9 @@
                     const dat = stats[`${m.id}_${m.difFija}`] || { record: 0, derrotas: 0, notas: 0 };
                     html += `
                         <div style="display: flex; justify-content: space-around; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; text-align: center; font-size: 0.82rem;">
-                            <div style="color: var(--subtext-color);">Récord: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
-                            <div style="color: var(--subtext-color);">Derrotas: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
-                            <div style="color: var(--subtext-color);">Notas: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
+                            <div style="color: var(--subtext-color);">${escaparTextoHTML(t('statRecord'))}: <span style="color: #ffffff; font-weight: 600;">${dat.record}</span></div>
+                            <div style="color: var(--subtext-color);">${escaparTextoHTML(t('statDerrotas'))}: <span style="color: #ffffff; font-weight: 600;">${dat.derrotas}</span></div>
+                            <div style="color: var(--subtext-color);">${escaparTextoHTML(t('statNotas'))}: <span style="color: #ffffff; font-weight: 600;">${dat.notas}</span></div>
                         </div>
                     `;
                 }
@@ -3183,6 +3795,7 @@
             aplicarPreferenciasVisualesAlCargar();
             actualizarBadgeRacha();
             iniciarAtmosfera();
+            aplicarIdioma(idiomaActual);
 
             cerrarConfirmacionBorrar();
             abrirEstadisticas();
