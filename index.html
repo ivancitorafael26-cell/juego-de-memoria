@@ -1142,46 +1142,6 @@
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🎯 Entrar a un Nivel de Cualquier Modo</div>
-                <div class="admin-fila-input" style="margin-bottom: 8px;">
-                    <select id="admin-ir-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifIrNivel()">
-                        <option value="normal">▶️ Normal</option>
-                        <option value="invertido">🔄 Invertido</option>
-                        <option value="relampago">⚡ Relámpago</option>
-                        <option value="contrarreloj">⏱️ Contrarreloj</option>
-                        <option value="extremo">🔥 Extremo</option>
-                        <option value="hacker">💻 Hacker</option>
-                    </select>
-                    <select id="admin-ir-nivel" class="admin-select" style="width: 110px;">
-                        <option value="1">Nivel 1</option>
-                        <option value="2">Nivel 2</option>
-                        <option value="3">Nivel 3</option>
-                        <option value="4">Nivel 4</option>
-                        <option value="5">Nivel 5</option>
-                        <option value="6">Nivel 6</option>
-                        <option value="7">Nivel 7</option>
-                        <option value="8">Nivel 8</option>
-                        <option value="9">Nivel 9</option>
-                        <option value="10">Nivel 10</option>
-                    </select>
-                    <select id="admin-ir-dif" class="admin-select">
-                        <option value="2">🟢 Fácil</option>
-                        <option value="3">🟡 Medio</option>
-                        <option value="4">🔴 Difícil</option>
-                    </select>
-                </div>
-                <button class="btn-mini" type="button" onclick="adminEntrarANivel()" style="width: 100%; background-color: #3742fa; color: #ffffff; border: none;">🚀 Entrar al Nivel</button>
-            </div>
-
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🔐 Cambiar Contraseña de Admin</div>
-                <div class="admin-fila-input">
-                    <input type="password" id="admin-input-nuevo-pin" class="admin-input" inputmode="numeric" maxlength="6" style="flex: 1; letter-spacing: 4px;" placeholder="Nuevo PIN (4 a 6 dígitos)">
-                    <button class="btn-mini" type="button" onclick="adminGuardarNuevoPin()" style="background-color: #3742fa; color: #ffffff; border: none;">Guardar PIN</button>
-                </div>
-            </div>
-
-            <div class="admin-seccion">
                 <div class="admin-seccion-titulo">👤 Nombre y Emoji del Usuario</div>
                 <div class="admin-fila-input" style="margin-bottom: 8px;">
                     <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
@@ -1215,29 +1175,6 @@
             </div>
 
             <div class="admin-seccion">
-                <div class="admin-seccion-titulo">📊 Editar Récord en los Modos</div>
-                <div class="admin-fila-input" style="margin-bottom: 8px;">
-                    <select id="admin-select-modo" class="admin-select" style="flex: 1;" onchange="cargarCamposAdminEstadistica()">
-                        <option value="normal">▶️ Normal</option>
-                        <option value="invertido">🔄 Invertido</option>
-                        <option value="relampago">⚡ Relámpago</option>
-                        <option value="contrarreloj">⏱️ Contrarreloj</option>
-                        <option value="extremo">🔥 Extremo</option>
-                        <option value="hacker">💻 Hacker</option>
-                    </select>
-                    <select id="admin-select-dif" class="admin-select" onchange="cargarCamposAdminEstadistica()">
-                        <option value="2">🟢 Fácil</option>
-                        <option value="3">🟡 Medio</option>
-                        <option value="4">🔴 Difícil</option>
-                    </select>
-                </div>
-                <div class="admin-fila-input">
-                    <input type="number" id="admin-input-record" class="admin-input" min="0" max="10" style="width: 115px;" placeholder="Nivel (0-10)">
-                    <button class="btn-mini" type="button" onclick="adminGuardarEstadisticaModo()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Guardar Nivel</button>
-                </div>
-            </div>
-
-            <div class="admin-seccion">
                 <div class="admin-seccion-titulo">💀 Resetear Derrotas</div>
                 <div class="admin-fila-input" style="margin-bottom: 8px;">
                     <select id="admin-reset-derrotas-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifResetDerrotas()">
@@ -1258,31 +1195,6 @@
                     <button class="btn-mini" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
                     <button class="btn-mini" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
                 </div>
-            </div>
-
-            <div class="admin-seccion">
-                <div class="admin-seccion-titulo">🚀 Sincronizar Récord Manual a Global</div>
-                <div class="admin-fila-input" style="margin-bottom: 8px;">
-                    <select id="admin-sync-modo" class="admin-select" style="flex: 1;" onchange="actualizarVistaRecordLocalAdmin()">
-                        <option value="normal">▶️ Normal</option>
-                        <option value="invertido">🔄 Invertido</option>
-                        <option value="relampago">⚡ Relámpago</option>
-                        <option value="contrarreloj">⏱️ Contrarreloj</option>
-                        <option value="extremo">🔥 Extremo</option>
-                        <option value="hacker">💻 Hacker</option>
-                    </select>
-                    <select id="admin-sync-dif" class="admin-select" onchange="actualizarVistaRecordLocalAdmin()">
-                        <option value="2">🟢 Fácil</option>
-                        <option value="3">🟡 Medio</option>
-                        <option value="4">🔴 Difícil</option>
-                    </select>
-                </div>
-                <div style="font-size: 0.82rem; color: var(--subtext-color); margin-bottom: 8px;">
-                    Récord local guardado: <strong id="admin-sync-record-actual" style="color: #2ed573;">Nivel 0</strong>
-                </div>
-                <button class="btn-mini" type="button" onclick="adminSincronizarRecordManual()" style="width: 100%; background: linear-gradient(135deg, #2ed573, #1e90ff); color: #ffffff; border: none;">
-                    🚀 Subir / Sincronizar a Global
-                </button>
             </div>
 
             <div class="admin-seccion">
@@ -1444,7 +1356,6 @@
         const TIEMPO_MAXIMO = 6000;
 
         let esGrabando = false;
-        let esReproduciendo = false;
         let notasGrabadas = [];
         let tiempoInicioGrabacion = 0;
         let timeoutsGrabacion = [];
@@ -1525,35 +1436,6 @@
             abrirPanelAdmin();
         }
 
-        async function adminGuardarNuevoPin() {
-            if (!esAdminActivo) return;
-            const inputNuevoPin = document.getElementById('admin-input-nuevo-pin');
-            const nuevoPin = inputNuevoPin ? inputNuevoPin.value.trim() : '';
-
-            if (!/^\d{4,6}$/.test(nuevoPin)) {
-                alert('⚠️ La nueva contraseña debe tener entre 4 y 6 números.');
-                return;
-            }
-
-            claveAdminActual = nuevoPin;
-            localStorage.setItem('memoria_pin_admin_v1', nuevoPin);
-
-            try {
-                const res = await fetch(URL_CONFIG_PIN, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nuevoPin)
-                });
-                if (!res.ok) throw new Error('Error al guardar PIN en Firebase');
-                if (inputNuevoPin) inputNuevoPin.value = '';
-                alert('✅ Contraseña actualizada en este dispositivo y en Firebase para otros equipos.');
-            } catch (err) {
-                console.error(err);
-                if (inputNuevoPin) inputNuevoPin.value = '';
-                alert('⚠️ Se guardó en este dispositivo, pero falló al subir a Firebase. Revisa las reglas de escritura de tu base de datos.');
-            }
-        }
-
         function sincronizarInputComodin() {
             const sel = document.getElementById('admin-select-comodin-cant');
             const inp = document.getElementById('admin-input-comodin-cant');
@@ -1572,93 +1454,6 @@
             comodinDisponibleEnPartida = true;
             actualizarBotonComodin();
             alert(`✅ Comodín recargado con ${cant} uso(s).`);
-        }
-
-        function actualizarSelectDifIrNivel() {
-            const selModo = document.getElementById('admin-ir-modo');
-            const selDif = document.getElementById('admin-ir-dif');
-            if (!selModo || !selDif) return;
-            const esFijo = selModo.value === 'hacker' || selModo.value === 'extremo';
-            selDif.disabled = esFijo;
-        }
-
-        function adminEntrarANivel() {
-            if (!esAdminActivo) return;
-            const selModo = document.getElementById('admin-ir-modo');
-            const selNivel = document.getElementById('admin-ir-nivel');
-            const selDif = document.getElementById('admin-ir-dif');
-            if (!selModo || !selNivel || !selDif) return;
-
-            const modoElegido = selModo.value;
-            const nivelObjetivo = Math.max(1, Math.min(NIVEL_FINAL, parseInt(selNivel.value, 10) || 1));
-            const difElegida = modoElegido === 'hacker'
-                ? 2
-                : (modoElegido === 'extremo' ? obtenerDimensionExtremoPorNivel(nivelObjetivo) : parseInt(selDif.value, 10));
-
-            const selectorModoMain = document.getElementById('selector-modo');
-            const selectorDifMain = document.getElementById('selector-dificultad');
-
-            if (selectorDifMain && ['2', '3', '4'].includes(String(difElegida))) {
-                selectorDifMain.value = String(difElegida);
-                guardarPreferenciaVisual('dificultad', String(difElegida));
-            }
-
-            if (selectorModoMain) {
-                selectorModoMain.value = modoElegido;
-                cambiarModoJuego(selectorModoMain, true);
-            }
-
-            construirTablero(difElegida);
-
-            haJugadoPartida = true;
-            partidaEnCurso = true;
-            registrarDiaJugado();
-
-            limpiarTimers();
-            secuencia = [];
-            for (let i = 0; i < nivelObjetivo; i++) {
-                secuencia.push(Math.floor(Math.random() * totalBloques));
-            }
-            nivel = nivelObjetivo;
-            pasoUsuario = 0;
-            bloqueado = true;
-            reproduciendoSecuenciaActual = false;
-            comodinUsosRestantes = comodinUsosConfigurados;
-            comodinDisponibleEnPartida = MODOS_CON_COMODIN.includes(modoJuego);
-
-            actualizarBrilloNivelAlto();
-            actualizarBotonComodin();
-            actualizarBotonesPartida();
-            setControlesPartidaActivos(true);
-
-            segundosPartida = 0;
-            const crono = document.getElementById('cronometro-juego');
-            if (crono) {
-                crono.style.display = 'inline-block';
-                crono.textContent = '⏱️ 00:00';
-            }
-            timerPartidaInterval = setInterval(() => {
-                segundosPartida++;
-                const min = String(Math.floor(segundosPartida / 60)).padStart(2, '0');
-                const seg = String(segundosPartida % 60).padStart(2, '0');
-                if (crono) crono.textContent = `⏱️ ${min}:${seg}`;
-            }, 1000);
-
-            if (nivel >= 8) {
-                desbloquearLogro('memoria_fotografica');
-            }
-            if (modoJuego === 'hacker' && nivel >= 6) {
-                desbloquearLogro('hacker_maestro');
-            }
-
-            const prefijoExtremo = (modoJuego === 'extremo') ? ` (${tamanoCuadricula}x${tamanoCuadricula})` : '';
-            document.getElementById('mensaje').textContent = `Nivel ${nivel}/${NIVEL_FINAL}${prefijoExtremo} — Observa la secuencia`;
-            secuenciaObjetivo = (modoJuego === 'invertido') ? [...secuencia].reverse() : [...secuencia];
-
-            cerrarPanelAdmin();
-
-            const velocidad = modoJuego === 'relampago' ? 260 : (modoJuego === 'extremo' ? 350 : 580);
-            reproducirSecuencia(velocidad);
         }
 
         function actualizarSelectDifResetDerrotas() {
@@ -1699,8 +1494,6 @@
 
         function abrirPanelAdmin() {
             if (!esAdminActivo) return;
-            const inputNuevoPin = document.getElementById('admin-input-nuevo-pin');
-            if (inputNuevoPin) inputNuevoPin.value = '';
 
             const selComodin = document.getElementById('admin-select-comodin-cant');
             const inpComodin = document.getElementById('admin-input-comodin-cant');
@@ -1714,25 +1507,11 @@
                 inpComodin.value = String(actual);
             }
 
-            const irModo = document.getElementById('admin-ir-modo');
-            const irNivel = document.getElementById('admin-ir-nivel');
-            const irDif = document.getElementById('admin-ir-dif');
-            if (irModo) irModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
-            if (irNivel) irNivel.value = String(Math.max(1, Math.min(NIVEL_FINAL, nivel || 1)));
-            if (irDif) irDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
-            actualizarSelectDifIrNivel();
-
             const resetModo = document.getElementById('admin-reset-derrotas-modo');
             const resetDif = document.getElementById('admin-reset-derrotas-dif');
             if (resetModo) resetModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
             if (resetDif) resetDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
             actualizarSelectDifResetDerrotas();
-
-            const syncModo = document.getElementById('admin-sync-modo');
-            const syncDif = document.getElementById('admin-sync-dif');
-            if (syncModo) syncModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
-            if (syncDif) syncDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
-            actualizarVistaRecordLocalAdmin();
 
             const inputNombre = document.getElementById('admin-input-nombre');
             const selectEmoji = document.getElementById('admin-select-emoji');
@@ -1750,53 +1529,8 @@
 
             const inputNotas = document.getElementById('admin-input-notas');
             if (inputNotas) inputNotas.value = totalNotasTocadas;
-            cargarCamposAdminEstadistica();
             renderizarListaAdminLogros();
             document.getElementById('modal-panel-admin').classList.add('activo');
-        }
-
-        function actualizarVistaRecordLocalAdmin() {
-            const selModo = document.getElementById('admin-sync-modo');
-            const selDif = document.getElementById('admin-sync-dif');
-            const txtRecord = document.getElementById('admin-sync-record-actual');
-            if (!selModo || !selDif || !txtRecord) return;
-
-            const modo = selModo.value;
-            const esFijo = modo === 'hacker' || modo === 'extremo';
-            selDif.disabled = esFijo;
-
-            const dif = modo === 'hacker' ? 2 : (modo === 'extremo' ? obtenerDimensionExtremoPorNivel(10) : Number(selDif.value));
-            const stats = obtenerDatosStats();
-            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
-            txtRecord.textContent = `Nivel ${actual.record || 0}`;
-        }
-
-        async function adminSincronizarRecordManual() {
-            if (!esAdminActivo) return;
-            const selModo = document.getElementById('admin-sync-modo');
-            const selDif = document.getElementById('admin-sync-dif');
-            if (!selModo || !selDif) return;
-
-            if (!usuarioActual || !usuarioActual.nombre) {
-                alert('⚠️ Primero configura un nombre de usuario para publicar en la clasificación global.');
-                return;
-            }
-
-            const modo = selModo.value;
-            const dif = modo === 'hacker' ? 2 : (modo === 'extremo' ? obtenerDimensionExtremoPorNivel(10) : Number(selDif.value));
-            const stats = obtenerDatosStats();
-            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
-            const recLocal = Number(actual.record) || 0;
-
-            if (recLocal < 1) {
-                alert('⚠️ No tienes un récord local mayor a Nivel 0 en ese modo/dificultad para subir.');
-                return;
-            }
-
-            ultimoRecordEnviado = { clave: '', record: 0 };
-            await publicarRecordGlobal(recLocal, modo, dif);
-            await cargarYMostrarGlobal(false);
-            alert(`🚀 Récord local (Nivel ${recLocal}) sincronizado con la Clasificación Global.`);
         }
 
         async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
@@ -1881,43 +1615,6 @@
             localStorage.setItem('memoria_total_notas_v1', String(totalNotasTocadas));
             verificarLogrosDeNotas();
             alert(`✅ Total de notas actualizado a ${totalNotasTocadas}.`);
-        }
-
-        function cargarCamposAdminEstadistica() {
-            const selModo = document.getElementById('admin-select-modo');
-            const selDif = document.getElementById('admin-select-dif');
-            const inpRec = document.getElementById('admin-input-record');
-            if (!selModo || !selDif || !inpRec) return;
-
-            const modo = selModo.value;
-            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
-            const stats = obtenerDatosStats();
-            const actual = stats[`${modo}_${dif}`] || { record: 0, derrotas: 0, notas: 0 };
-            inpRec.value = actual.record;
-        }
-
-        function adminGuardarEstadisticaModo() {
-            if (!esAdminActivo) return;
-            const selModo = document.getElementById('admin-select-modo');
-            const selDif = document.getElementById('admin-select-dif');
-            const inpRec = document.getElementById('admin-input-record');
-            if (!selModo || !selDif || !inpRec) return;
-
-            const modo = selModo.value;
-            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
-            const rec = Math.max(0, Math.min(NIVEL_FINAL, parseInt(inpRec.value || '0', 10) || 0));
-
-            const stats = obtenerDatosStats();
-            const clave = `${modo}_${dif}`;
-            const previa = stats[clave] || { record: 0, derrotas: 0, notas: 0 };
-            stats[clave] = {
-                record: rec,
-                derrotas: previa.derrotas || 0,
-                notas: previa.notas || 0
-            };
-            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
-            actualizarVistaRecordLocalAdmin();
-            alert(`✅ Nivel récord guardado en ${rec}.`);
         }
 
         function verificarLogroCienPorCientoAuto() {
@@ -2951,7 +2648,6 @@
             }
 
             esGrabando = false;
-            esReproduciendo = false;
             notasGrabadas = [];
             firmaUltimaGrabacion = '';
             repeticionesConsecutivas = 0;
@@ -3286,7 +2982,6 @@
         function limpiarTimersGrabacion() {
             timeoutsGrabacion.forEach(t => clearTimeout(t));
             timeoutsGrabacion = [];
-            esReproduciendo = false;
         }
 
         function obtenerVelocidadLibre() {
@@ -3330,7 +3025,6 @@
                 return;
             }
             limpiarTimersGrabacion();
-            esReproduciendo = true;
 
             const firmaActual = notasGrabadas.map(n => n.bloque).join(',');
             if (firmaActual === firmaUltimaGrabacion) {
@@ -3361,7 +3055,6 @@
             });
 
             const finTimeout = setTimeout(() => {
-                esReproduciendo = false;
                 document.getElementById('mensaje').textContent = "🎹 Toca libremente o graba tu melodía";
             }, maxDelay + duracionBrillo + 60);
             timeoutsGrabacion.push(finTimeout);
