@@ -240,6 +240,46 @@
             justify-content: center;
         }
 
+        .banner-sin-internet {
+            display: none;
+            width: 100%;
+            max-width: 540px;
+            margin: 6px auto 8px auto;
+            padding: 8px 14px;
+            border-radius: 14px;
+            background: rgba(255, 71, 87, 0.22);
+            border: 1px solid rgba(255, 71, 87, 0.65);
+            color: #ff6b81;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-align: center;
+            box-sizing: border-box;
+            box-shadow: 0 4px 14px rgba(255, 71, 87, 0.22);
+        }
+
+        .banner-sin-internet.visible {
+            display: block;
+        }
+
+        body.modo-hacker .banner-sin-internet {
+            background: #0a0f0a !important;
+            border-color: #00ff00 !important;
+            color: #00ff00 !important;
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.25) !important;
+        }
+
+        .aviso-global-offline {
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            background: rgba(255, 165, 2, 0.16);
+            border: 1px solid rgba(255, 165, 2, 0.55);
+            color: #ffd166;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
         .toast-logro {
             position: fixed;
             bottom: 24px;
@@ -1256,6 +1296,7 @@
                 </select>
                 <button class="btn-mini" id="btn-actualizar-global" type="button" onclick="cargarYMostrarGlobal(true)">🔄 Actualizar</button>
             </div>
+            <div class="aviso-global-offline" id="aviso-global-offline" style="display: none;"></div>
             <div class="lista-ranking" id="lista-ranking-global">
                 <div style="text-align: center; color: var(--subtext-color); padding: 16px;">Cargando clasificación...</div>
             </div>
@@ -1529,6 +1570,7 @@
         <div class="titulo-wrapper">
             <h1 id="titulo-principal" style="display: none;"></h1>
         </div>
+        <div class="banner-sin-internet" id="banner-sin-internet" role="status" aria-live="polite">📡 Sin conexión a internet — Jugando en modo local</div>
         <div class="contenedor-info-partida">
             <div class="badge-modo" id="badge-modo">Modo = ▶️ Normal</div>
             <div class="badge-modo" id="badge-racha" style="background-color: rgba(255, 165, 2, 0.16); color: #ffa502; border-color: rgba(255, 165, 2, 0.35);">🔥 Racha: 0 días</div>
@@ -1600,6 +1642,10 @@
                 btnActualizar: '🔄 Actualizar',
                 cargandoGlobal: 'Cargando clasificación...',
                 errorGlobal: '⚠️ No se pudo conectar con la clasificación global.',
+                sinInternetBanner: '📡 Sin conexión a internet — Tus récords globales se guardarán cuando vuelvas a conectarte',
+                sinInternetGlobal: '📡 Estás sin internet. No se puede cargar ni subir puntajes globales ahora mismo.',
+                sinInternetGlobalCache: '📡 Sin conexión a internet — Mostrando la última clasificación guardada.',
+                conexionRecuperada: '🌐 ¡Conexión a internet recuperada!',
                 vacioGlobal: 'Aún no hay récords registrados en este modo. ¡Sé el primero!',
                 nivelRank: (n) => `Nivel ${n}`,
                 borrarRegistroTitle: 'Borrar registro',
@@ -1824,6 +1870,10 @@
                 btnActualizar: '🔄 Refresh',
                 cargandoGlobal: 'Loading leaderboard...',
                 errorGlobal: '⚠️ Could not connect to the global leaderboard.',
+                sinInternetBanner: '📡 No internet connection — Global records will sync once you are back online',
+                sinInternetGlobal: '📡 You are offline. Global scores cannot be loaded or uploaded right now.',
+                sinInternetGlobalCache: '📡 No internet connection — Showing the last saved leaderboard.',
+                conexionRecuperada: '🌐 Internet connection restored!',
                 vacioGlobal: 'No records in this mode yet. Be the first!',
                 nivelRank: (n) => `Level ${n}`,
                 borrarRegistroTitle: 'Delete entry',
@@ -2103,6 +2153,8 @@
             setText('btn-empezar-usuario', t('btnEmpezar'));
 
             setText('titulo-modal-global', t('tituloGlobal'));
+            setText('banner-sin-internet', t('sinInternetBanner'));
+            actualizarEstadoConexion();
             setText('btn-actualizar-global', t('btnActualizar'));
             setAttr('btn-cerrar-global', 'title', t('cerrar'));
             setAttr('btn-cerrar-logros', 'title', t('cerrar'));
@@ -2270,6 +2322,47 @@
         let esAdminActivo = false;
 
         let cacheClasificacionGlobal = [];
+        let estabaSinInternet = typeof navigator !== 'undefined' && navigator.onLine === false;
+
+        function hayConexionInternet() {
+            return typeof navigator === 'undefined' ? true : navigator.onLine !== false;
+        }
+
+        function actualizarEstadoConexion(notificarRecuperacion = false) {
+            const online = hayConexionInternet();
+            const banner = document.getElementById('banner-sin-internet');
+            const avisoGlobal = document.getElementById('aviso-global-offline');
+
+            if (banner) {
+                banner.textContent = t('sinInternetBanner');
+                banner.classList.toggle('visible', !online);
+            }
+
+            if (avisoGlobal) {
+                if (!online) {
+                    avisoGlobal.style.display = 'block';
+                    avisoGlobal.textContent = cacheClasificacionGlobal.length > 0
+                        ? t('sinInternetGlobalCache')
+                        : t('sinInternetGlobal');
+                } else {
+                    avisoGlobal.style.display = 'none';
+                }
+            }
+
+            if (online && estabaSinInternet && notificarRecuperacion) {
+                const msg = document.getElementById('mensaje');
+                if (msg && !partidaEnCurso) {
+                    msg.textContent = t('conexionRecuperada');
+                }
+                if (document.getElementById('modal-global')?.classList.contains('activo')) {
+                    cargarYMostrarGlobal(false);
+                }
+            }
+            estabaSinInternet = !online;
+        }
+
+        window.addEventListener('online', () => actualizarEstadoConexion(true));
+        window.addEventListener('offline', () => actualizarEstadoConexion(false));
         let ultimoRecordEnviado = { clave: '', record: 0 };
 
         function getEtiquetasModo() {
@@ -2700,6 +2793,10 @@
 
         async function publicarRecordGlobal(record, modo, dif) {
             if (!usuarioActual || !usuarioActual.nombre || modo === 'libre' || modo === 'automatico') return;
+            if (!hayConexionInternet()) {
+                actualizarEstadoConexion(false);
+                return;
+            }
             const nivelNum = Number(record);
             if (!Number.isFinite(nivelNum) || nivelNum < 1 || nivelNum > NIVEL_FINAL) return;
 
@@ -2791,13 +2888,25 @@
         async function cargarYMostrarGlobal(forzarMensaje = false) {
             const lista = document.getElementById('lista-ranking-global');
             if (!lista) return;
+            actualizarEstadoConexion(false);
+
+            if (!hayConexionInternet()) {
+                if (cacheClasificacionGlobal.length > 0) {
+                    renderizarClasificacionGlobal();
+                } else {
+                    lista.innerHTML = `<div style="text-align: center; color: #ff6b81; padding: 16px;">${escaparTextoHTML(t('sinInternetGlobal'))}</div>`;
+                }
+                return;
+            }
+
             if (forzarMensaje || cacheClasificacionGlobal.length === 0) {
                 lista.innerHTML = `<div style="text-align: center; color: var(--subtext-color); padding: 16px;">${escaparTextoHTML(t('cargandoGlobal'))}</div>`;
             }
 
             const datos = await obtenerClasificacionGlobal();
             if (datos === null) {
-                lista.innerHTML = `<div style="text-align: center; color: #ff4757; padding: 16px;">${escaparTextoHTML(t('errorGlobal'))}</div>`;
+                const msgError = !hayConexionInternet() ? t('sinInternetGlobal') : t('errorGlobal');
+                lista.innerHTML = `<div style="text-align: center; color: #ff4757; padding: 16px;">${escaparTextoHTML(msgError)}</div>`;
                 return;
             }
 
