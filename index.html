@@ -504,6 +504,31 @@
         #btn-reproducir { background-color: #2ed573; color: white; display: none; flex: 1; }
         #btn-reproducir.visible { display: inline-block; }
 
+        #btn-metronomo {
+            background-color: rgba(5, 217, 232, 0.22);
+            color: #05d9e8;
+            border: 1px solid rgba(5, 217, 232, 0.65);
+            width: 100%;
+        }
+
+        #btn-metronomo.activo {
+            background-color: #05d9e8;
+            color: #1a1a2e;
+            box-shadow: 0 0 14px rgba(5, 217, 232, 0.55);
+        }
+
+        body.modo-hacker #btn-metronomo {
+            background-color: #0a0f0a !important;
+            color: #00ff00 !important;
+            border-color: #00ff00 !important;
+        }
+
+        body.modo-hacker #btn-metronomo.activo {
+            background-color: #00ff00 !important;
+            color: #000000 !important;
+            box-shadow: 0 0 14px #00ff00 !important;
+        }
+
         .select-velocidad-libre {
             width: 100%;
             padding: 8px 10px;
@@ -1597,6 +1622,9 @@
                     <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
                     <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Oír</button>
                 </div>
+                <div class="fila-libre">
+                    <button class="btn-grabadora" id="btn-metronomo" type="button" onclick="toggleMetronomo()">🥁 Metrónomo: OFF</button>
+                </div>
                 <select class="select-velocidad-libre" id="selector-velocidad-libre" title="Velocidad de reproducción">
                     <option value="0.75">0.75x</option>
                     <option value="1" selected>1x</option>
@@ -1784,6 +1812,8 @@
                 melodiaGuardada: (n) => `✅ Melodía guardada (${n} notas)`,
                 primeroGraba: '⚠️ Primero graba una melodía',
                 oyendoVelocidad: (v) => `▶️ Oyendo (${v}x)...`,
+                btnMetronomoOff: '🥁 Metrónomo: OFF',
+                btnMetronomoOn: '🥁 Metrónomo: ON',
                 totalNotasTocadas: '🎵 Total de notas tocadas',
                 statRecord: 'Récord',
                 statDerrotas: 'Derrotas',
@@ -2012,6 +2042,8 @@
                 melodiaGuardada: (n) => `✅ Melody saved (${n} notes)`,
                 primeroGraba: '⚠️ Record a melody first',
                 oyendoVelocidad: (v) => `▶️ Playing (${v}x)...`,
+                btnMetronomoOff: '🥁 Metronome: OFF',
+                btnMetronomoOn: '🥁 Metronome: ON',
                 totalNotasTocadas: '🎵 Total notes played',
                 statRecord: 'Best',
                 statDerrotas: 'Losses',
@@ -2286,6 +2318,7 @@
                 btnGrabar.textContent = esGrabando ? t('btnDetener') : t('btnGrabar');
             }
             setText('btn-reproducir', t('btnReproducir'));
+            actualizarTextoBotonMetronomo();
             setText('btn-terminar-partida', t('btnTerminarPartida'));
 
             actualizarBadgeRacha();
@@ -2425,6 +2458,84 @@
         let notasGrabadas = [];
         let tiempoInicioGrabacion = 0;
         let timeoutsGrabacion = [];
+
+        let metronomoActivo = false;
+        let intervaloMetronomo = null;
+        let pulsoMetronomo = 0;
+        const BPM_METRONOMO = 100;
+
+        function actualizarTextoBotonMetronomo() {
+            const btn = document.getElementById('btn-metronomo');
+            if (!btn) return;
+            btn.textContent = metronomoActivo ? t('btnMetronomoOn') : t('btnMetronomoOff');
+            btn.classList.toggle('activo', metronomoActivo);
+        }
+
+        function sonarPulsoMetronomo(esAcento = false) {
+            if (estaSilenciado) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const ahora = audioCtx.currentTime;
+            const duracion = 0.075;
+
+            osc.type = 'sine';
+            const freq = esAcento ? 1046.5 : 783.99;
+            osc.frequency.setValueAtTime(freq, ahora);
+
+            const pico = esAcento ? 0.28 : 0.18;
+            gain.gain.setValueAtTime(0.001, ahora);
+            gain.gain.linearRampToValueAtTime(pico, ahora + 0.005);
+            gain.gain.exponentialRampToValueAtTime(0.001, ahora + duracion);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(ahora);
+            osc.stop(ahora + duracion + 0.01);
+        }
+
+        function detenerMetronomo() {
+            if (intervaloMetronomo) {
+                clearInterval(intervaloMetronomo);
+                intervaloMetronomo = null;
+            }
+            metronomoActivo = false;
+            pulsoMetronomo = 0;
+            actualizarTextoBotonMetronomo();
+        }
+
+        function iniciarMetronomo() {
+            detenerMetronomo();
+            if (modoJuego !== 'libre') return;
+            metronomoActivo = true;
+            pulsoMetronomo = 0;
+            actualizarTextoBotonMetronomo();
+
+            const tick = () => {
+                if (!metronomoActivo || modoJuego !== 'libre') {
+                    detenerMetronomo();
+                    return;
+                }
+                const esAcento = (pulsoMetronomo % 4) === 0;
+                sonarPulsoMetronomo(esAcento);
+                pulsoMetronomo++;
+            };
+
+            tick();
+            const intervaloMs = Math.round(60000 / BPM_METRONOMO);
+            intervaloMetronomo = setInterval(tick, intervaloMs);
+        }
+
+        function toggleMetronomo() {
+            if (modoJuego !== 'libre') return;
+            if (metronomoActivo) {
+                detenerMetronomo();
+            } else {
+                iniciarMetronomo();
+            }
+        }
 
         const listaEmojis = ['🚀', '🐱', '🌟', '🎮', '🔥', '⚡', '🤖', '👑', '🍕', '🎸', '🦄', '💎', '🍀', '🎯', '🐉'];
         let usuarioActual = { nombre: '', emoji: '' };
@@ -4138,6 +4249,7 @@
         function resetearEstadoAlCambiarModo() {
             limpiarTimers();
             limpiarTimersGrabacion();
+            detenerMetronomo();
             detenerBarraContrarreloj();
             secuencia = [];
             secuenciaObjetivo = [];
