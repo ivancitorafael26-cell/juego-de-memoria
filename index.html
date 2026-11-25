@@ -57,6 +57,43 @@
             100% { opacity: 1; }
         }
 
+        body.modo-contrarreloj-activo::before,
+        body.modo-relampago-activo::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+
+        body.modo-contrarreloj-activo::before {
+            box-shadow: inset 0 0 42px rgba(255, 165, 2, 0.22);
+            opacity: 0.85;
+        }
+
+        body.modo-contrarreloj-activo.urgencia-baja::before {
+            box-shadow: inset 0 0 68px rgba(255, 71, 87, 0.52);
+            background: radial-gradient(circle at 50% 50%, transparent 62%, rgba(255, 71, 87, 0.14) 100%);
+            animation: pulsoUrgenciaTiempo 0.45s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulsoUrgenciaTiempo {
+            0% { opacity: 0.65; }
+            100% { opacity: 1; }
+        }
+
+        body.modo-relampago-activo::before {
+            box-shadow: inset 0 0 46px rgba(255, 215, 0, 0.22);
+            opacity: 0.75;
+        }
+
+        body.modo-relampago-activo.destello-relampago::before {
+            box-shadow: inset 0 0 78px rgba(255, 235, 59, 0.58);
+            opacity: 1;
+        }
+
+
         #matrix-canvas, #atmosfera-canvas, #confeti-canvas {
             position: fixed;
             top: 0;
@@ -3001,6 +3038,32 @@
             document.body.classList.toggle('brillo-nivel-alto', activar);
         }
 
+        function actualizarEfectosVisualesModo() {
+            const esContrarrelojActivo = partidaEnCurso && modoJuego === 'contrarreloj';
+            const esRelampagoActivo = partidaEnCurso && modoJuego === 'relampago';
+
+            document.body.classList.toggle('modo-contrarreloj-activo', esContrarrelojActivo);
+            document.body.classList.toggle('modo-relampago-activo', esRelampagoActivo);
+
+            if (!esContrarrelojActivo) {
+                document.body.classList.remove('urgencia-baja');
+            }
+            if (!esRelampagoActivo) {
+                document.body.classList.remove('destello-relampago');
+            }
+        }
+
+        function dispararDestelloRelampago() {
+            if (!partidaEnCurso || modoJuego !== 'relampago') return;
+            document.body.classList.remove('destello-relampago');
+            void document.body.offsetWidth;
+            document.body.classList.add('destello-relampago');
+            setTimeout(() => {
+                document.body.classList.remove('destello-relampago');
+            }, 160);
+        }
+
+
         function actualizarBotonesPartida() {
             const btnJugar = document.getElementById('btn-jugar');
             const btnTerminar = document.getElementById('btn-terminar-partida');
@@ -3059,6 +3122,7 @@
             }
 
             actualizarBrilloNivelAlto();
+            actualizarEfectosVisualesModo();
             actualizarBotonComodin();
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
@@ -3980,6 +4044,7 @@
             toquesHacker = 0;
 
             actualizarBrilloNivelAlto();
+            actualizarEfectosVisualesModo();
 
             const crono = document.getElementById('cronometro-juego');
             if (crono) {
@@ -4082,6 +4147,7 @@
             actualizarBotonComodin();
             actualizarBotonesPartida();
             actualizarBrilloNivelAlto();
+            actualizarEfectosVisualesModo();
             setControlesPartidaActivos(true);
 
             if (modoJuego === 'extremo') {
@@ -4107,6 +4173,7 @@
             nivel++;
             pasoUsuario = 0;
             actualizarBrilloNivelAlto();
+            actualizarEfectosVisualesModo();
 
             if (modoJuego === 'extremo') {
                 const dimDeseada = obtenerDimensionExtremoPorNivel(nivel);
@@ -4231,6 +4298,9 @@
 
                 if (porcentaje <= 30) {
                     barra.classList.add('vibrando-alerta');
+                    document.body.classList.add('urgencia-baja');
+                } else {
+                    document.body.classList.remove('urgencia-baja');
                 }
 
                 if (tiempoRestante <= 0) {
@@ -4249,12 +4319,14 @@
             }
             const barra = document.getElementById('barra-progreso-tiempo');
             if (barra) barra.classList.remove('vibrando-alerta');
+            document.body.classList.remove('urgencia-baja');
         }
 
         function iluminarBloque(indice, duracion = 260, contarNota = true) {
             const bloque = document.getElementById(`bloque-${indice}`);
             if (!bloque) return;
             bloque.classList.add('brillar');
+            dispararDestelloRelampago();
             reproducirSonido(indice, false, contarNota);
             setTimeout(() => bloque.classList.remove('brillar'), duracion);
         }
@@ -4351,6 +4423,7 @@
             comodinDisponibleEnPartida = false;
             comodinUsosRestantes = 0;
             actualizarBrilloNivelAlto();
+            actualizarEfectosVisualesModo();
             actualizarBotonComodin();
             actualizarBotonesPartida();
             limpiarTimers();
