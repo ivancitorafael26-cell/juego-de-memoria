@@ -1332,7 +1332,7 @@
     <div class="modal-overlay" id="modal-logros">
         <div class="modal-contenido">
             <div class="modal-header">
-                <h2><span id="titulo-modal-logros">🏆 Logros</span> (<span id="contador-logros">0/19</span>)</h2>
+                <h2><span id="titulo-modal-logros">🏆 Logros</span> (<span id="contador-logros">0/20</span>)</h2>
                 <button class="btn-cerrar-x" id="btn-cerrar-logros" type="button" onclick="cerrarLogros()" title="Cerrar">✕</button>
             </div>
             <div class="lista-logros" id="lista-logros"></div>
@@ -1874,6 +1874,7 @@
                     repeticion: { nombre: 'Repetición', desc: 'Reproduce tu misma melodía grabada 2 veces seguidas.' },
                     modo_matrix: { nombre: 'Modo Matrix', desc: 'Activa el modo Hacker y toca al menos 10 bloques.' },
                     curioso: { nombre: 'Curioso', desc: 'Abre Estadísticas o Logros después de jugar una partida.' },
+                    trotamundos: { nombre: 'Trotamundos', desc: 'Juega en todos los modos del juego.' },
                     cien_por_ciento: { nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
                 }
             },
@@ -2106,6 +2107,7 @@
                     repeticion: { nombre: 'Replay', desc: 'Play your same recorded melody 2 times in a row.' },
                     modo_matrix: { nombre: 'Matrix Mode', desc: 'Activate Hacker mode and tap at least 10 blocks.' },
                     curioso: { nombre: 'Curious', desc: 'Open Stats or Achievements after playing a game.' },
+                    trotamundos: { nombre: 'Globetrotter', desc: 'Play in all game modes.' },
                     cien_por_ciento: { nombre: '100 Percent', desc: 'Unlock all previous achievements.' }
                 }
             }
@@ -3474,6 +3476,7 @@
             { id: 'repeticion', icono: '🔁', nombre: 'Repetición', desc: 'Reproduce tu misma melodía grabada 2 veces seguidas.' },
             { id: 'modo_matrix', icono: '💻', nombre: 'Modo Matrix', desc: 'Activa el modo Hacker y toca al menos 10 bloques.' },
             { id: 'curioso', icono: '👀', nombre: 'Curioso', desc: 'Abre Estadísticas o Logros después de jugar una partida.' },
+            { id: 'trotamundos', icono: '🗺️', nombre: 'Trotamundos', desc: 'Juega en todos los modos del juego.' },
             { id: 'cien_por_ciento', icono: '👑', nombre: '100 Por Ciento', desc: 'Desbloquea todos los logros anteriores.' }
         ];
 
@@ -3679,6 +3682,7 @@
             }
 
             try { aplicarPreferenciasVisualesAlCargar(); } catch (e) { console.error(e); }
+            try { registrarModoJugadoParaLogro(modoJuego); } catch (e) { console.error(e); }
             try { actualizarBadgeRacha(); } catch (e) { console.error(e); }
             ultimoIndiceTituloLogros = obtenerIndiceTituloPorLogros();
             try { verificarLogrosDeNotas(); } catch (e) { console.error(e); }
@@ -4371,6 +4375,7 @@
 
         function cambiarModoJuego(select, guardar = true) {
             modoJuego = select.value;
+            registrarModoJugadoParaLogro(modoJuego);
             if (guardar) {
                 guardarPreferenciaVisual('modo', modoJuego);
             }
@@ -4422,6 +4427,27 @@
             actualizarBotonesPartida();
         }
 
+        
+        const TODOS_LOS_MODOS_LOGRO = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker', 'automatico'];
+
+        function registrarModoJugadoParaLogro(modo) {
+            if (!TODOS_LOS_MODOS_LOGRO.includes(modo)) return;
+            let visitados = [];
+            try {
+                visitados = JSON.parse(localStorage.getItem('memoria_modos_jugados_v1') || '[]');
+                if (!Array.isArray(visitados)) visitados = [];
+            } catch (e) {
+                visitados = [];
+            }
+            if (!visitados.includes(modo)) {
+                visitados.push(modo);
+                localStorage.setItem('memoria_modos_jugados_v1', JSON.stringify(visitados));
+            }
+            if (TODOS_LOS_MODOS_LOGRO.every(m => visitados.includes(m))) {
+                desbloquearLogro('trotamundos');
+            }
+        }
+
         function iniciarJuego() {
             if (modoJuego === 'libre') {
                 document.getElementById('mensaje').textContent = t('mensajeLibre');
@@ -4429,6 +4455,7 @@
             }
 
             partidaEnCurso = true;
+            registrarModoJugadoParaLogro(modoJuego);
             if (modoJuego !== 'automatico') {
                 haJugadoPartida = true;
                 registrarDiaJugado();
@@ -4630,6 +4657,7 @@
 
         function manejarClicBloque(indice) {
             if (modoJuego === 'libre') {
+                registrarModoJugadoParaLogro('libre');
                 iluminarBloque(indice, 220, false);
                 if (esGrabando) {
                     notasGrabadas.push({ bloque: indice, tiempo: Date.now() - tiempoInicioGrabacion });
@@ -4757,6 +4785,7 @@
             const btnReproducir = document.getElementById('btn-reproducir');
 
             if (!esGrabando) {
+                registrarModoJugadoParaLogro('libre');
                 limpiarTimersGrabacion();
                 esGrabando = true;
                 notasGrabadas = [];
@@ -4782,6 +4811,7 @@
         }
 
         function reproducirGrabacion() {
+            registrarModoJugadoParaLogro('libre');
             if (notasGrabadas.length === 0) {
                 document.getElementById('mensaje').textContent = t('primeroGraba');
                 return;
@@ -4939,6 +4969,7 @@
             localStorage.removeItem('memoria_estetico_v1');
             localStorage.removeItem('memoria_dias_jugados_v1');
             localStorage.removeItem('memoria_prefs_visuales_v1');
+            localStorage.removeItem('memoria_modos_jugados_v1');
 
             totalNotasTocadas = 0;
             logrosDesbloqueados = {};
