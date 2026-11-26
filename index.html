@@ -28,7 +28,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding-top: 80px;
+            padding-top: max(80px, calc(var(--alto-barra, 60px) + 20px));
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1403,6 +1403,37 @@
         #btn-tutorial-sig { background-color: #2ed573; color: #ffffff; border: none; }
         #btn-tutorial-atras:disabled { opacity: 0.35; cursor: default; }
         body.modo-hacker #btn-tutorial-sig { background-color: #00ff00 !important; color: #000000 !important; }
+
+        /* ===== Barra superior en pantallas pequeñas ===== */
+        @media (max-width: 1023px) {
+            .barra-superior .grupo-controles { gap: 6px; }
+            .barra-superior .grupo-controles:last-child .btn-mini {
+                min-width: 40px;
+                height: 38px;
+                padding: 0 10px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+            }
+            .barra-superior .grupo-controles:last-child #btn-silenciar,
+            .barra-superior .grupo-controles:last-child #btn-tutorial-top {
+                min-width: 38px;
+                padding: 0;
+            }
+            .bar-txt { display: none; }
+        }
+        @media (max-width: 640px) {
+            .barra-superior {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 8px 10px;
+            }
+            .barra-superior .grupo-controles { justify-content: center; }
+            .barra-superior .perfil-usuario-bloque { width: 100%; max-width: 360px; }
+            .barra-superior .perfil-usuario-fila { justify-content: center; flex-wrap: nowrap; }
+        }
     </style>
 </head>
 <body>
@@ -2521,6 +2552,7 @@
             }
 
             try { aplicarIdiomaTutorial(); } catch (e) { console.error(e); }
+            try { compactarBotonesBarra(); ajustarEspacioBarra(); } catch (e) { console.error(e); }
         }
 
         function alternarIdioma() {
@@ -2752,6 +2784,45 @@
             else if (e.key === 'ArrowLeft') tutorialAnterior();
         });
         // ================= FIN TUTORIAL =================
+
+
+        // ====== Barra superior: iconos en pantallas pequeñas + espacio dinamico ======
+        function compactarBotonesBarra() {
+            ['btn-global-top', 'btn-confeti-admin-top', 'btn-logros-top', 'btn-estadisticas-top', 'btn-config'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const texto = (el.textContent || '').trim();
+                const corte = texto.indexOf(' ');
+                if (corte <= 0) return;
+                const ico = document.createElement('span');
+                ico.className = 'bar-ico';
+                ico.textContent = texto.slice(0, corte);
+                const txt = document.createElement('span');
+                txt.className = 'bar-txt';
+                txt.textContent = texto.slice(corte);
+                el.textContent = '';
+                el.appendChild(ico);
+                el.appendChild(txt);
+                el.setAttribute('aria-label', texto);
+            });
+        }
+
+        function ajustarEspacioBarra() {
+            const barra = document.querySelector('.barra-superior');
+            if (!barra) return;
+            document.documentElement.style.setProperty('--alto-barra', barra.offsetHeight + 'px');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try { compactarBotonesBarra(); } catch (e) { console.error(e); }
+            ajustarEspacioBarra();
+            const barra = document.querySelector('.barra-superior');
+            if (barra && typeof ResizeObserver !== 'undefined') {
+                new ResizeObserver(ajustarEspacioBarra).observe(barra);
+            }
+        });
+        window.addEventListener('resize', ajustarEspacioBarra);
+        window.addEventListener('orientationchange', () => setTimeout(ajustarEspacioBarra, 150));
 
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
         const CLAVE_ADMIN_POR_DEFECTO = '123456';
