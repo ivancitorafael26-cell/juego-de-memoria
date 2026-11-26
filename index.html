@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Juego de Memoria</title>
     <link rel="icon" type="image/png" href="logo.png">
-    <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a1a2e">
     <style>
         :root {
@@ -1254,8 +1253,6 @@
             white-space: nowrap;
         }
 
-
-    
         .fondo-onda-inclinada {
             position: fixed;
             inset: -26%;
@@ -1297,7 +1294,6 @@
             opacity: 0;
             animation-play-state: paused;
         }
-
     </style>
 </head>
 <body>
@@ -4082,33 +4078,32 @@
                 return;
             }
 
-            // Teclas de piano (blancas y negras cromáticas desde C4 hasta C6 / 25 semitonos)
             const teclasPianoCromaticas = [
-                { freq: 261.63, esNegra: false }, // C4 (Blanca)
-                { freq: 277.18, esNegra: true  }, // C#4/Db4 (Negra)
-                { freq: 293.66, esNegra: false }, // D4 (Blanca)
-                { freq: 311.13, esNegra: true  }, // D#4/Eb4 (Negra)
-                { freq: 329.63, esNegra: false }, // E4 (Blanca)
-                { freq: 349.23, esNegra: false }, // F4 (Blanca)
-                { freq: 369.99, esNegra: true  }, // F#4/Gb4 (Negra)
-                { freq: 392.00, esNegra: false }, // G4 (Blanca)
-                { freq: 415.30, esNegra: true  }, // G#4/Ab4 (Negra)
-                { freq: 440.00, esNegra: false }, // A4 (Blanca)
-                { freq: 466.16, esNegra: true  }, // A#4/Bb4 (Negra)
-                { freq: 493.88, esNegra: false }, // B4 (Blanca)
-                { freq: 523.25, esNegra: false }, // C5 (Blanca)
-                { freq: 554.37, esNegra: true  }, // C#5/Db5 (Negra)
-                { freq: 587.33, esNegra: false }, // D5 (Blanca)
-                { freq: 622.25, esNegra: true  }, // D#5/Eb5 (Negra)
-                { freq: 659.25, esNegra: false }, // E5 (Blanca)
-                { freq: 698.46, esNegra: false }, // F5 (Blanca)
-                { freq: 739.99, esNegra: true  }, // F#5/Gb5 (Negra)
-                { freq: 783.99, esNegra: false }, // G5 (Blanca)
-                { freq: 830.61, esNegra: true  }, // G#5/Ab5 (Negra)
-                { freq: 880.00, esNegra: false }, // A5 (Blanca)
-                { freq: 932.33, esNegra: true  }, // A#5/Bb5 (Negra)
-                { freq: 987.77, esNegra: false }, // B5 (Blanca)
-                { freq: 1046.50, esNegra: false } // C6 (Blanca)
+                { freq: 261.63, esNegra: false },
+                { freq: 277.18, esNegra: true  },
+                { freq: 293.66, esNegra: false },
+                { freq: 311.13, esNegra: true  },
+                { freq: 329.63, esNegra: false },
+                { freq: 349.23, esNegra: false },
+                { freq: 369.99, esNegra: true  },
+                { freq: 392.00, esNegra: false },
+                { freq: 415.30, esNegra: true  },
+                { freq: 440.00, esNegra: false },
+                { freq: 466.16, esNegra: true  },
+                { freq: 493.88, esNegra: false },
+                { freq: 523.25, esNegra: false },
+                { freq: 554.37, esNegra: true  },
+                { freq: 587.33, esNegra: false },
+                { freq: 622.25, esNegra: true  },
+                { freq: 659.25, esNegra: false },
+                { freq: 698.46, esNegra: false },
+                { freq: 739.99, esNegra: true  },
+                { freq: 783.99, esNegra: false },
+                { freq: 830.61, esNegra: true  },
+                { freq: 880.00, esNegra: false },
+                { freq: 932.33, esNegra: true  },
+                { freq: 987.77, esNegra: false },
+                { freq: 1046.50, esNegra: false }
             ];
             const teclaActual = teclasPianoCromaticas[indice % teclasPianoCromaticas.length];
             const frecuencias = teclasPianoCromaticas.map(t => t.freq);
@@ -4158,7 +4153,6 @@
             }
 
             if (tipoSonido === 9) {
-                // Cristal: tono cristalino brillante con armónico agudo
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freqBase * 1.25, ahora);
                 gain.gain.setValueAtTime(0.62, ahora);
@@ -4183,7 +4177,6 @@
             }
 
             if (tipoSonido === 10) {
-                // Trompeta: metal con filtro pasa-bajos que abre rápido
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(freqBase, ahora);
 
@@ -4207,7 +4200,6 @@
             }
 
             if (tipoSonido === 11) {
-                // Agua: burbuja/gota que sube rápido de tono
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freqBase * 0.72, ahora);
                 osc.frequency.exponentialRampToValueAtTime(freqBase * 1.65, ahora + 0.13);
@@ -4223,7 +4215,6 @@
             }
 
             if (tipoSonido === 7) {
-                // Láser: barrido rápido descendente de frecuencia con timbre claro
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(freqBase * 1.85, ahora);
                 osc.frequency.exponentialRampToValueAtTime(Math.max(140, freqBase * 0.42), ahora + 0.17);
@@ -4245,7 +4236,6 @@
             }
 
             if (tipoSonido === 8) {
-                // Arcade: salto escalonado de dos tonos tipo chip de consola
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(freqBase, ahora);
                 osc.frequency.setValueAtTime(freqBase * 1.5, ahora + 0.065);
@@ -4266,7 +4256,6 @@
             }
 
             if (tipoSonido === 3) {
-                // Retro: suavizado con filtro pasa-bajos y menor ganancia para no sonar tan fuerte/áspero
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(freqBase, ahora);
 
@@ -4517,7 +4506,6 @@
             actualizarBotonesPartida();
         }
 
-        
         const TODOS_LOS_MODOS_LOGRO = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker', 'automatico'];
 
         function registrarModoJugadoParaLogro(modo) {
@@ -5074,13 +5062,6 @@
             cerrarConfirmacionBorrar();
             abrirEstadisticas();
         }
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').catch((err) => {
-      console.error('Error registrando Service Worker:', err);
-    });
-  });
-}
     </script>
 </body>
 </html>
