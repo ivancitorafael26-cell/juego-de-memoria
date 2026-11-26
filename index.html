@@ -1254,9 +1254,53 @@
         }
 
 
+    
+        .fondo-onda-inclinada {
+            position: fixed;
+            inset: -26%;
+            width: 152%;
+            height: 152%;
+            pointer-events: none;
+            z-index: 0;
+            background: linear-gradient(
+                -30deg,
+                var(--onda-oscuro, #15182b) 0%,
+                var(--onda-onda, #252c54) 45%,
+                rgba(255, 255, 255, 0.04) 52%,
+                var(--onda-onda, #252c54) 60%,
+                var(--onda-oscuro, #15182b) 100%
+            );
+            background-size: 250% 250%;
+            opacity: 0.55;
+            animation: moverOndaInclinada 20s ease-in-out infinite alternate;
+            will-change: transform, background-position;
+            transition: opacity 0.25s ease;
+        }
+
+        @keyframes moverOndaInclinada {
+            0% {
+                background-position: 10% 25%;
+                transform: translate3d(-1.5%, -1%, 0) rotate(-0.7deg);
+            }
+            50% {
+                background-position: 55% 55%;
+                transform: translate3d(1%, 1%, 0) rotate(0.4deg);
+            }
+            100% {
+                background-position: 90% 80%;
+                transform: translate3d(1.5%, -0.8%, 0) rotate(-0.5deg);
+            }
+        }
+
+        body.modo-hacker .fondo-onda-inclinada {
+            opacity: 0;
+            animation-play-state: paused;
+        }
+
     </style>
 </head>
 <body>
+    <div class="fondo-onda-inclinada" id="fondo-onda-inclinada" aria-hidden="true"></div>
 
     <canvas id="matrix-canvas"></canvas>
     <canvas id="atmosfera-canvas"></canvas>
@@ -3382,6 +3426,7 @@
 
             document.documentElement.style.setProperty('--bg-color', prefs.fondo);
             document.body.style.backgroundColor = prefs.fondo;
+            actualizarOndaFondo(prefs.fondo);
             actualizarColoresTablero(false);
 
             const modosValidos = ['normal', 'invertido', 'relampago', 'contrarreloj', 'libre', 'extremo', 'hacker', 'automatico'];
@@ -3750,12 +3795,55 @@
             }
         }
 
+
+        const PALETAS_ONDA_FONDO = {
+            '#1a1a2e': { oscuro: '#141426', onda: '#2b3363' },
+            '#450a0a': { oscuro: '#330606', onda: '#6e1212' },
+            '#431407': { oscuro: '#2e0d04', onda: '#6e230c' },
+            '#422006': { oscuro: '#2e1603', onda: '#6e380a' },
+            '#052e16': { oscuro: '#031f0e', onda: '#0a5227' },
+            '#172554': { oscuro: '#0f1838', onda: '#233982' },
+            '#2e1065': { oscuro: '#1e0945', onda: '#4919a3' }
+        };
+
+        function hexARgb(hex) {
+            const limpio = String(hex || '').replace('#', '').trim();
+            if (!/^[0-9a-fA-F]{6}$/.test(limpio)) return null;
+            return {
+                r: parseInt(limpio.slice(0, 2), 16),
+                g: parseInt(limpio.slice(2, 4), 16),
+                b: parseInt(limpio.slice(4, 6), 16)
+            };
+        }
+
+        function ajustarTonoHex(hex, factor) {
+            const rgb = hexARgb(hex);
+            if (!rgb) return hex;
+            const clamp = (n) => Math.max(0, Math.min(255, Math.round(n)));
+            const r = clamp(rgb.r * factor);
+            const g = clamp(rgb.g * factor);
+            const b = clamp(rgb.b * factor);
+            return `#${[r, g, b].map(v => v.toString(16).padStart(2, '0')).join('')}`;
+        }
+
+        function actualizarOndaFondo(colorHex) {
+            const onda = document.getElementById('fondo-onda-inclinada');
+            if (!onda) return;
+            const paleta = PALETAS_ONDA_FONDO[colorHex] || {
+                oscuro: ajustarTonoHex(colorHex, 0.72),
+                onda: ajustarTonoHex(colorHex, 1.55)
+            };
+            onda.style.setProperty('--onda-oscuro', paleta.oscuro);
+            onda.style.setProperty('--onda-onda', paleta.onda);
+        }
+
         function aplicarFondoOscuro(select) {
             if (modoJuego === 'hacker' || !select) return;
             const colorElegido = select.value;
             guardarPreferenciaVisual('fondo', colorElegido);
             document.documentElement.style.setProperty('--bg-color', colorElegido);
             document.body.style.backgroundColor = colorElegido;
+            actualizarOndaFondo(colorElegido);
         }
 
         const canvasMatrix = document.getElementById('matrix-canvas');
@@ -4404,6 +4492,7 @@
                 const colorActual = selectorFondo ? selectorFondo.value : '#1a1a2e';
                 document.documentElement.style.setProperty('--bg-color', colorActual);
                 document.body.style.backgroundColor = colorActual;
+                actualizarOndaFondo(colorActual);
             }
 
             if (modoJuego === 'libre') {
