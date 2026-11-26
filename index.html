@@ -1253,6 +1253,7 @@
             white-space: nowrap;
         }
 
+
     </style>
 </head>
 <body>
@@ -1300,7 +1301,7 @@
             <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
-            <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;">⚙️ Configuración</button>
+            <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;" title="Configuración">⚙️ Configuración</button>
         </div>
     </div>
 
@@ -1387,6 +1388,7 @@
             <div class="grupo-opcion-config">
                 <label id="label-sonido">🎹 Instrumento / Sonido</label>
                 <select id="selector-sonido" class="btn-mini" onchange="cambiarSonidoSeleccionado(this)">
+                    <option value="12">🎹 Piano</option>
                     <option value="1" selected>🔔 Campanas</option>
                     <option value="3">🕹️ Retro</option>
                     <option value="5">🎸 Guitarra</option>
@@ -1619,11 +1621,11 @@
 
             <div class="panel-grabadora" id="panel-grabadora">
                 <div class="fila-libre">
-                    <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar (G)</button>
-                    <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Oír (P)</button>
+                    <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
+                    <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Oír</button>
                 </div>
                 <div class="fila-libre">
-                    <button class="btn-grabadora" id="btn-metronomo" type="button" onclick="toggleMetronomo()">🥁 Metrónomo: OFF (M)</button>
+                    <button class="btn-grabadora" id="btn-metronomo" type="button" onclick="toggleMetronomo()">🥁 Metrónomo: OFF</button>
                 </div>
                 <select class="select-velocidad-libre" id="selector-velocidad-libre" title="Velocidad de reproducción">
                     <option value="0.75">0.75x</option>
@@ -1635,9 +1637,9 @@
         </div>
 
         <div class="acciones-partida">
-            <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar (Enter)</button>
-            <button id="btn-terminar-partida" type="button" onclick="terminarPartidaManualmente()">🛑 Terminar partida (Esc)</button>
-            <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir 1 (C)</button>
+            <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar</button>
+            <button id="btn-terminar-partida" type="button" onclick="terminarPartidaManualmente()">🛑 Terminar partida</button>
+            <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir 1</button>
         </div>
     </div>
 
@@ -1657,6 +1659,7 @@
                 titleEstadisticas: 'Ver Estadísticas',
                 titleSilenciar: 'Silenciar / Activar sonido',
                 btnConfig: '⚙️ Configuración',
+                titleConfig: 'Configuración',
                 cerrar: 'Cerrar',
                 toastTitulo: '¡Logro Desbloqueado!',
                 usuarioTitulo: '👋 ¡Bienvenido al Juego de Memoria!',
@@ -1708,6 +1711,7 @@
                 atmos2: '❄️ Nieve',
                 atmos3: '✨ Brillitos',
                 labelSonido: '🎹 Instrumento / Sonido',
+                sonido12: '🎹 Piano',
                 sonido1: '🔔 Campanas',
                 sonido3: '🕹️ Retro',
                 sonido5: '🎸 Guitarra',
@@ -1786,14 +1790,14 @@
                 racha: (n) => `🔥 Racha: ${n} ${n === 1 ? 'día' : 'días'}`,
                 mensajeInicial: 'Presiona "Jugar" para empezar',
                 mensajeLibre: '🎹 Toca libremente o graba tu melodía',
-                btnGrabar: '🔴 Grabar (G)',
-                btnDetener: '⏹️ Detener (G)',
-                btnReproducir: '▶️ Oír (P)',
+                btnGrabar: '🔴 Grabar',
+                btnDetener: '⏹️ Detener',
+                btnReproducir: '▶️ Oír',
                 titleVelocidad: 'Velocidad de reproducción',
-                btnJugar: 'Jugar (Enter)',
-                btnJugarDeNuevo: 'Jugar de nuevo (Enter)',
-                btnTerminarPartida: '🛑 Terminar partida (Esc)',
-                btnComodin: (n) => `🔁 Repetir ${n} (C)`,
+                btnJugar: 'Jugar',
+                btnJugarDeNuevo: 'Jugar de nuevo',
+                btnTerminarPartida: '🛑 Terminar partida',
+                btnComodin: (n) => `🔁 Repetir ${n}`,
                 repitiendoSecuencia: '🔁 Repitiendo secuencia...',
                 partidaTerminadaRecord: (n) => `🛑 Partida terminada · Récord guardado (Nivel ${n})`,
                 partidaTerminada: '🛑 Partida terminada',
@@ -1812,8 +1816,8 @@
                 melodiaGuardada: (n) => `✅ Melodía guardada (${n} notas)`,
                 primeroGraba: '⚠️ Primero graba una melodía',
                 oyendoVelocidad: (v) => `▶️ Oyendo (${v}x)...`,
-                btnMetronomoOff: '🥁 Metrónomo: OFF (M)',
-                btnMetronomoOn: '🥁 Metrónomo: ON (M)',
+                btnMetronomoOff: '🥁 Metrónomo: OFF',
+                btnMetronomoOn: '🥁 Metrónomo: ON',
                 totalNotasTocadas: '🎵 Total de notas tocadas',
                 statRecord: 'Récord',
                 statDerrotas: 'Derrotas',
@@ -1887,6 +1891,7 @@
                 titleEstadisticas: 'View Stats',
                 titleSilenciar: 'Mute / Unmute sound',
                 btnConfig: '⚙️ Settings',
+                titleConfig: 'Settings',
                 cerrar: 'Close',
                 toastTitulo: 'Achievement Unlocked!',
                 usuarioTitulo: '👋 Welcome to Memory Game!',
@@ -1938,6 +1943,7 @@
                 atmos2: '❄️ Snow',
                 atmos3: '✨ Sparkles',
                 labelSonido: '🎹 Instrument / Sound',
+                sonido12: '🎹 Piano',
                 sonido1: '🔔 Bells',
                 sonido3: '🕹️ Retro',
                 sonido5: '🎸 Guitar',
@@ -2016,14 +2022,14 @@
                 racha: (n) => `🔥 Streak: ${n} ${n === 1 ? 'day' : 'days'}`,
                 mensajeInicial: 'Press "Play" to start',
                 mensajeLibre: '🎹 Play freely or record your melody',
-                btnGrabar: '🔴 Record (G)',
-                btnDetener: '⏹️ Stop (G)',
-                btnReproducir: '▶️ Play (P)',
+                btnGrabar: '🔴 Record',
+                btnDetener: '⏹️ Stop',
+                btnReproducir: '▶️ Play',
                 titleVelocidad: 'Playback speed',
-                btnJugar: 'Play (Enter)',
-                btnJugarDeNuevo: 'Play again (Enter)',
-                btnTerminarPartida: '🛑 End game (Esc)',
-                btnComodin: (n) => `🔁 Repeat ${n} (C)`,
+                btnJugar: 'Play',
+                btnJugarDeNuevo: 'Play again',
+                btnTerminarPartida: '🛑 End game',
+                btnComodin: (n) => `🔁 Repeat ${n}`,
                 repitiendoSecuencia: '🔁 Replaying sequence...',
                 partidaTerminadaRecord: (n) => `🛑 Game ended · Record saved (Level ${n})`,
                 partidaTerminada: '🛑 Game ended',
@@ -2042,8 +2048,8 @@
                 melodiaGuardada: (n) => `✅ Melody saved (${n} notes)`,
                 primeroGraba: '⚠️ Record a melody first',
                 oyendoVelocidad: (v) => `▶️ Playing (${v}x)...`,
-                btnMetronomoOff: '🥁 Metronome: OFF (M)',
-                btnMetronomoOn: '🥁 Metronome: ON (M)',
+                btnMetronomoOff: '🥁 Metronome: OFF',
+                btnMetronomoOn: '🥁 Metronome: ON',
                 totalNotasTocadas: '🎵 Total notes played',
                 statRecord: 'Best',
                 statDerrotas: 'Losses',
@@ -2173,6 +2179,7 @@
             setAttr('btn-estadisticas-top', 'title', t('titleEstadisticas'));
             setAttr('btn-silenciar', 'title', t('titleSilenciar'));
             setText('btn-config', t('btnConfig'));
+            setAttr('btn-config', 'title', t('titleConfig'));
 
             setText('usuario-titulo', t('usuarioTitulo'));
             setText('usuario-subtitulo', t('usuarioSubtitulo'));
@@ -2237,6 +2244,7 @@
             setSelectOptionText('selector-atmosfera', '3', t('atmos3'));
 
             setText('label-sonido', t('labelSonido'));
+            setSelectOptionText('selector-sonido', '12', t('sonido12'));
             setSelectOptionText('selector-sonido', '1', t('sonido1'));
             setSelectOptionText('selector-sonido', '3', t('sonido3'));
             setSelectOptionText('selector-sonido', '5', t('sonido5'));
@@ -3534,7 +3542,7 @@
         }
 
         function verificarProgresoEstetico() {
-            const todosSonidos = ['1', '3', '5', '7', '8', '9', '10', '11'].every(s => progresoEstetico.sonidos.includes(s));
+            const todosSonidos = ['12', '1', '3', '5', '7', '8', '9', '10', '11'].every(s => progresoEstetico.sonidos.includes(s));
             const todasAtmosferas = ['0', '1', '2', '3'].every(a => progresoEstetico.atmosferas.includes(a));
             if (todosSonidos && todasAtmosferas) {
                 desbloquearLogro('estetico');
@@ -3981,12 +3989,80 @@
                 return;
             }
 
-            const frecuencias = [
-                392.00, 440.00, 493.88, 523.25, 587.33, 659.25, 698.46, 783.99,
-                880.00, 987.77, 1046.50, 1174.66, 1244.51, 1318.51, 1396.91, 1479.98,
-                1567.98, 1661.22, 1760.00, 1864.66, 1975.53, 2093.00, 2217.46, 2349.32, 2489.02
+            // Teclas de piano (blancas y negras cromáticas desde C4 hasta C6 / 25 semitonos)
+            const teclasPianoCromaticas = [
+                { freq: 261.63, esNegra: false }, // C4 (Blanca)
+                { freq: 277.18, esNegra: true  }, // C#4/Db4 (Negra)
+                { freq: 293.66, esNegra: false }, // D4 (Blanca)
+                { freq: 311.13, esNegra: true  }, // D#4/Eb4 (Negra)
+                { freq: 329.63, esNegra: false }, // E4 (Blanca)
+                { freq: 349.23, esNegra: false }, // F4 (Blanca)
+                { freq: 369.99, esNegra: true  }, // F#4/Gb4 (Negra)
+                { freq: 392.00, esNegra: false }, // G4 (Blanca)
+                { freq: 415.30, esNegra: true  }, // G#4/Ab4 (Negra)
+                { freq: 440.00, esNegra: false }, // A4 (Blanca)
+                { freq: 466.16, esNegra: true  }, // A#4/Bb4 (Negra)
+                { freq: 493.88, esNegra: false }, // B4 (Blanca)
+                { freq: 523.25, esNegra: false }, // C5 (Blanca)
+                { freq: 554.37, esNegra: true  }, // C#5/Db5 (Negra)
+                { freq: 587.33, esNegra: false }, // D5 (Blanca)
+                { freq: 622.25, esNegra: true  }, // D#5/Eb5 (Negra)
+                { freq: 659.25, esNegra: false }, // E5 (Blanca)
+                { freq: 698.46, esNegra: false }, // F5 (Blanca)
+                { freq: 739.99, esNegra: true  }, // F#5/Gb5 (Negra)
+                { freq: 783.99, esNegra: false }, // G5 (Blanca)
+                { freq: 830.61, esNegra: true  }, // G#5/Ab5 (Negra)
+                { freq: 880.00, esNegra: false }, // A5 (Blanca)
+                { freq: 932.33, esNegra: true  }, // A#5/Bb5 (Negra)
+                { freq: 987.77, esNegra: false }, // B5 (Blanca)
+                { freq: 1046.50, esNegra: false } // C6 (Blanca)
             ];
-            const freqBase = frecuencias[indice % frecuencias.length];
+            const teclaActual = teclasPianoCromaticas[indice % teclasPianoCromaticas.length];
+            const frecuencias = teclasPianoCromaticas.map(t => t.freq);
+            const freqBase = teclaActual.freq;
+
+            if (tipoSonido === 12) {
+                const esNegra = teclaActual.esNegra;
+                const duracionNota = esNegra ? 0.52 : 0.72;
+                const brilloFiltro = esNegra ? 5.2 : 6.8;
+                const armonicos = esNegra
+                    ? [
+                        { mult: 1, tipo: 'triangle', amp: 0.62, decay: duracionNota },
+                        { mult: 2, tipo: 'sine', amp: 0.34, decay: duracionNota * 0.75 },
+                        { mult: 3, tipo: 'sine', amp: 0.16, decay: duracionNota * 0.5 },
+                        { mult: 4, tipo: 'sine', amp: 0.08, decay: duracionNota * 0.32 }
+                    ]
+                    : [
+                        { mult: 1, tipo: 'triangle', amp: 0.70, decay: duracionNota },
+                        { mult: 2, tipo: 'sine', amp: 0.26, decay: duracionNota * 0.74 },
+                        { mult: 3, tipo: 'sine', amp: 0.11, decay: duracionNota * 0.46 },
+                        { mult: 4, tipo: 'sine', amp: 0.04, decay: duracionNota * 0.28 }
+                    ];
+
+                const filtroPiano = audioCtx.createBiquadFilter();
+                filtroPiano.type = 'lowpass';
+                filtroPiano.Q.setValueAtTime(esNegra ? 1.45 : 1.05, ahora);
+                filtroPiano.frequency.setValueAtTime(Math.min(9200, freqBase * brilloFiltro), ahora);
+                filtroPiano.frequency.exponentialRampToValueAtTime(Math.max(400, freqBase * (esNegra ? 2.1 : 1.75)), ahora + duracionNota * 0.85);
+                filtroPiano.connect(compresor);
+
+                armonicos.forEach(arm => {
+                    const oscArm = audioCtx.createOscillator();
+                    const gainArm = audioCtx.createGain();
+                    oscArm.type = arm.tipo;
+                    oscArm.frequency.setValueAtTime(freqBase * arm.mult, ahora);
+
+                    gainArm.gain.setValueAtTime(0.0008, ahora);
+                    gainArm.gain.linearRampToValueAtTime(arm.amp, ahora + (esNegra ? 0.006 : 0.009));
+                    gainArm.gain.exponentialRampToValueAtTime(0.0008, ahora + arm.decay);
+
+                    oscArm.connect(gainArm);
+                    gainArm.connect(filtroPiano);
+                    oscArm.start(ahora);
+                    oscArm.stop(ahora + arm.decay + 0.02);
+                });
+                return;
+            }
 
             if (tipoSonido === 9) {
                 // Cristal: tono cristalino brillante con armónico agudo
@@ -4878,105 +4954,6 @@
             abrirEstadisticas();
         }
 
-        function hayModalActivo() {
-            return !!document.querySelector('.modal-overlay.activo');
-        }
-
-        function cerrarModalActivoPorEscape() {
-            const modales = [
-                { id: 'modal-confirmar-borrar', cerrar: cerrarConfirmacionBorrar },
-                { id: 'modal-panel-admin', cerrar: cerrarPanelAdmin },
-                { id: 'modal-pin-admin', cerrar: cerrarModalPinAdmin },
-                { id: 'modal-estadisticas', cerrar: cerrarEstadisticas },
-                { id: 'modal-logros', cerrar: cerrarLogros },
-                { id: 'modal-global', cerrar: cerrarClasificacionGlobal },
-                { id: 'modal-configuracion', cerrar: cerrarConfiguracion }
-            ];
-            for (const m of modales) {
-                const el = document.getElementById(m.id);
-                if (el && el.classList.contains('activo')) {
-                    m.cerrar();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        document.addEventListener('keydown', (e) => {
-            const target = e.target;
-            const etiqueta = target && target.tagName ? target.tagName.toUpperCase() : '';
-            if (etiqueta === 'INPUT' || etiqueta === 'TEXTAREA' || etiqueta === 'SELECT' || (target && target.isContentEditable)) {
-                return;
-            }
-
-            const modalUsr = document.getElementById('modal-usuario');
-            if (modalUsr && (modalUsr.classList.contains('activo') || modalUsr.style.display === 'flex')) {
-                return;
-            }
-
-            if (e.key === 'Escape') {
-                if (cerrarModalActivoPorEscape()) {
-                    e.preventDefault();
-                    return;
-                }
-                const btnTerminar = document.getElementById('btn-terminar-partida');
-                if (btnTerminar && btnTerminar.classList.contains('visible') && !btnTerminar.disabled) {
-                    e.preventDefault();
-                    terminarPartidaManualmente();
-                }
-                return;
-            }
-
-            if (hayModalActivo()) return;
-
-            const tecla = (e.key || '').toLowerCase();
-
-            if (e.key === 'Enter' || e.code === 'Space') {
-                const btnJugar = document.getElementById('btn-jugar');
-                if (btnJugar && btnJugar.style.display !== 'none' && !btnJugar.disabled) {
-                    e.preventDefault();
-                    iniciarJuego();
-                }
-                return;
-            }
-
-            if (tecla === 'c') {
-                const btnComodin = document.getElementById('btn-comodin-repetir');
-                if (btnComodin && btnComodin.classList.contains('visible') && !btnComodin.disabled) {
-                    e.preventDefault();
-                    usarComodinRepetir();
-                }
-                return;
-            }
-
-            if (tecla === 's') {
-                e.preventDefault();
-                toggleSilenciar();
-                return;
-            }
-
-            if (modoJuego === 'libre') {
-                if (tecla === 'g') {
-                    const btnGrabar = document.getElementById('btn-grabar');
-                    if (btnGrabar && !btnGrabar.disabled) {
-                        e.preventDefault();
-                        toggleGrabar();
-                    }
-                } else if (tecla === 'p') {
-                    const btnReproducir = document.getElementById('btn-reproducir');
-                    if (btnReproducir && btnReproducir.classList.contains('visible') && !btnReproducir.disabled) {
-                        e.preventDefault();
-                        reproducirGrabacion();
-                    }
-                } else if (tecla === 'm') {
-                    const btnMetro = document.getElementById('btn-metronomo');
-                    if (btnMetro && !btnMetro.disabled) {
-                        e.preventDefault();
-                        toggleMetronomo();
-                    }
-                }
-            }
-        });
     </script>
 </body>
 </html>
