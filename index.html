@@ -1619,11 +1619,11 @@
 
             <div class="panel-grabadora" id="panel-grabadora">
                 <div class="fila-libre">
-                    <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar</button>
-                    <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Oír</button>
+                    <button class="btn-grabadora" id="btn-grabar" type="button" onclick="toggleGrabar()">🔴 Grabar (G)</button>
+                    <button class="btn-grabadora" id="btn-reproducir" type="button" onclick="reproducirGrabacion()">▶️ Oír (P)</button>
                 </div>
                 <div class="fila-libre">
-                    <button class="btn-grabadora" id="btn-metronomo" type="button" onclick="toggleMetronomo()">🥁 Metrónomo: OFF</button>
+                    <button class="btn-grabadora" id="btn-metronomo" type="button" onclick="toggleMetronomo()">🥁 Metrónomo: OFF (M)</button>
                 </div>
                 <select class="select-velocidad-libre" id="selector-velocidad-libre" title="Velocidad de reproducción">
                     <option value="0.75">0.75x</option>
@@ -1635,9 +1635,9 @@
         </div>
 
         <div class="acciones-partida">
-            <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar</button>
-            <button id="btn-terminar-partida" type="button" onclick="terminarPartidaManualmente()">🛑 Terminar partida</button>
-            <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir (1)</button>
+            <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar (Enter)</button>
+            <button id="btn-terminar-partida" type="button" onclick="terminarPartidaManualmente()">🛑 Terminar partida (Esc)</button>
+            <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir (1) (C)</button>
         </div>
     </div>
 
@@ -1786,14 +1786,14 @@
                 racha: (n) => `🔥 Racha: ${n} ${n === 1 ? 'día' : 'días'}`,
                 mensajeInicial: 'Presiona "Jugar" para empezar',
                 mensajeLibre: '🎹 Toca libremente o graba tu melodía',
-                btnGrabar: '🔴 Grabar',
-                btnDetener: '⏹️ Detener',
-                btnReproducir: '▶️ Oír',
+                btnGrabar: '🔴 Grabar (G)',
+                btnDetener: '⏹️ Detener (G)',
+                btnReproducir: '▶️ Oír (P)',
                 titleVelocidad: 'Velocidad de reproducción',
-                btnJugar: 'Jugar',
-                btnJugarDeNuevo: 'Jugar de nuevo',
-                btnTerminarPartida: '🛑 Terminar partida',
-                btnComodin: (n) => `🔁 Repetir (${n})`,
+                btnJugar: 'Jugar (Enter)',
+                btnJugarDeNuevo: 'Jugar de nuevo (Enter)',
+                btnTerminarPartida: '🛑 Terminar partida (Esc)',
+                btnComodin: (n) => `🔁 Repetir (${n}) (C)`,
                 repitiendoSecuencia: '🔁 Repitiendo secuencia...',
                 partidaTerminadaRecord: (n) => `🛑 Partida terminada · Récord guardado (Nivel ${n})`,
                 partidaTerminada: '🛑 Partida terminada',
@@ -1812,8 +1812,8 @@
                 melodiaGuardada: (n) => `✅ Melodía guardada (${n} notas)`,
                 primeroGraba: '⚠️ Primero graba una melodía',
                 oyendoVelocidad: (v) => `▶️ Oyendo (${v}x)...`,
-                btnMetronomoOff: '🥁 Metrónomo: OFF',
-                btnMetronomoOn: '🥁 Metrónomo: ON',
+                btnMetronomoOff: '🥁 Metrónomo: OFF (M)',
+                btnMetronomoOn: '🥁 Metrónomo: ON (M)',
                 totalNotasTocadas: '🎵 Total de notas tocadas',
                 statRecord: 'Récord',
                 statDerrotas: 'Derrotas',
@@ -2016,14 +2016,14 @@
                 racha: (n) => `🔥 Streak: ${n} ${n === 1 ? 'day' : 'days'}`,
                 mensajeInicial: 'Press "Play" to start',
                 mensajeLibre: '🎹 Play freely or record your melody',
-                btnGrabar: '🔴 Record',
-                btnDetener: '⏹️ Stop',
-                btnReproducir: '▶️ Play',
+                btnGrabar: '🔴 Record (G)',
+                btnDetener: '⏹️ Stop (G)',
+                btnReproducir: '▶️ Play (P)',
                 titleVelocidad: 'Playback speed',
-                btnJugar: 'Play',
-                btnJugarDeNuevo: 'Play again',
-                btnTerminarPartida: '🛑 End game',
-                btnComodin: (n) => `🔁 Repeat (${n})`,
+                btnJugar: 'Play (Enter)',
+                btnJugarDeNuevo: 'Play again (Enter)',
+                btnTerminarPartida: '🛑 End game (Esc)',
+                btnComodin: (n) => `🔁 Repeat (${n}) (C)`,
                 repitiendoSecuencia: '🔁 Replaying sequence...',
                 partidaTerminadaRecord: (n) => `🛑 Game ended · Record saved (Level ${n})`,
                 partidaTerminada: '🛑 Game ended',
@@ -2042,8 +2042,8 @@
                 melodiaGuardada: (n) => `✅ Melody saved (${n} notes)`,
                 primeroGraba: '⚠️ Record a melody first',
                 oyendoVelocidad: (v) => `▶️ Playing (${v}x)...`,
-                btnMetronomoOff: '🥁 Metronome: OFF',
-                btnMetronomoOn: '🥁 Metronome: ON',
+                btnMetronomoOff: '🥁 Metronome: OFF (M)',
+                btnMetronomoOn: '🥁 Metronome: ON (M)',
                 totalNotasTocadas: '🎵 Total notes played',
                 statRecord: 'Best',
                 statDerrotas: 'Losses',
@@ -4877,6 +4877,106 @@
             cerrarConfirmacionBorrar();
             abrirEstadisticas();
         }
+
+        function hayModalActivo() {
+            return !!document.querySelector('.modal-overlay.activo');
+        }
+
+        function cerrarModalActivoPorEscape() {
+            const modales = [
+                { id: 'modal-confirmar-borrar', cerrar: cerrarConfirmacionBorrar },
+                { id: 'modal-panel-admin', cerrar: cerrarPanelAdmin },
+                { id: 'modal-pin-admin', cerrar: cerrarModalPinAdmin },
+                { id: 'modal-estadisticas', cerrar: cerrarEstadisticas },
+                { id: 'modal-logros', cerrar: cerrarLogros },
+                { id: 'modal-global', cerrar: cerrarClasificacionGlobal },
+                { id: 'modal-configuracion', cerrar: cerrarConfiguracion }
+            ];
+            for (const m of modales) {
+                const el = document.getElementById(m.id);
+                if (el && el.classList.contains('activo')) {
+                    m.cerrar();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const target = e.target;
+            const etiqueta = target && target.tagName ? target.tagName.toUpperCase() : '';
+            if (etiqueta === 'INPUT' || etiqueta === 'TEXTAREA' || etiqueta === 'SELECT' || (target && target.isContentEditable)) {
+                return;
+            }
+
+            const modalUsr = document.getElementById('modal-usuario');
+            if (modalUsr && (modalUsr.classList.contains('activo') || modalUsr.style.display === 'flex')) {
+                return;
+            }
+
+            if (e.key === 'Escape') {
+                if (cerrarModalActivoPorEscape()) {
+                    e.preventDefault();
+                    return;
+                }
+                const btnTerminar = document.getElementById('btn-terminar-partida');
+                if (btnTerminar && btnTerminar.classList.contains('visible') && !btnTerminar.disabled) {
+                    e.preventDefault();
+                    terminarPartidaManualmente();
+                }
+                return;
+            }
+
+            if (hayModalActivo()) return;
+
+            const tecla = (e.key || '').toLowerCase();
+
+            if (e.key === 'Enter' || e.code === 'Space') {
+                const btnJugar = document.getElementById('btn-jugar');
+                if (btnJugar && btnJugar.style.display !== 'none' && !btnJugar.disabled) {
+                    e.preventDefault();
+                    iniciarJuego();
+                }
+                return;
+            }
+
+            if (tecla === 'c') {
+                const btnComodin = document.getElementById('btn-comodin-repetir');
+                if (btnComodin && btnComodin.classList.contains('visible') && !btnComodin.disabled) {
+                    e.preventDefault();
+                    usarComodinRepetir();
+                }
+                return;
+            }
+
+            if (tecla === 's') {
+                e.preventDefault();
+                toggleSilenciar();
+                return;
+            }
+
+            if (modoJuego === 'libre') {
+                if (tecla === 'g') {
+                    const btnGrabar = document.getElementById('btn-grabar');
+                    if (btnGrabar && !btnGrabar.disabled) {
+                        e.preventDefault();
+                        toggleGrabar();
+                    }
+                } else if (tecla === 'p') {
+                    const btnReproducir = document.getElementById('btn-reproducir');
+                    if (btnReproducir && btnReproducir.classList.contains('visible') && !btnReproducir.disabled) {
+                        e.preventDefault();
+                        reproducirGrabacion();
+                    }
+                } else if (tecla === 'm') {
+                    const btnMetro = document.getElementById('btn-metronomo');
+                    if (btnMetro && !btnMetro.disabled) {
+                        e.preventDefault();
+                        toggleMetronomo();
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
