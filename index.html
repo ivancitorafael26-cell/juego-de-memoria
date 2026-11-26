@@ -1637,7 +1637,7 @@
         <div class="acciones-partida">
             <button id="btn-jugar" type="button" onclick="iniciarJuego()">Jugar (Enter)</button>
             <button id="btn-terminar-partida" type="button" onclick="terminarPartidaManualmente()">🛑 Terminar partida (Esc)</button>
-            <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir (1) (C)</button>
+            <button id="btn-comodin-repetir" type="button" onclick="usarComodinRepetir()">🔁 Repetir 1 (C)</button>
         </div>
     </div>
 
@@ -1793,7 +1793,7 @@
                 btnJugar: 'Jugar (Enter)',
                 btnJugarDeNuevo: 'Jugar de nuevo (Enter)',
                 btnTerminarPartida: '🛑 Terminar partida (Esc)',
-                btnComodin: (n) => `🔁 Repetir (${n}) (C)`,
+                btnComodin: (n) => `🔁 Repetir ${n} (C)`,
                 repitiendoSecuencia: '🔁 Repitiendo secuencia...',
                 partidaTerminadaRecord: (n) => `🛑 Partida terminada · Récord guardado (Nivel ${n})`,
                 partidaTerminada: '🛑 Partida terminada',
@@ -2023,7 +2023,7 @@
                 btnJugar: 'Play (Enter)',
                 btnJugarDeNuevo: 'Play again (Enter)',
                 btnTerminarPartida: '🛑 End game (Esc)',
-                btnComodin: (n) => `🔁 Repeat (${n}) (C)`,
+                btnComodin: (n) => `🔁 Repeat ${n} (C)`,
                 repitiendoSecuencia: '🔁 Replaying sequence...',
                 partidaTerminadaRecord: (n) => `🛑 Game ended · Record saved (Level ${n})`,
                 partidaTerminada: '🛑 Game ended',
