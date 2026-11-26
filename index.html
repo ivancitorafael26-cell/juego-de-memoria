@@ -1295,6 +1295,113 @@
             opacity: 0;
             animation-play-state: paused;
         }
+
+        /* ===== Tutorial ===== */
+        #modal-tutorial .modal-contenido {
+            max-width: 430px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .tutorial-slide {
+            text-align: center;
+            height: min(520px, calc(85vh - 190px));
+            min-height: 150px;
+            overflow-y: auto;
+            animation: tutorialEntra 0.28s ease;
+        }
+        .tutorial-puntos, .tutorial-nav, #modal-tutorial .modal-header { flex-shrink: 0; }
+        @keyframes tutorialEntra {
+            from { opacity: 0; transform: translateX(14px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .tutorial-icono { font-size: 2.3rem; line-height: 1.1; margin-bottom: 2px; }
+        .tutorial-slide h3 { margin: 2px 0 8px; font-size: 1.1rem; }
+        .tutorial-slide p {
+            margin: 0 0 10px;
+            color: var(--subtext-color);
+            font-size: 0.92rem;
+            line-height: 1.45;
+        }
+        .tutorial-slide p b, .tutorial-slide li b { color: var(--text-color); }
+        .tutorial-lista {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.35;
+            color: var(--subtext-color);
+        }
+        .tutorial-lista li {
+            padding: 5px 10px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .tutorial-pasos { counter-reset: paso; }
+        .tutorial-pasos li { counter-increment: paso; padding-left: 38px; position: relative; }
+        .tutorial-pasos li::before {
+            content: counter(paso);
+            position: absolute;
+            left: 8px;
+            top: 6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2ed573;
+            color: #0b2a17;
+            font-weight: 800;
+            font-size: 0.78rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tuto-demo {
+            display: grid;
+            grid-template-columns: repeat(2, 42px);
+            gap: 8px;
+            justify-content: center;
+            margin: 2px auto 12px;
+        }
+        .tuto-demo span {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            opacity: 0.35;
+            color: inherit;
+            animation: tutoLuz 4s infinite;
+        }
+        .tuto-demo span:nth-child(1) { background: #ff4757; color: #ff4757; animation-delay: 0s; }
+        .tuto-demo span:nth-child(4) { background: #ffa502; color: #ffa502; animation-delay: 1s; }
+        .tuto-demo span:nth-child(2) { background: #05d9e8; color: #05d9e8; animation-delay: 2s; }
+        .tuto-demo span:nth-child(3) { background: #2ed573; color: #2ed573; animation-delay: 3s; }
+        @keyframes tutoLuz {
+            0%, 20% { opacity: 1; transform: scale(1.12); box-shadow: 0 0 18px currentColor; }
+            26%, 100% { opacity: 0.35; transform: scale(1); box-shadow: none; }
+        }
+        .tutorial-puntos {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 14px 0 12px;
+        }
+        .tutorial-punto {
+            width: 9px;
+            height: 9px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.28);
+            cursor: pointer;
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+        .tutorial-punto.activo { background: #2ed573; transform: scale(1.35); }
+        .tutorial-nav { display: flex; gap: 10px; }
+        .tutorial-nav .btn-mini { flex: 1; padding: 10px; font-size: 0.9rem; }
+        #btn-tutorial-sig { background-color: #2ed573; color: #ffffff; border: none; }
+        #btn-tutorial-atras:disabled { opacity: 0.35; cursor: default; }
+        body.modo-hacker #btn-tutorial-sig { background-color: #00ff00 !important; color: #000000 !important; }
     </style>
 </head>
 <body>
@@ -1343,8 +1450,24 @@
             <button class="btn-mini" id="btn-confeti-admin-top" type="button" onclick="lanzarConfeti()" title="Probar Confeti">🎉 Confeti</button>
             <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
+            <button class="btn-mini" id="btn-tutorial-top" type="button" onclick="abrirTutorial()" style="background-color: rgba(46, 213, 115, 0.65); color: white;" title="Cómo jugar">❓</button>
             <button class="btn-mini" id="btn-silenciar" type="button" onclick="toggleSilenciar()" title="Silenciar / Activar sonido">🔊</button>
             <button class="btn-mini" id="btn-config" type="button" onclick="abrirConfiguracion()" style="background-color: rgba(55, 66, 250, 0.65); color: white;" title="Configuración">⚙️ Configuración</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-tutorial" style="z-index: 1300;">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2 id="titulo-modal-tutorial">❓ Cómo jugar</h2>
+                <button class="btn-cerrar-x" id="btn-cerrar-tutorial" type="button" onclick="cerrarTutorial()" title="Cerrar">✕</button>
+            </div>
+            <div class="tutorial-slide" id="tutorial-cuerpo"></div>
+            <div class="tutorial-puntos" id="tutorial-puntos"></div>
+            <div class="tutorial-nav">
+                <button class="btn-mini" id="btn-tutorial-atras" type="button" onclick="tutorialAnterior()">◀ Atrás</button>
+                <button class="btn-mini" id="btn-tutorial-sig" type="button" onclick="tutorialSiguiente()">Siguiente ▶</button>
+            </div>
         </div>
     </div>
 
@@ -2395,16 +2518,244 @@
                 sincronizarSelectTituloAdmin();
                 renderizarListaAdminLogros();
             }
+
+            try { aplicarIdiomaTutorial(); } catch (e) { console.error(e); }
         }
 
         function alternarIdioma() {
             aplicarIdioma(idiomaActual === 'es' ? 'en' : 'es');
         }
 
+
+        // ================= TUTORIAL =================
+        const TUTORIAL_TEXTOS = {
+            es: {
+                titulo: '❓ Cómo jugar',
+                cerrar: 'Cerrar',
+                atras: '◀ Atrás',
+                siguiente: 'Siguiente ▶',
+                fin: '¡A jugar! 🎮',
+                boton: 'Cómo jugar',
+                pasos: [
+                    {
+                        icono: '🎯',
+                        titulo: 'El objetivo',
+                        html: `<p>Memoriza la <b>secuencia de bloques</b> que se iluminan y repítela <b>en el mismo orden</b>.</p>
+                               <p>Cada nivel añade <b>un bloque más</b>, así que cada vez es más difícil.</p>
+                               <p>🏁 ¡Llega al <b>nivel 10</b> para ganar la partida!</p>`
+                    },
+                    {
+                        icono: '👀',
+                        titulo: 'Así se juega',
+                        html: `<div class="tuto-demo"><span></span><span></span><span></span><span></span></div>
+                               <ul class="tutorial-lista tutorial-pasos">
+                                   <li>Pulsa <b>Jugar</b>.</li>
+                                   <li><b>Observa:</b> los bloques se iluminan y suenan.</li>
+                                   <li>Cuando diga <b>«¡Tu turno!»</b>, toca los mismos bloques en el mismo orden.</li>
+                                   <li>Si aciertas, <b>subes de nivel</b>. Si fallas, termina la partida.</li>
+                               </ul>`
+                    },
+                    {
+                        icono: '🎮',
+                        titulo: 'Modos de juego',
+                        html: `<p>Se cambian en <b>⚙️ Configuración</b>.</p>
+                               <ul class="tutorial-lista">
+                                   <li>▶️ <b>Normal:</b> el clásico.</li>
+                                   <li>🔄 <b>Invertido:</b> repite la secuencia <b>al revés</b>.</li>
+                                   <li>⚡ <b>Relámpago:</b> la secuencia va mucho más rápido.</li>
+                                   <li>⏱️ <b>Contrarreloj:</b> tienes <b>6 segundos</b> para responder.</li>
+                                   <li>🔥 <b>Extremo:</b> el tablero crece (2x2 → 3x3 → 4x4).</li>
+                                   <li>💻 <b>Hacker:</b> todos los bloques son iguales; guíate por la posición y el sonido.</li>
+                                   <li>🤖 <b>Automático:</b> se juega solo, tú escuchas (sin récords).</li>
+                                   <li>🎵 <b>Libre:</b> tablero 5x5 para tocar y grabar melodías.</li>
+                               </ul>`
+                    },
+                    {
+                        icono: '🧰',
+                        titulo: 'Ayudas y ajustes',
+                        html: `<ul class="tutorial-lista">
+                                   <li>🟢🟡🔴 <b>Dificultad:</b> tablero de 2x2, 3x3 o 4x4.</li>
+                                   <li>🔁 <b>Comodín Repetir:</b> en Normal, Invertido y Relámpago puedes ver la secuencia otra vez (1 uso por partida).</li>
+                                   <li>🛑 <b>Terminar partida:</b> te rindes pero se guarda el nivel que alcanzaste.</li>
+                                   <li>🎹 <b>Personaliza</b> instrumento, tema de colores, fondo y efectos en ⚙️ Configuración.</li>
+                                   <li>🔊 Silencia o activa el sonido con el botón del altavoz.</li>
+                               </ul>`
+                    },
+                    {
+                        icono: '🏆',
+                        titulo: 'Tu progreso',
+                        html: `<ul class="tutorial-lista">
+                                   <li>🏆 <b>Logros:</b> hay 20 por desbloquear jugando.</li>
+                                   <li>🌟 <b>Títulos:</b> sube de <b>Principiante</b> a <b>Líder</b> consiguiendo logros.</li>
+                                   <li>📊 <b>Estadísticas:</b> tus récords por modo y dificultad.</li>
+                                   <li>🌍 <b>Global:</b> compárate con jugadores de todo el mundo.</li>
+                                   <li>🔥 <b>Racha:</b> juega días seguidos para mantenerla.</li>
+                               </ul>
+                               <p style="margin-top:12px;">¡Mucha suerte! 🍀</p>`
+                    }
+                ]
+            },
+            en: {
+                titulo: '❓ How to play',
+                cerrar: 'Close',
+                atras: '◀ Back',
+                siguiente: 'Next ▶',
+                fin: "Let's play! 🎮",
+                boton: 'How to play',
+                pasos: [
+                    {
+                        icono: '🎯',
+                        titulo: 'The goal',
+                        html: `<p>Memorize the <b>sequence of blocks</b> that light up and repeat it <b>in the same order</b>.</p>
+                               <p>Every level adds <b>one more block</b>, so it gets harder each time.</p>
+                               <p>🏁 Reach <b>level 10</b> to win the game!</p>`
+                    },
+                    {
+                        icono: '👀',
+                        titulo: 'How it works',
+                        html: `<div class="tuto-demo"><span></span><span></span><span></span><span></span></div>
+                               <ul class="tutorial-lista tutorial-pasos">
+                                   <li>Press <b>Play</b>.</li>
+                                   <li><b>Watch:</b> the blocks light up and play sounds.</li>
+                                   <li>When it says <b>"Your turn!"</b>, tap the same blocks in the same order.</li>
+                                   <li>If you get it right, you <b>level up</b>. If you miss, the game ends.</li>
+                               </ul>`
+                    },
+                    {
+                        icono: '🎮',
+                        titulo: 'Game modes',
+                        html: `<p>Change them in <b>⚙️ Settings</b>.</p>
+                               <ul class="tutorial-lista">
+                                   <li>▶️ <b>Normal:</b> the classic.</li>
+                                   <li>🔄 <b>Inverted:</b> repeat the sequence <b>backwards</b>.</li>
+                                   <li>⚡ <b>Lightning:</b> the sequence plays much faster.</li>
+                                   <li>⏱️ <b>Time Attack:</b> you have <b>6 seconds</b> to answer.</li>
+                                   <li>🔥 <b>Extreme:</b> the board grows (2x2 → 3x3 → 4x4).</li>
+                                   <li>💻 <b>Hacker:</b> all blocks look the same; rely on position and sound.</li>
+                                   <li>🤖 <b>Auto:</b> the game plays itself. You just watch and listen (no records saved).</li>
+                                   <li>🎵 <b>Free:</b> 5x5 board to play and record your own melodies.</li>
+                               </ul>`
+                    },
+                    {
+                        icono: '🧰',
+                        titulo: 'Helps and settings',
+                        html: `<ul class="tutorial-lista">
+                                   <li>🟢🟡🔴 <b>Difficulty:</b> 2x2, 3x3 or 4x4 board.</li>
+                                   <li>🔁 <b>Repeat Wildcard:</b> in Normal, Inverted and Lightning you can watch the sequence again (1 use per game).</li>
+                                   <li>🛑 <b>End game:</b> you give up but the level you reached is saved.</li>
+                                   <li>🎹 <b>Customize</b> instrument, color theme, background and effects in ⚙️ Settings.</li>
+                                   <li>🔊 Mute or unmute with the speaker button.</li>
+                               </ul>`
+                    },
+                    {
+                        icono: '🏆',
+                        titulo: 'Your progress',
+                        html: `<ul class="tutorial-lista">
+                                   <li>🏆 <b>Achievements:</b> 20 to unlock by playing.</li>
+                                   <li>🌟 <b>Titles:</b> go from <b>Beginner</b> to <b>Leader</b> by earning achievements.</li>
+                                   <li>📊 <b>Stats:</b> your records by mode and difficulty.</li>
+                                   <li>🌍 <b>Global:</b> compare yourself with players around the world.</li>
+                                   <li>🔥 <b>Streak:</b> play on consecutive days to keep it going.</li>
+                               </ul>
+                               <p style="margin-top:12px;">Good luck! 🍀</p>`
+                    }
+                ]
+            }
+        };
+
+        const CLAVE_TUTORIAL_VISTO = 'memoria_tutorial_visto_v1';
+        let tutorialPaso = 0;
+
+        function datosTutorial() {
+            return TUTORIAL_TEXTOS[idiomaActual] || TUTORIAL_TEXTOS.es;
+        }
+
+        function renderizarTutorial(animar = true) {
+            const d = datosTutorial();
+            const paso = d.pasos[tutorialPaso];
+            const cuerpo = document.getElementById('tutorial-cuerpo');
+            const puntos = document.getElementById('tutorial-puntos');
+            const btnAtras = document.getElementById('btn-tutorial-atras');
+            const btnSig = document.getElementById('btn-tutorial-sig');
+            if (!cuerpo || !paso) return;
+
+            cuerpo.innerHTML = `<div class="tutorial-icono">${paso.icono}</div><h3>${paso.titulo}</h3>${paso.html}`;
+            if (animar) {
+                cuerpo.style.animation = 'none';
+                void cuerpo.offsetWidth;
+                cuerpo.style.animation = '';
+            }
+
+            puntos.innerHTML = d.pasos.map((_, i) =>
+                `<button type="button" class="tutorial-punto${i === tutorialPaso ? ' activo' : ''}" onclick="irPasoTutorial(${i})" aria-label="${i + 1}/${d.pasos.length}"></button>`
+            ).join('');
+
+            btnAtras.textContent = d.atras;
+            btnAtras.disabled = tutorialPaso === 0;
+            btnSig.textContent = tutorialPaso === d.pasos.length - 1 ? d.fin : d.siguiente;
+            document.getElementById('titulo-modal-tutorial').textContent = d.titulo;
+            document.getElementById('btn-cerrar-tutorial').title = d.cerrar;
+        }
+
+        function aplicarIdiomaTutorial() {
+            const d = datosTutorial();
+            const btn = document.getElementById('btn-tutorial-top');
+            if (btn) btn.title = d.boton;
+            renderizarTutorial(false);
+        }
+
+        function abrirTutorial() {
+            tutorialPaso = 0;
+            renderizarTutorial();
+            document.getElementById('modal-tutorial').classList.add('activo');
+        }
+
+        function cerrarTutorial() {
+            document.getElementById('modal-tutorial').classList.remove('activo');
+            try { localStorage.setItem(CLAVE_TUTORIAL_VISTO, '1'); } catch (e) {}
+        }
+
+        function irPasoTutorial(i) {
+            tutorialPaso = i;
+            renderizarTutorial();
+        }
+
+        function tutorialSiguiente() {
+            if (tutorialPaso >= datosTutorial().pasos.length - 1) {
+                cerrarTutorial();
+                return;
+            }
+            tutorialPaso++;
+            renderizarTutorial();
+        }
+
+        function tutorialAnterior() {
+            if (tutorialPaso > 0) {
+                tutorialPaso--;
+                renderizarTutorial();
+            }
+        }
+
+        function mostrarTutorialSiPrimeraVez() {
+            let visto = false;
+            try { visto = localStorage.getItem(CLAVE_TUTORIAL_VISTO) === '1'; } catch (e) {}
+            if (visto) return;
+            setTimeout(abrirTutorial, 450);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('modal-tutorial');
+            if (!modal || !modal.classList.contains('activo')) return;
+            if (e.key === 'Escape') cerrarTutorial();
+            else if (e.key === 'ArrowRight') tutorialSiguiente();
+            else if (e.key === 'ArrowLeft') tutorialAnterior();
+        });
+        // ================= FIN TUTORIAL =================
+
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
-        const URL_CONFIG_PIN = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/config/pinAdmin.json';
-        const CLAVE_ADMIN_POR_DEFECTO = '3905';
-        let claveAdminActual = localStorage.getItem('memoria_pin_admin_v1') || CLAVE_ADMIN_POR_DEFECTO;
+        const CLAVE_ADMIN_POR_DEFECTO = '123456';
+        // PIN fijo: ya no se lee de Firebase ni se guarda en el navegador
+        try { localStorage.removeItem('memoria_pin_admin_v1'); } catch (e) {}
         let esAdminActivo = false;
 
         let cacheClasificacionGlobal = [];
@@ -2621,21 +2972,6 @@
             document.getElementById('modal-pin-admin').classList.remove('activo');
         }
 
-        async function obtenerPinRemoto() {
-            try {
-                const res = await fetch(URL_CONFIG_PIN);
-                if (!res.ok) return null;
-                const data = await res.json();
-                if (typeof data === 'string' && /^\d{4,6}$/.test(data.trim())) {
-                    return data.trim();
-                }
-                return null;
-            } catch (err) {
-                console.error('No se pudo consultar el PIN en Firebase:', err);
-                return null;
-            }
-        }
-
         async function verificarPinAdmin() {
             const input = document.getElementById('input-pin-admin');
             const err = document.getElementById('mensaje-error-pin');
@@ -2646,15 +2982,7 @@
                 return;
             }
 
-            const pinRemoto = await obtenerPinRemoto();
-            const pinValido = pinRemoto || claveAdminActual || CLAVE_ADMIN_POR_DEFECTO;
-
-            if (pinRemoto) {
-                claveAdminActual = pinRemoto;
-                localStorage.setItem('memoria_pin_admin_v1', pinRemoto);
-            }
-
-            if (pin !== pinValido) {
+            if (pin !== CLAVE_ADMIN_POR_DEFECTO) {
                 if (err) err.textContent = t('pinIncorrecto');
                 return;
             }
@@ -3736,6 +4064,10 @@
             actualizarVisibilidadControlesAdmin();
             actualizarBotonComodin();
             actualizarBotonesPartida();
+
+            if (usuarioActual && usuarioActual.nombre && usuarioActual.nombre.trim().length > 0) {
+                mostrarTutorialSiPrimeraVez();
+            }
         });
 
         function guardarUsuario() {
@@ -3767,6 +4099,7 @@
                 modalUsuario.style.display = 'none';
             }
             if (badgeUsuario) badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
+            mostrarTutorialSiPrimeraVez();
         }
 
         function abrirConfiguracion() {
@@ -3782,8 +4115,10 @@
         function setControlesPartidaActivos(enPartida) {
             const btnStats = document.getElementById('btn-estadisticas-top');
             const btnConfig = document.getElementById('btn-config');
+            const btnTutorial = document.getElementById('btn-tutorial-top');
             if (btnStats) btnStats.disabled = enPartida;
             if (btnConfig) btnConfig.disabled = enPartida;
+            if (btnTutorial) btnTutorial.disabled = enPartida;
         }
 
         function toggleListaFondo() {
