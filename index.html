@@ -1541,18 +1541,29 @@
         }
 
         body.fondo-navidad:not(.modo-hacker) .fondo-onda-inclinada {
-            background:
-                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.085) 0 26px, rgba(255, 255, 255, 0) 26px 52px),
-                linear-gradient(
-                    -30deg,
-                    var(--onda-oscuro, #5e0b16) 0%,
-                    var(--onda-onda, #c0283a) 45%,
-                    rgba(255, 232, 130, 0.22) 52%,
-                    var(--onda-onda, #c0283a) 60%,
-                    var(--onda-oscuro, #5e0b16) 100%
-                );
-            background-size: auto, 250% 250%;
+            background: linear-gradient(
+                -30deg,
+                var(--onda-oscuro, #5e0b16) 0%,
+                var(--onda-onda, #c0283a) 45%,
+                rgba(255, 232, 130, 0.22) 52%,
+                var(--onda-onda, #c0283a) 60%,
+                var(--onda-oscuro, #5e0b16) 100%
+            );
+            background-size: 250% 250%;
             opacity: 0.85;
+        }
+
+        .navidad-rayas {
+            display: none;
+            pointer-events: none;
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .navidad-rayas {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.075) 0 26px, rgba(255, 255, 255, 0) 26px 52px);
         }
 
         .decor-navidad,
@@ -1675,6 +1686,7 @@
 </head>
 <body>
     <div class="fondo-onda-inclinada" id="fondo-onda-inclinada" aria-hidden="true"></div>
+    <div class="navidad-rayas" id="navidad-rayas" aria-hidden="true"></div>
     <div class="decor-navidad" id="decor-navidad" aria-hidden="true"></div>
     <div class="navidad-suelo" id="navidad-suelo" aria-hidden="true">
         <span class="navidad-adorno nav-arbol-1">🎄</span>
@@ -4622,6 +4634,8 @@
         const ctxAtmos = canvasAtmos.getContext('2d');
         let atmosParticles = [];
         let atmosAnimId = null;
+        let atmosUltimoTiempo = 0;
+        let spritesCopos = null;
 
         function cambiarAtmosfera() {
             const selector = document.getElementById('selector-atmosfera');
@@ -4634,6 +4648,73 @@
                 }
             }
             iniciarAtmosfera();
+        }
+
+        // Copos de nieve dibujados una sola vez (3 disenos de 6 puntas) y luego copiados en cada cuadro.
+        function crearSpritesCopos() {
+            const N = 64;
+            const disenos = [
+                { largo: 27, ancho: 3.6, punta: 0, ramas: [{ pos: 0.46, largo: 9, ang: Math.PI / 3 }, { pos: 0.74, largo: 6, ang: Math.PI / 3 }] },
+                { largo: 26, ancho: 3.4, punta: 2.8, ramas: [{ pos: 0.58, largo: 11, ang: Math.PI / 3.3 }] },
+                { largo: 28, ancho: 2.8, punta: 0, ramas: [{ pos: 0.34, largo: 7, ang: Math.PI / 2.3 }, { pos: 0.6, largo: 9, ang: Math.PI / 3 }, { pos: 0.84, largo: 5, ang: Math.PI / 3 }] }
+            ];
+            return disenos.map((d) => {
+                const lienzo = document.createElement('canvas');
+                lienzo.width = N;
+                lienzo.height = N;
+                const c = lienzo.getContext('2d');
+                if (!c) return null;
+                c.translate(N / 2, N / 2);
+                c.strokeStyle = '#ffffff';
+                c.fillStyle = '#ffffff';
+                c.lineWidth = d.ancho;
+                c.lineCap = 'round';
+                for (let k = 0; k < 6; k++) {
+                    c.save();
+                    c.rotate((Math.PI / 3) * k);
+                    c.beginPath();
+                    c.moveTo(0, 0);
+                    c.lineTo(d.largo, 0);
+                    d.ramas.forEach((r) => {
+                        const bx = d.largo * r.pos;
+                        c.moveTo(bx, 0);
+                        c.lineTo(bx + Math.cos(r.ang) * r.largo, Math.sin(r.ang) * r.largo);
+                        c.moveTo(bx, 0);
+                        c.lineTo(bx + Math.cos(r.ang) * r.largo, -Math.sin(r.ang) * r.largo);
+                    });
+                    c.stroke();
+                    if (d.punta) {
+                        c.beginPath();
+                        c.arc(d.largo, 0, d.punta, 0, Math.PI * 2);
+                        c.fill();
+                    }
+                    c.restore();
+                }
+                c.beginPath();
+                c.arc(0, 0, 3.4, 0, Math.PI * 2);
+                c.fill();
+                return lienzo;
+            });
+        }
+
+        function dibujarCopoNieve(ctx, p) {
+            if (!spritesCopos) {
+                try { spritesCopos = crearSpritesCopos(); } catch (e) { spritesCopos = []; }
+            }
+            const sprite = spritesCopos[p.sprite % 3];
+            ctx.save();
+            ctx.globalAlpha = p.alpha;
+            if (sprite) {
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rot);
+                ctx.drawImage(sprite, -p.size / 2, -p.size / 2, p.size, p.size);
+            } else {
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size / 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
         }
 
         function iniciarAtmosfera() {
@@ -4666,7 +4747,28 @@
                 });
             }
 
+            if (tipo === 2) {
+                // Nieve: copos grandes y pequenos (lejos/cerca). La velocidad depende del alto de la pantalla,
+                // asi cae a un ritmo parecido en cualquier celular (unos 5 s en cruzar una pantalla de 640 px).
+                const alto = canvasAtmos.height || 640;
+                const pantallaChica = Math.min(canvasAtmos.width, canvasAtmos.height) < 700;
+                const escalaAlto = Math.min(1.5, Math.max(0.9, alto / 700));
+                const velBase = (pantallaChica ? 2.2 : 1.6) * escalaAlto;
+                atmosParticles.forEach((p, i) => {
+                    const prof = Math.random();
+                    p.size = (pantallaChica ? 12 : 14) + prof * (pantallaChica ? 14 : 16);
+                    p.speedY = (0.55 + prof * 0.9) * velBase;
+                    p.speedX = Math.random() * 0.5 - 0.25;
+                    p.alpha = 0.5 + prof * 0.45;
+                    p.sprite = i % 3;
+                    p.rot = Math.random() * Math.PI * 2;
+                    p.spin = (Math.random() * 0.02 + 0.004) * (Math.random() < 0.5 ? -1 : 1);
+                    p.fase = Math.random() * Math.PI * 2;
+                });
+            }
+
             if (atmosAnimId) cancelAnimationFrame(atmosAnimId);
+            atmosUltimoTiempo = 0;
             animarAtmosfera(tipo);
         }
 
@@ -4704,7 +4806,14 @@
         window.addEventListener('resize', manejarCambioOrientacionAtmosfera);
         window.addEventListener('orientationchange', manejarCambioOrientacionAtmosfera);
 
-        function animarAtmosfera(tipo) {
+        function animarAtmosfera(tipo, tiempo) {
+            // El movimiento se mide en tiempo (no en cuadros): si el celular va a menos de 60 cuadros por segundo,
+            // las particulas siguen cayendo a la misma velocidad.
+            const ahoraMs = (typeof tiempo === 'number') ? tiempo : performance.now();
+            let dt = atmosUltimoTiempo ? (ahoraMs - atmosUltimoTiempo) / 16.667 : 1;
+            dt = Math.min(3, Math.max(0.25, dt));
+            atmosUltimoTiempo = ahoraMs;
+
             ctxAtmos.clearRect(0, 0, canvasAtmos.width, canvasAtmos.height);
 
             const esHorizontal = window.innerWidth > window.innerHeight;
@@ -4715,7 +4824,9 @@
                 ctxAtmos.fillStyle = p.color;
                 ctxAtmos.globalAlpha = tipo === 3 ? (0.45 + Math.abs(Math.sin(p.angle)) * 0.5) : 0.65;
 
-                if (tipo === 1) {
+                if (tipo === 2) {
+                    dibujarCopoNieve(ctxAtmos, p);
+                } else if (tipo === 1) {
                     ctxAtmos.save();
                     ctxAtmos.translate(p.x, p.y);
                     ctxAtmos.rotate(Math.sin(p.angle) * 0.45);
@@ -4737,12 +4848,16 @@
                     ctxAtmos.fill();
                 }
 
-                p.y += p.speedY;
-                p.x += p.speedX;
-                p.angle += 0.03;
+                p.y += p.speedY * dt;
+                p.x += p.speedX * dt;
+                p.angle += 0.03 * dt;
+                if (tipo === 2) {
+                    p.x += Math.sin(p.angle * 1.4 + p.fase) * 0.45 * dt;
+                    p.rot += p.spin * dt;
+                }
 
-                if (p.y > canvasAtmos.height + 15) {
-                    p.y = -15;
+                if (p.y > canvasAtmos.height + (tipo === 2 ? p.size : 15)) {
+                    p.y = tipo === 2 ? -p.size : -15;
                     p.x = Math.random() * canvasAtmos.width;
                 }
                 if (p.x > canvasAtmos.width + 15) p.x = -15;
@@ -4750,7 +4865,7 @@
             }
 
             ctxAtmos.globalAlpha = 1;
-            atmosAnimId = requestAnimationFrame(() => animarAtmosfera(tipo));
+            atmosAnimId = requestAnimationFrame((t) => animarAtmosfera(tipo, t));
         }
 
         function toggleSilenciar() {
