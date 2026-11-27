@@ -1400,6 +1400,46 @@
         .tutorial-punto.activo { background: #2ed573; transform: scale(1.35); }
         .tutorial-nav { display: flex; gap: 10px; }
         .tutorial-nav .btn-mini { flex: 1; padding: 10px; font-size: 0.9rem; }
+
+        .tutorial-zona { position: relative; flex-shrink: 0; }
+        .tutorial-mas {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 46px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            background: linear-gradient(to bottom, transparent, var(--modal-bg) 85%);
+            color: #2ed573;
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+        .tutorial-mas.visible { opacity: 1; }
+        .tutorial-mas span { display: inline-block; animation: tutoRebote 1.2s ease-in-out infinite; }
+        @keyframes tutoRebote {
+            0%, 100% { transform: translateY(-2px); }
+            50% { transform: translateY(3px); }
+        }
+        @media (max-height: 720px) {
+            #modal-tutorial .modal-contenido { padding: 16px 18px; }
+            #modal-tutorial .modal-header { margin-bottom: 8px; min-height: 30px; }
+            .tutorial-slide { height: min(520px, calc(85vh - 150px)); }
+            .tutorial-icono { font-size: 1.9rem; }
+            .tutorial-slide h3 { margin: 0 0 6px; font-size: 1.02rem; }
+            .tutorial-slide p { font-size: 0.86rem; margin-bottom: 7px; }
+            .tutorial-lista { font-size: 0.8rem; }
+            .tutorial-lista li { padding: 4px 9px; margin-bottom: 3px; }
+            .tutorial-pasos li { padding-left: 36px; }
+            .tutorial-pasos li::before { top: 4px; }
+            .tuto-demo { grid-template-columns: repeat(2, 34px); gap: 6px; margin-bottom: 8px; }
+            .tuto-demo span { width: 34px; height: 34px; }
+            .tutorial-puntos { margin: 10px 0 8px; }
+        }
         #btn-tutorial-sig { background-color: #2ed573; color: #ffffff; border: none; }
         #btn-tutorial-atras:disabled { opacity: 0.35; cursor: default; }
         body.modo-hacker #btn-tutorial-sig { background-color: #00ff00 !important; color: #000000 !important; }
@@ -1494,7 +1534,10 @@
                 <h2 id="titulo-modal-tutorial">❓ Cómo jugar</h2>
                 <button class="btn-cerrar-x" id="btn-cerrar-tutorial" type="button" onclick="cerrarTutorial()" title="Cerrar">✕</button>
             </div>
-            <div class="tutorial-slide" id="tutorial-cuerpo"></div>
+            <div class="tutorial-zona">
+                <div class="tutorial-slide" id="tutorial-cuerpo" onscroll="actualizarAvisoScrollTutorial()"></div>
+                <div class="tutorial-mas" id="tutorial-mas" aria-hidden="true"><span>▾</span></div>
+            </div>
             <div class="tutorial-puntos" id="tutorial-puntos"></div>
             <div class="tutorial-nav">
                 <button class="btn-mini" id="btn-tutorial-atras" type="button" onclick="tutorialAnterior()">◀ Atrás</button>
@@ -2594,13 +2637,13 @@
                         html: `<p>Se cambian en <b>⚙️ Configuración</b>.</p>
                                <ul class="tutorial-lista">
                                    <li>▶️ <b>Normal:</b> el clásico.</li>
-                                   <li>🔄 <b>Invertido:</b> repite la secuencia <b>al revés</b>.</li>
-                                   <li>⚡ <b>Relámpago:</b> la secuencia va mucho más rápido.</li>
-                                   <li>⏱️ <b>Contrarreloj:</b> tienes <b>6 segundos</b> para responder.</li>
-                                   <li>🔥 <b>Extremo:</b> el tablero crece (2x2 → 3x3 → 4x4).</li>
-                                   <li>💻 <b>Hacker:</b> todos los bloques son iguales; guíate por la posición y el sonido.</li>
-                                   <li>🤖 <b>Automático:</b> se juega solo, tú escuchas (sin récords).</li>
-                                   <li>🎵 <b>Libre:</b> tablero 5x5 para tocar y grabar melodías.</li>
+                                   <li>🔄 <b>Invertido:</b> repítela <b>al revés</b>.</li>
+                                   <li>⚡ <b>Relámpago:</b> va muy rápido.</li>
+                                   <li>⏱️ <b>Contrarreloj:</b> <b>6 segundos</b> para responder.</li>
+                                   <li>🔥 <b>Extremo:</b> el tablero va creciendo.</li>
+                                   <li>💻 <b>Hacker:</b> bloques iguales; guíate por la posición.</li>
+                                   <li>🤖 <b>Automático:</b> se juega solo (sin récords).</li>
+                                   <li>🎵 <b>Libre:</b> tablero 5x5 para grabar melodías.</li>
                                </ul>`
                     },
                     {
@@ -2660,13 +2703,13 @@
                         html: `<p>Change them in <b>⚙️ Settings</b>.</p>
                                <ul class="tutorial-lista">
                                    <li>▶️ <b>Normal:</b> the classic.</li>
-                                   <li>🔄 <b>Inverted:</b> repeat the sequence <b>backwards</b>.</li>
-                                   <li>⚡ <b>Lightning:</b> the sequence plays much faster.</li>
-                                   <li>⏱️ <b>Time Attack:</b> you have <b>6 seconds</b> to answer.</li>
-                                   <li>🔥 <b>Extreme:</b> the board grows (2x2 → 3x3 → 4x4).</li>
-                                   <li>💻 <b>Hacker:</b> all blocks look the same; rely on position and sound.</li>
-                                   <li>🤖 <b>Auto:</b> the game plays itself. You just watch and listen (no records saved).</li>
-                                   <li>🎵 <b>Free:</b> 5x5 board to play and record your own melodies.</li>
+                                   <li>🔄 <b>Inverted:</b> repeat it <b>backwards</b>.</li>
+                                   <li>⚡ <b>Lightning:</b> plays much faster.</li>
+                                   <li>⏱️ <b>Time Attack:</b> <b>6 seconds</b> to answer.</li>
+                                   <li>🔥 <b>Extreme:</b> the board keeps growing.</li>
+                                   <li>💻 <b>Hacker:</b> identical blocks; use position.</li>
+                                   <li>🤖 <b>Auto:</b> plays itself (no records).</li>
+                                   <li>🎵 <b>Free:</b> 5x5 board to record melodies.</li>
                                </ul>`
                     },
                     {
@@ -2713,6 +2756,7 @@
             if (!cuerpo || !paso) return;
 
             cuerpo.innerHTML = `<div class="tutorial-icono">${paso.icono}</div><h3>${paso.titulo}</h3>${paso.html}`;
+            cuerpo.scrollTop = 0;
             if (animar) {
                 cuerpo.style.animation = 'none';
                 void cuerpo.offsetWidth;
@@ -2728,6 +2772,14 @@
             btnSig.textContent = tutorialPaso === d.pasos.length - 1 ? d.fin : d.siguiente;
             document.getElementById('titulo-modal-tutorial').textContent = d.titulo;
             document.getElementById('btn-cerrar-tutorial').title = d.cerrar;
+            actualizarAvisoScrollTutorial();
+        }
+
+        function actualizarAvisoScrollTutorial() {
+            const c = document.getElementById('tutorial-cuerpo');
+            const m = document.getElementById('tutorial-mas');
+            if (!c || !m) return;
+            m.classList.toggle('visible', c.scrollHeight - c.clientHeight - c.scrollTop > 6);
         }
 
         function aplicarIdiomaTutorial() {
@@ -2822,6 +2874,7 @@
             }
         });
         window.addEventListener('resize', ajustarEspacioBarra);
+        window.addEventListener('resize', () => { try { actualizarAvisoScrollTutorial(); } catch (e) {} });
         window.addEventListener('orientationchange', () => setTimeout(ajustarEspacioBarra, 150));
 
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
@@ -3799,7 +3852,7 @@
             actualizarBotonComodin();
             actualizarBotonesPartida();
             setControlesPartidaActivos(false);
-            document.getElementById('mensaje').textContent = nivelAlcanzado >= 1
+            document.getElementById('mensaje').textContent = (nivelAlcanzado >= 1 && modoAlcanzado !== 'automatico')
                 ? t('partidaTerminadaRecord', nivelAlcanzado)
                 : t('partidaTerminada');
         }
