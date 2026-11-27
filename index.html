@@ -219,17 +219,6 @@
             transform: translateY(-2px);
         }
 
-        #btn-confeti-admin-top {
-            display: none;
-            background: linear-gradient(135deg, #ff6b81, #ffa502);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        #btn-confeti-admin-top.visible {
-            display: inline-block;
-        }
-
         #btn-silenciar,
         #btn-tutorial-top {
             width: 38px;
@@ -774,34 +763,6 @@
             transform: translateY(-50%) scale(0.95);
         }
 
-        .btn-ayuda-pin {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: rgba(255, 215, 0, 0.2);
-            border: 1.5px solid #ffd700;
-            color: #ffd700;
-            font-size: 0.95rem;
-            font-weight: 800;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 0;
-            transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-        }
-
-        .btn-ayuda-pin:hover {
-            background-color: #ffd700;
-            color: #1a1a2e;
-            transform: translateY(-50%) scale(1.08);
-        }
-
         .grupo-opcion-config {
             margin-bottom: 12px;
             display: flex;
@@ -997,110 +958,6 @@
             font-size: 0.92rem;
             color: #2ed573;
             white-space: nowrap;
-        }
-
-        .btn-borrar-fila-global {
-            background: rgba(255, 71, 87, 0.22);
-            border: 1px solid #ff4757;
-            color: #ff6b81;
-            border-radius: 10px;
-            padding: 6px 9px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
-        }
-
-        .btn-borrar-fila-global:hover:not(:disabled) {
-            background: #ff4757;
-            color: #ffffff;
-            transform: scale(1.06);
-        }
-
-        .admin-seccion {
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 14px;
-        }
-
-        .admin-seccion-titulo {
-            font-size: 0.92rem;
-            font-weight: 800;
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
-
-        .admin-fila-input {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .admin-input, .admin-select {
-            padding: 8px 10px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.4);
-            color: #ffffff;
-            font-size: 0.88rem;
-            font-weight: 600;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .admin-lista-logros {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-height: 220px;
-            overflow-y: auto;
-        }
-
-        .admin-item-logro {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 7px 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            font-size: 0.84rem;
-        }
-
-        .admin-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        .admin-tab-btn {
-            flex: 1;
-            padding: 8px 6px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background: rgba(0, 0, 0, 0.28);
-            color: var(--subtext-color);
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-        }
-
-        .admin-tab-btn.activa {
-            background: rgba(255, 215, 0, 0.22);
-            color: #ffd700;
-            border-color: #ffd700;
-        }
-
-        .admin-tab-panel {
-            display: none;
-        }
-
-        .admin-tab-panel.activa {
-            display: block;
         }
 
         .fila-ranking.es-usuario-actual {
@@ -1736,7 +1593,6 @@
 
         <div class="grupo-controles">
             <button class="btn-mini" id="btn-global-top" type="button" onclick="abrirClasificacionGlobal()" style="background-color: rgba(46, 213, 115, 0.65); color: white;" title="Clasificación Global">🌍 Global</button>
-            <button class="btn-mini" id="btn-confeti-admin-top" type="button" onclick="lanzarConfeti()" title="Probar Confeti">🎉 Confeti</button>
             <button class="btn-mini" id="btn-logros-top" type="button" onclick="abrirLogros()" style="background-color: rgba(255, 215, 0, 0.65); color: white;" title="Ver Logros">🏆 Logros</button>
             <button class="btn-mini" id="btn-estadisticas-top" type="button" onclick="abrirEstadisticas()" style="background-color: rgba(255, 165, 2, 0.65); color: white;" title="Ver Estadísticas">📊 Estadísticas</button>
             <button class="btn-mini" id="btn-tutorial-top" type="button" onclick="abrirTutorial()" title="Cómo jugar">❓</button>
@@ -1802,7 +1658,6 @@
     <div class="modal-overlay" id="modal-configuracion">
         <div class="modal-contenido">
             <div class="modal-header">
-                <button class="btn-ayuda-pin" id="btn-ayuda-pin" type="button" onclick="abrirModalPinAdmin()" title="Acceso">🔑</button>
                 <h2 id="titulo-modal-config">⚙️ Configuración</h2>
                 <button class="btn-cerrar-x" id="btn-cerrar-config" type="button" onclick="cerrarConfiguracion()" title="Cerrar">✕</button>
             </div>
@@ -1898,143 +1753,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-pin-admin" style="z-index: 1250;">
-        <div class="modal-contenido" style="text-align: center; max-width: 350px;">
-            <div class="modal-header">
-                <h2 id="titulo-modal-pin">🔐 Código</h2>
-                <button class="btn-cerrar-x" id="btn-cerrar-pin" type="button" onclick="cerrarModalPinAdmin()" title="Cerrar">✕</button>
-            </div>
-            <p id="texto-pin-admin" style="color: var(--subtext-color); font-size: 0.88rem; margin-bottom: 12px;">Ingresa la contraseña:</p>
-            <input type="password" id="input-pin-admin" inputmode="numeric" maxlength="6" placeholder="••••" style="width: 140px; padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.4); color: #ffffff; font-size: 1.2rem; letter-spacing: 6px; text-align: center; outline: none; margin-bottom: 10px;">
-            <div id="mensaje-error-pin" style="color: #ff4757; font-size: 0.8rem; font-weight: 700; min-height: 18px; margin-bottom: 12px;"></div>
-            <button class="btn-mini" id="btn-comprobar-pin" type="button" onclick="verificarPinAdmin()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none; padding: 10px;">Comprobar</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-panel-admin" style="z-index: 1260;">
-        <div class="modal-contenido" style="max-width: 480px;">
-            <div class="modal-header">
-                <h2 id="titulo-panel-admin">🛡️ Administrador</h2>
-                <button class="btn-cerrar-x" id="btn-cerrar-admin" type="button" onclick="cerrarPanelAdmin()" title="Cerrar">✕</button>
-            </div>
-
-            <div class="admin-tabs">
-                <button class="admin-tab-btn activa" id="tab-admin-juego" type="button" onclick="cambiarPestanaAdmin('juego')">🎮 Juego</button>
-                <button class="admin-tab-btn" id="tab-admin-global" type="button" onclick="cambiarPestanaAdmin('global')">🌍 Perfil y Global</button>
-                <button class="admin-tab-btn" id="tab-admin-logros" type="button" onclick="cambiarPestanaAdmin('logros')">🏆 Logros</button>
-            </div>
-
-            <div class="admin-tab-panel activa" id="panel-admin-juego">
-                <div class="admin-seccion">
-                    <div class="admin-seccion-titulo" id="admin-sec-comodin">🔁 Comodín Repetir</div>
-                    <div class="admin-fila-input">
-                        <select id="admin-select-comodin-cant" class="admin-select" style="width: 115px;" onchange="sincronizarInputComodin()">
-                            <option value="1">1 uso</option>
-                            <option value="10">10 usos</option>
-                            <option value="100">100 usos</option>
-                            <option value="custom">Personalizado</option>
-                        </select>
-                        <input type="number" id="admin-input-comodin-cant" class="admin-input" min="1" max="999" value="1" style="width: 90px;" placeholder="Cant.">
-                        <button class="btn-mini" id="btn-admin-recargar-comodin" type="button" onclick="adminRecargarComodin()" style="flex: 1; background-color: #ffa502; color: #1a1a2e; border: none;">Recargar Comodín</button>
-                    </div>
-                </div>
-
-                <div class="admin-seccion">
-                    <div class="admin-seccion-titulo" id="admin-sec-notas">🎵 Total de Notas</div>
-                    <div class="admin-fila-input">
-                        <input type="number" id="admin-input-notas" class="admin-input" min="0" max="9999999" style="flex: 1;" placeholder="Ej. 1500">
-                        <button class="btn-mini" id="btn-admin-guardar-notas" type="button" onclick="adminGuardarNotas()" style="background-color: #2ed573; color: #ffffff; border: none;">Guardar Notas</button>
-                    </div>
-                </div>
-
-                <div class="admin-seccion" style="margin-bottom: 0;">
-                    <div class="admin-seccion-titulo" id="admin-sec-derrotas">💀 Resetear Derrotas</div>
-                    <div class="admin-fila-input" style="margin-bottom: 8px;">
-                        <select id="admin-reset-derrotas-modo" class="admin-select" style="flex: 1;" onchange="actualizarSelectDifResetDerrotas()">
-                            <option value="normal">▶️ Normal</option>
-                            <option value="invertido">🔄 Invertido</option>
-                            <option value="relampago">⚡ Relámpago</option>
-                            <option value="contrarreloj">⏱️ Contrarreloj</option>
-                            <option value="extremo">🔥 Extremo</option>
-                            <option value="hacker">💻 Hacker</option>
-                            <option value="automatico">🤖 Automático</option>
-                        </select>
-                        <select id="admin-reset-derrotas-dif" class="admin-select">
-                            <option value="2">🟢 Fácil</option>
-                            <option value="3">🟡 Medio</option>
-                            <option value="4">🔴 Difícil</option>
-                        </select>
-                    </div>
-                    <div class="admin-fila-input">
-                        <button class="btn-mini" id="btn-admin-reset-modo" type="button" onclick="adminResetearDerrotasModo()" style="flex: 1; background-color: rgba(255, 165, 2, 0.35);">Resetear Modo</button>
-                        <button class="btn-mini" id="btn-admin-reset-todas" type="button" onclick="adminResetearTodasDerrotas()" style="flex: 1; background-color: rgba(255, 71, 87, 0.45); color: #ffffff;">Resetear Todas</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-tab-panel" id="panel-admin-global">
-                <div class="admin-seccion">
-                    <div class="admin-seccion-titulo" id="admin-sec-perfil">👤 Nombre y Emoji del Usuario</div>
-                    <div class="admin-fila-input" style="margin-bottom: 8px;">
-                        <input type="text" id="admin-input-nombre" class="admin-input" maxlength="16" style="flex: 1;" placeholder="Nuevo nombre">
-                        <select id="admin-select-emoji" class="admin-select" style="width: 84px; text-align: center;">
-                            <option value="🚀">🚀</option>
-                            <option value="🐱">🐱</option>
-                            <option value="🌟">🌟</option>
-                            <option value="🎮">🎮</option>
-                            <option value="🔥">🔥</option>
-                            <option value="⚡">⚡</option>
-                            <option value="🤖">🤖</option>
-                            <option value="👑">👑</option>
-                            <option value="🍕">🍕</option>
-                            <option value="🎸">🎸</option>
-                            <option value="🦄">🦄</option>
-                            <option value="💎">💎</option>
-                            <option value="🍀">🍀</option>
-                            <option value="🎯">🎯</option>
-                            <option value="🐉">🐉</option>
-                        </select>
-                    </div>
-                    <div class="admin-fila-input" style="margin-bottom: 8px;">
-                        <select id="admin-select-titulo" class="admin-select" style="flex: 1;" onchange="adminCambiarTitulo()">
-                            <option value="auto">✨ Automático por Logros</option>
-                            <option value="0">🌱 Principiante</option>
-                            <option value="1">⚡ Aprendiz</option>
-                            <option value="2">🎯 Estratega</option>
-                            <option value="3">👑 Maestro</option>
-                            <option value="4">🌟 Líder</option>
-                        </select>
-                        <button class="btn-mini" id="btn-admin-reset-titulo" type="button" onclick="adminResetTituloAuto()" style="padding: 8px 10px;">🔄 Auto</button>
-                    </div>
-                    <button class="btn-mini" id="btn-admin-guardar-perfil" type="button" onclick="adminGuardarPerfilUsuario()" style="width: 100%; background-color: #2ed573; color: #ffffff; border: none;">Guardar Nombre y Emoji</button>
-                </div>
-
-                <div class="admin-seccion" style="margin-bottom: 0;">
-                    <div class="admin-seccion-titulo" id="admin-sec-global">🌍 Clasificación Global</div>
-                    <div class="admin-fila-input">
-                        <button class="btn-mini" id="btn-admin-borrar-filas" type="button" onclick="abrirClasificacionGlobal(); cerrarPanelAdmin();" style="flex: 1; background-color: rgba(55, 66, 250, 0.55);">🗑️ Borrar Filas en Global</button>
-                        <button class="btn-mini" id="btn-admin-borrar-todos" type="button" onclick="borrarTodosRecordsGlobalAdmin()" style="flex: 1; background-color: rgba(255, 71, 87, 0.55); color: #ffffff;">💥 Borrar Todos los Récords</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-tab-panel" id="panel-admin-logros">
-                <div class="admin-seccion" style="margin-bottom: 0;">
-                    <div class="admin-seccion-titulo" id="admin-sec-logros">🏆 Control de Logros</div>
-                    <div class="admin-fila-input" style="margin-bottom: 10px;">
-                        <button class="btn-mini" id="btn-admin-poner-logros" type="button" onclick="adminToggleTodosLogros(true)" style="flex: 1; background-color: rgba(46, 213, 115, 0.35);">✅ Poner Todos</button>
-                        <button class="btn-mini" id="btn-admin-quitar-logros" type="button" onclick="adminToggleTodosLogros(false)" style="flex: 1; background-color: rgba(255, 71, 87, 0.35);">❌ Quitar Todos</button>
-                    </div>
-                    <div class="admin-lista-logros" id="admin-lista-logros"></div>
-                </div>
-            </div>
-
-            <div class="admin-fila-input" style="margin-top: 14px;">
-                <button class="btn-mini" id="btn-admin-salir" type="button" onclick="desactivarModoAdmin()" style="width: 100%; background-color: rgba(255, 71, 87, 0.45);">Salir del Modo Admin</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="modal-estadisticas">
         <div class="modal-contenido">
             <div class="modal-header">
@@ -2120,8 +1838,6 @@
                 sinNombre: '👤 Sin nombre',
                 btnGlobal: '🌍 Global',
                 titleGlobal: 'Clasificación Global',
-                btnConfeti: '🎉 Confeti',
-                titleConfeti: 'Probar Confeti',
                 btnLogros: '🏆 Logros',
                 titleLogros: 'Ver Logros',
                 btnEstadisticas: '📊 Estadísticas',
@@ -2148,7 +1864,6 @@
                 conexionRecuperada: '🌐 ¡Conexión a internet recuperada!',
                 vacioGlobal: 'Aún no hay récords registrados en este modo. ¡Sé el primero!',
                 nivelRank: (n) => `Nivel ${n}`,
-                borrarRegistroTitle: 'Borrar registro',
                 etiquetaTu: 'Tú',
                 tituloLogros: '🏆 Logros',
                 tituloConfig: '⚙️ Configuración',
@@ -2213,50 +1928,6 @@
                 fondoVerde: '🟩 Verde Oscuro',
                 fondoAzul: '🟦 Azul Oscuro',
                 fondoMorado: '🟪 Morado Oscuro',
-                accesoTitle: 'Acceso',
-                tituloPin: '🔐 Código',
-                textoPin: 'Ingresa la contraseña:',
-                btnComprobar: 'Comprobar',
-                pinFormatoError: '⚠️ Escribe solo números (4 a 6 dígitos).',
-                pinIncorrecto: '❌ Contraseña incorrecta.',
-                tituloAdmin: '🛡️ Administrador',
-                tabAdminJuego: '🎮 Juego',
-                tabAdminGlobal: '🌍 Perfil y Global',
-                tabAdminLogros: '🏆 Logros',
-                adminSecComodin: '🔁 Comodín Repetir',
-                usoSingular: '1 uso',
-                usosPlural: (n) => `${n} usos`,
-                usoPersonalizado: 'Personalizado',
-                placeholderCant: 'Cant.',
-                btnRecargarComodin: 'Recargar Comodín',
-                alertaComodinRecargado: (n) => `✅ Comodín recargado con ${n} uso(s).`,
-                adminSecPerfil: '👤 Nombre y Emoji del Usuario',
-                placeholderNuevoNombre: 'Nuevo nombre',
-                btnGuardarPerfil: 'Guardar Nombre y Emoji',
-                alertaNombreVacio: '⚠️ El nombre no puede estar vacío.',
-                alertaPerfilGuardado: '✅ Nombre y emoji actualizados también en tus récords globales.',
-                adminSecNotas: '🎵 Total de Notas',
-                placeholderNotas: 'Ej. 1500',
-                btnGuardarNotas: 'Guardar Notas',
-                alertaNotasGuardadas: (n) => `✅ Total de notas actualizado a ${n}.`,
-                adminSecDerrotas: '💀 Resetear Derrotas',
-                btnResetModo: 'Resetear Modo',
-                btnResetTodas: 'Resetear Todas',
-                alertaDerrotasModo: (m) => `✅ Derrotas reseteadas en ${m}.`,
-                alertaDerrotasTodas: '✅ Todas las derrotas han sido reseteadas a 0.',
-                adminSecGlobal: '🌍 Clasificación Global',
-                btnBorrarFilasGlobal: '🗑️ Borrar Filas en Global',
-                btnBorrarTodosGlobal: '💥 Borrar Todos los Récords',
-                confirmBorrarTodosGlobal: '⚠️ ¿Seguro que quieres borrar TODOS los récords de la clasificación global?',
-                alertaTodosGlobalBorrados: '💥 Se borraron todos los récords de la clasificación global.',
-                errorBorrarGlobal: '⚠️ No se pudo borrar el registro. Revisa las reglas de Firebase.',
-                errorBorrarTodosGlobal: '⚠️ No se pudieron borrar todos los récords. Revisa las reglas de Firebase.',
-                adminSecLogros: '🏆 Control de Logros',
-                btnPonerTodos: '✅ Poner Todos',
-                btnQuitarTodos: '❌ Quitar Todos',
-                logroActivo: '✅ Activo',
-                logroQuitar: '🔒 Quitar',
-                btnSalirAdmin: 'Salir del Modo Admin',
                 tituloEstadisticas: '📊 Estadísticas',
                 btnBorrarDatos: '🗑️ Borrar Datos',
                 tituloConfirmarBorrar: 'Advertencia',
@@ -2360,8 +2031,6 @@
                 sinNombre: '👤 No name',
                 btnGlobal: '🌍 Global',
                 titleGlobal: 'Global Leaderboard',
-                btnConfeti: '🎉 Confetti',
-                titleConfeti: 'Test Confetti',
                 btnLogros: '🏆 Achievements',
                 titleLogros: 'View Achievements',
                 btnEstadisticas: '📊 Stats',
@@ -2388,7 +2057,6 @@
                 conexionRecuperada: '🌐 Internet connection restored!',
                 vacioGlobal: 'No records in this mode yet. Be the first!',
                 nivelRank: (n) => `Level ${n}`,
-                borrarRegistroTitle: 'Delete entry',
                 etiquetaTu: 'You',
                 tituloLogros: '🏆 Achievements',
                 tituloConfig: '⚙️ Settings',
@@ -2453,50 +2121,6 @@
                 fondoVerde: '🟩 Dark Green',
                 fondoAzul: '🟦 Dark Blue',
                 fondoMorado: '🟪 Dark Purple',
-                accesoTitle: 'Access',
-                tituloPin: '🔐 Passcode',
-                textoPin: 'Enter password:',
-                btnComprobar: 'Verify',
-                pinFormatoError: '⚠️ Enter numbers only (4 to 6 digits).',
-                pinIncorrecto: '❌ Incorrect password.',
-                tituloAdmin: '🛡️ Admin Panel',
-                tabAdminJuego: '🎮 Game',
-                tabAdminGlobal: '🌍 Profile & Global',
-                tabAdminLogros: '🏆 Achievements',
-                adminSecComodin: '🔁 Repeat Wildcard',
-                usoSingular: '1 use',
-                usosPlural: (n) => `${n} uses`,
-                usoPersonalizado: 'Custom',
-                placeholderCant: 'Qty.',
-                btnRecargarComodin: 'Reload Wildcard',
-                alertaComodinRecargado: (n) => `✅ Wildcard reloaded with ${n} use(s).`,
-                adminSecPerfil: '👤 User Name & Emoji',
-                placeholderNuevoNombre: 'New name',
-                btnGuardarPerfil: 'Save Name & Emoji',
-                alertaNombreVacio: '⚠️ Name cannot be empty.',
-                alertaPerfilGuardado: '✅ Name and emoji updated on your global records as well.',
-                adminSecNotas: '🎵 Total Notes',
-                placeholderNotas: 'E.g. 1500',
-                btnGuardarNotas: 'Save Notes',
-                alertaNotasGuardadas: (n) => `✅ Total notes updated to ${n}.`,
-                adminSecDerrotas: '💀 Reset Losses',
-                btnResetModo: 'Reset Mode',
-                btnResetTodas: 'Reset All',
-                alertaDerrotasModo: (m) => `✅ Losses reset in ${m}.`,
-                alertaDerrotasTodas: '✅ All losses have been reset to 0.',
-                adminSecGlobal: '🌍 Global Leaderboard',
-                btnBorrarFilasGlobal: '🗑️ Delete Rows in Global',
-                btnBorrarTodosGlobal: '💥 Delete All Records',
-                confirmBorrarTodosGlobal: '⚠️ Are you sure you want to delete ALL global leaderboard records?',
-                alertaTodosGlobalBorrados: '💥 All global leaderboard records were deleted.',
-                errorBorrarGlobal: '⚠️ Could not delete entry. Check Firebase rules.',
-                errorBorrarTodosGlobal: '⚠️ Could not delete all records. Check Firebase rules.',
-                adminSecLogros: '🏆 Achievements Control',
-                btnPonerTodos: '✅ Unlock All',
-                btnQuitarTodos: '❌ Lock All',
-                logroActivo: '✅ Unlocked',
-                logroQuitar: '🔒 Lock',
-                btnSalirAdmin: 'Exit Admin Mode',
                 tituloEstadisticas: '📊 Stats',
                 btnBorrarDatos: '🗑️ Delete Data',
                 tituloConfirmarBorrar: 'Warning',
@@ -2656,8 +2280,6 @@
 
             setText('btn-global-top', t('btnGlobal'));
             setAttr('btn-global-top', 'title', t('titleGlobal'));
-            setText('btn-confeti-admin-top', t('btnConfeti'));
-            setAttr('btn-confeti-admin-top', 'title', t('titleConfeti'));
             setText('btn-logros-top', t('btnLogros'));
             setAttr('btn-logros-top', 'title', t('titleLogros'));
             setText('btn-estadisticas-top', t('btnEstadisticas'));
@@ -2683,11 +2305,8 @@
             setAttr('btn-cerrar-global', 'title', t('cerrar'));
             setAttr('btn-cerrar-logros', 'title', t('cerrar'));
             setAttr('btn-cerrar-config', 'title', t('cerrar'));
-            setAttr('btn-cerrar-pin', 'title', t('cerrar'));
-            setAttr('btn-cerrar-admin', 'title', t('cerrar'));
             setAttr('btn-cerrar-estadisticas', 'title', t('cerrar'));
             actualizarBadgeTituloJugador();
-            setAttr('btn-ayuda-pin', 'title', t('accesoTitle'));
 
             setText('titulo-modal-logros', t('tituloLogros'));
             setText('titulo-modal-config', t('tituloConfig'));
@@ -2713,7 +2332,6 @@
             modosOpciones.forEach(([val, lbl]) => {
                 setSelectOptionText('selector-modo', val, lbl);
                 setSelectOptionText('filtro-modo-global', val, lbl);
-                setSelectOptionText('admin-reset-derrotas-modo', val, lbl);
             });
 
             const selModo = document.getElementById('selector-modo');
@@ -2758,46 +2376,6 @@
             setSelectOptionText('selector-fondo-oscuro', '#172554', t('fondoAzul'));
             setSelectOptionText('selector-fondo-oscuro', '#2e1065', t('fondoMorado'));
 
-            setText('titulo-modal-pin', t('tituloPin'));
-            setText('texto-pin-admin', t('textoPin'));
-            setText('btn-comprobar-pin', t('btnComprobar'));
-
-            setText('titulo-panel-admin', t('tituloAdmin'));
-            setText('tab-admin-juego', t('tabAdminJuego'));
-            setText('tab-admin-global', t('tabAdminGlobal'));
-            setText('tab-admin-logros', t('tabAdminLogros'));
-            setText('admin-sec-comodin', t('adminSecComodin'));
-            setSelectOptionText('admin-select-comodin-cant', '1', t('usoSingular'));
-            setSelectOptionText('admin-select-comodin-cant', '10', t('usosPlural', 10));
-            setSelectOptionText('admin-select-comodin-cant', '100', t('usosPlural', 100));
-            setSelectOptionText('admin-select-comodin-cant', 'custom', t('usoPersonalizado'));
-            setProp('admin-input-comodin-cant', 'placeholder', t('placeholderCant'));
-            setText('btn-admin-recargar-comodin', t('btnRecargarComodin'));
-
-            setText('admin-sec-perfil', t('adminSecPerfil'));
-            setProp('admin-input-nombre', 'placeholder', t('placeholderNuevoNombre'));
-            setText('btn-admin-guardar-perfil', t('btnGuardarPerfil'));
-
-            setText('admin-sec-notas', t('adminSecNotas'));
-            setProp('admin-input-notas', 'placeholder', t('placeholderNotas'));
-            setText('btn-admin-guardar-notas', t('btnGuardarNotas'));
-
-            setText('admin-sec-derrotas', t('adminSecDerrotas'));
-            setSelectOptionText('admin-reset-derrotas-dif', '2', t('difFacilBadge'));
-            setSelectOptionText('admin-reset-derrotas-dif', '3', t('difMedioBadge'));
-            setSelectOptionText('admin-reset-derrotas-dif', '4', t('difDificilBadge'));
-            setText('btn-admin-reset-modo', t('btnResetModo'));
-            setText('btn-admin-reset-todas', t('btnResetTodas'));
-
-            setText('admin-sec-global', t('adminSecGlobal'));
-            setText('btn-admin-borrar-filas', t('btnBorrarFilasGlobal'));
-            setText('btn-admin-borrar-todos', t('btnBorrarTodosGlobal'));
-
-            setText('admin-sec-logros', t('adminSecLogros'));
-            setText('btn-admin-poner-logros', t('btnPonerTodos'));
-            setText('btn-admin-quitar-logros', t('btnQuitarTodos'));
-            setText('btn-admin-salir', t('btnSalirAdmin'));
-
             setText('titulo-modal-estadisticas', t('tituloEstadisticas'));
             setText('btn-borrar-datos', t('btnBorrarDatos'));
             setText('titulo-confirmar-borrar', t('tituloConfirmarBorrar'));
@@ -2830,10 +2408,6 @@
             }
             if (document.getElementById('modal-global').classList.contains('activo')) {
                 renderizarClasificacionGlobal();
-            }
-            if (document.getElementById('modal-panel-admin').classList.contains('activo')) {
-                sincronizarSelectTituloAdmin();
-                renderizarListaAdminLogros();
             }
 
             try { aplicarIdiomaTutorial(); } catch (e) { console.error(e); }
@@ -3084,7 +2658,7 @@
 
         // ====== Barra superior: iconos en pantallas pequeñas + espacio dinamico ======
         function compactarBotonesBarra() {
-            ['btn-global-top', 'btn-confeti-admin-top', 'btn-logros-top', 'btn-estadisticas-top', 'btn-config'].forEach(id => {
+            ['btn-global-top', 'btn-logros-top', 'btn-estadisticas-top', 'btn-config'].forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
                 const texto = (el.textContent || '').trim();
@@ -3122,10 +2696,6 @@
         window.addEventListener('orientationchange', () => setTimeout(ajustarEspacioBarra, 150));
 
         const URL_RANKING = 'https://juego-memoria-36940-default-rtdb.firebaseio.com/clasificacion';
-        const CLAVE_ADMIN_POR_DEFECTO = '123456';
-        // PIN fijo: ya no se lee de Firebase ni se guarda en el navegador
-        try { localStorage.removeItem('memoria_pin_admin_v1'); } catch (e) {}
-        let esAdminActivo = false;
 
         let cacheClasificacionGlobal = [];
         let estabaSinInternet = typeof navigator !== 'undefined' && navigator.onLine === false;
@@ -3194,7 +2764,11 @@
         const MODOS_CON_COMODIN = ['normal', 'invertido', 'relampago'];
         let comodinDisponibleEnPartida = false;
         let comodinUsosConfigurados = 1;
-        let comodinUsosRestantes = 1;
+        try {
+            const usosGuardados = parseInt(localStorage.getItem('memoria_comodin_usos_v1'), 10);
+            if (usosGuardados >= 1 && usosGuardados <= 999) comodinUsosConfigurados = usosGuardados;
+        } catch (e) {}
+        let comodinUsosRestantes = comodinUsosConfigurados;
         let reproduciendoSecuenciaActual = false;
         let partidaEnCurso = false;
 
@@ -3319,339 +2893,6 @@
             return String(texto || '').replace(/[&<>"']/g, m => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             }[m]));
-        }
-
-        function actualizarVisibilidadControlesAdmin() {
-            const btnConfeti = document.getElementById('btn-confeti-admin-top');
-            if (btnConfeti) {
-                btnConfeti.classList.toggle('visible', esAdminActivo);
-            }
-        }
-
-        function abrirModalPinAdmin() {
-            const input = document.getElementById('input-pin-admin');
-            const err = document.getElementById('mensaje-error-pin');
-            if (err) err.textContent = '';
-            if (input) {
-                input.value = '';
-                setTimeout(() => input.focus(), 50);
-            }
-            document.getElementById('modal-pin-admin').classList.add('activo');
-        }
-
-        function cerrarModalPinAdmin() {
-            document.getElementById('modal-pin-admin').classList.remove('activo');
-        }
-
-        async function verificarPinAdmin() {
-            const input = document.getElementById('input-pin-admin');
-            const err = document.getElementById('mensaje-error-pin');
-            const pin = input ? input.value.trim() : '';
-
-            if (!/^\d{4,6}$/.test(pin)) {
-                if (err) err.textContent = t('pinFormatoError');
-                return;
-            }
-
-            if (pin !== CLAVE_ADMIN_POR_DEFECTO) {
-                if (err) err.textContent = t('pinIncorrecto');
-                return;
-            }
-
-            esAdminActivo = true;
-            actualizarVisibilidadControlesAdmin();
-            actualizarBadgeTituloJugador();
-            cerrarModalPinAdmin();
-            cerrarConfiguracion();
-            abrirPanelAdmin();
-        }
-
-        function sincronizarInputComodin() {
-            const sel = document.getElementById('admin-select-comodin-cant');
-            const inp = document.getElementById('admin-input-comodin-cant');
-            if (!sel || !inp) return;
-            if (sel.value !== 'custom') {
-                inp.value = sel.value;
-            }
-        }
-
-        function adminRecargarComodin() {
-            if (!esAdminActivo) return;
-            const inp = document.getElementById('admin-input-comodin-cant');
-            const cant = Math.max(1, Math.min(999, parseInt(inp ? inp.value : '1', 10) || 1));
-            comodinUsosConfigurados = cant;
-            comodinUsosRestantes = cant;
-            comodinDisponibleEnPartida = true;
-            actualizarBotonComodin();
-            alert(t('alertaComodinRecargado', cant));
-        }
-
-        function actualizarSelectDifResetDerrotas() {
-            const selModo = document.getElementById('admin-reset-derrotas-modo');
-            const selDif = document.getElementById('admin-reset-derrotas-dif');
-            if (!selModo || !selDif) return;
-            selDif.disabled = selModo.value === 'hacker';
-        }
-
-        function adminResetearDerrotasModo() {
-            if (!esAdminActivo) return;
-            const selModo = document.getElementById('admin-reset-derrotas-modo');
-            const selDif = document.getElementById('admin-reset-derrotas-dif');
-            if (!selModo || !selDif) return;
-
-            const modo = selModo.value;
-            const dif = modo === 'hacker' ? 2 : Number(selDif.value);
-            const stats = obtenerDatosStats();
-            const clave = `${modo}_${dif}`;
-            if (stats[clave]) {
-                stats[clave].derrotas = 0;
-                localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
-            }
-            const modosMap = getEtiquetasModo();
-            alert(t('alertaDerrotasModo', modosMap[modo] || modo));
-        }
-
-        function adminResetearTodasDerrotas() {
-            if (!esAdminActivo) return;
-            const stats = obtenerDatosStats();
-            Object.keys(stats).forEach(clave => {
-                if (stats[clave] && typeof stats[clave] === 'object') {
-                    stats[clave].derrotas = 0;
-                }
-            });
-            localStorage.setItem('memoria_stats_v3', JSON.stringify(stats));
-            alert(t('alertaDerrotasTodas'));
-        }
-
-        function abrirPanelAdmin() {
-            if (!esAdminActivo) return;
-
-            const selComodin = document.getElementById('admin-select-comodin-cant');
-            const inpComodin = document.getElementById('admin-input-comodin-cant');
-            if (selComodin && inpComodin) {
-                const actual = Math.max(1, comodinUsosConfigurados || 1);
-                if ([1, 10, 100].includes(actual)) {
-                    selComodin.value = String(actual);
-                } else {
-                    selComodin.value = 'custom';
-                }
-                inpComodin.value = String(actual);
-            }
-
-            const resetModo = document.getElementById('admin-reset-derrotas-modo');
-            const resetDif = document.getElementById('admin-reset-derrotas-dif');
-            if (resetModo) resetModo.value = modoJuego === 'libre' ? 'normal' : modoJuego;
-            if (resetDif) resetDif.value = ['2', '3', '4'].includes(String(tamanoCuadricula)) ? String(tamanoCuadricula) : '2';
-            actualizarSelectDifResetDerrotas();
-
-            const inputNombre = document.getElementById('admin-input-nombre');
-            const selectEmoji = document.getElementById('admin-select-emoji');
-            if (inputNombre) inputNombre.value = usuarioActual.nombre || '';
-            if (selectEmoji) {
-                const emojiActual = usuarioActual.emoji || '🚀';
-                if (![...selectEmoji.options].some(o => o.value === emojiActual)) {
-                    const opt = document.createElement('option');
-                    opt.value = emojiActual;
-                    opt.textContent = emojiActual;
-                    selectEmoji.appendChild(opt);
-                }
-                selectEmoji.value = emojiActual;
-            }
-
-            const inputNotas = document.getElementById('admin-input-notas');
-            if (inputNotas) inputNotas.value = totalNotasTocadas;
-            sincronizarSelectTituloAdmin();
-            renderizarListaAdminLogros();
-            cambiarPestanaAdmin('juego');
-            document.getElementById('modal-panel-admin').classList.add('activo');
-        }
-
-        function cambiarPestanaAdmin(pestana) {
-            const pestanas = ['juego', 'global', 'logros'];
-            pestanas.forEach(nombre => {
-                const btn = document.getElementById(`tab-admin-${nombre}`);
-                const panel = document.getElementById(`panel-admin-${nombre}`);
-                const activa = nombre === pestana;
-                if (btn) btn.classList.toggle('activa', activa);
-                if (panel) panel.classList.toggle('activa', activa);
-            });
-        }
-
-        async function actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji) {
-            const datos = await obtenerClasificacionGlobal();
-            if (!Array.isArray(datos) || datos.length === 0) return;
-
-            const nombrePrevNorm = String(nombreAnterior || '').trim().toLowerCase();
-            const nombreNuevoNorm = String(nuevoNombre || '').trim().toLowerCase();
-
-            const registrosPropios = datos.filter(item => {
-                const n = String(item.nombre || '').trim().toLowerCase();
-                return (nombrePrevNorm && n === nombrePrevNorm) || (nombreNuevoNorm && n === nombreNuevoNorm);
-            });
-
-            if (registrosPropios.length === 0) return;
-
-            await Promise.all(registrosPropios.map(async item => {
-                if (!item._id) return;
-                try {
-                    const res = await fetch(`${URL_RANKING}/${encodeURIComponent(item._id)}.json`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nombre: nuevoNombre,
-                            emoji: nuevoEmoji
-                        })
-                    });
-                    if (res.ok) {
-                        item.nombre = nuevoNombre;
-                        item.emoji = nuevoEmoji;
-                    }
-                } catch (err) {
-                    console.error('No se pudo actualizar un récord global:', err);
-                }
-            }));
-
-            cacheClasificacionGlobal = datos;
-            renderizarClasificacionGlobal();
-        }
-
-        async function adminGuardarPerfilUsuario() {
-            if (!esAdminActivo) return;
-            const inputNombre = document.getElementById('admin-input-nombre');
-            const selectEmoji = document.getElementById('admin-select-emoji');
-            const nuevoNombre = inputNombre ? inputNombre.value.trim().slice(0, 20) : '';
-            if (!nuevoNombre) {
-                alert(t('alertaNombreVacio'));
-                return;
-            }
-            const nombreAnterior = usuarioActual.nombre || '';
-            const nuevoEmoji = selectEmoji ? selectEmoji.value : (usuarioActual.emoji || '🚀');
-            usuarioActual = { nombre: nuevoNombre, emoji: nuevoEmoji };
-            localStorage.setItem('memoria_usuario_v1', JSON.stringify(usuarioActual));
-
-            const badgeUsuario = document.getElementById('badge-usuario');
-            if (badgeUsuario) {
-                badgeUsuario.textContent = `${usuarioActual.emoji} ${usuarioActual.nombre}`;
-            }
-
-            await actualizarNombreEmojiEnRecordsGlobal(nombreAnterior, nuevoNombre, nuevoEmoji);
-            alert(t('alertaPerfilGuardado'));
-        }
-
-        function cerrarPanelAdmin() {
-            document.getElementById('modal-panel-admin').classList.remove('activo');
-        }
-
-        function desactivarModoAdmin() {
-            esAdminActivo = false;
-            actualizarVisibilidadControlesAdmin();
-            cerrarPanelAdmin();
-            renderizarClasificacionGlobal();
-        }
-
-        function adminGuardarNotas() {
-            if (!esAdminActivo) return;
-            const input = document.getElementById('admin-input-notas');
-            const val = parseInt(input ? input.value : '0', 10);
-            if (!Number.isFinite(val) || val < 0) return;
-
-            totalNotasTocadas = val;
-            localStorage.setItem('memoria_total_notas_v1', String(totalNotasTocadas));
-            verificarLogrosDeNotas();
-            alert(t('alertaNotasGuardadas', totalNotasTocadas));
-        }
-
-        function verificarLogroCienPorCientoAuto() {
-            const otros = DEFINICION_LOGROS.filter(l => l.id !== 'cien_por_ciento');
-            const todosListos = otros.every(l => !!logrosDesbloqueados[l.id]);
-            if (todosListos) {
-                logrosDesbloqueados['cien_por_ciento'] = true;
-            } else {
-                delete logrosDesbloqueados['cien_por_ciento'];
-            }
-            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
-        }
-
-        function adminToggleLogroIndividual(id) {
-            if (!esAdminActivo) return;
-            if (logrosDesbloqueados[id]) {
-                delete logrosDesbloqueados[id];
-            } else {
-                logrosDesbloqueados[id] = true;
-            }
-            if (id !== 'cien_por_ciento') {
-                verificarLogroCienPorCientoAuto();
-            } else {
-                localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
-            }
-            renderizarListaAdminLogros();
-            actualizarBadgeTituloJugador();
-        }
-
-        function adminToggleTodosLogros(activar) {
-            if (!esAdminActivo) return;
-            if (activar) {
-                DEFINICION_LOGROS.forEach(l => {
-                    logrosDesbloqueados[l.id] = true;
-                });
-            } else {
-                logrosDesbloqueados = {};
-            }
-            localStorage.setItem('memoria_logros_v1', JSON.stringify(logrosDesbloqueados));
-            renderizarListaAdminLogros();
-        }
-
-        function renderizarListaAdminLogros() {
-            actualizarBadgeTituloJugador();
-            const cont = document.getElementById('admin-lista-logros');
-            if (!cont) return;
-            cont.innerHTML = DEFINICION_LOGROS.map(l => {
-                const info = obtenerInfoLogro(l.id);
-                const tiene = !!logrosDesbloqueados[l.id];
-                return `
-                    <div class="admin-item-logro">
-                        <span>${info.icono} ${escaparTextoHTML(info.nombre)}</span>
-                        <button class="btn-mini" type="button" onclick="adminToggleLogroIndividual('${l.id}')" style="padding: 5px 10px; font-size: 0.78rem; background-color: ${tiene ? 'rgba(46, 213, 115, 0.35)' : 'rgba(255, 255, 255, 0.12)'};">
-                            ${tiene ? t('logroActivo') : t('logroQuitar')}
-                        </button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function borrarRegistroGlobalAdmin(idFirebase) {
-            if (!esAdminActivo || !idFirebase) return;
-            try {
-                const res = await fetch(`${URL_RANKING}/${encodeURIComponent(idFirebase)}.json`, {
-                    method: 'DELETE'
-                });
-                if (!res.ok) throw new Error('Error al borrar');
-                cacheClasificacionGlobal = cacheClasificacionGlobal.filter(item => item._id !== idFirebase);
-                renderizarClasificacionGlobal();
-            } catch (err) {
-                console.error('No se pudo borrar el registro:', err);
-                alert(t('errorBorrarGlobal'));
-            }
-        }
-
-        async function borrarTodosRecordsGlobalAdmin() {
-            if (!esAdminActivo) return;
-            const confirmar = confirm(t('confirmBorrarTodosGlobal'));
-            if (!confirmar) return;
-
-            try {
-                const res = await fetch(`${URL_RANKING}.json`, {
-                    method: 'DELETE'
-                });
-                if (!res.ok) throw new Error('Error al borrar todos los récords');
-                cacheClasificacionGlobal = [];
-                ultimoRecordEnviado = { clave: '', record: 0 };
-                renderizarClasificacionGlobal();
-                alert(t('alertaTodosGlobalBorrados'));
-            } catch (err) {
-                console.error('No se pudieron borrar todos los récords:', err);
-                alert(t('errorBorrarTodosGlobal'));
-            }
         }
 
         async function publicarRecordGlobal(record, modo, dif) {
@@ -3802,9 +3043,6 @@
                 const claseTop = pos === 1 ? 'top-1' : (pos === 2 ? 'top-2' : (pos === 3 ? 'top-3' : ''));
                 const modoTxt = modosMap[item.modo] || item.modo || 'Normal';
                 const difTxt = item.modo === 'hacker' || item.modo === 'extremo' ? '' : ` · ${difsMap[item.dificultad] || ''}`;
-                const btnBorrar = esAdminActivo && item._id
-                    ? `<button class="btn-borrar-fila-global" type="button" onclick="borrarRegistroGlobalAdmin('${escaparTextoHTML(item._id)}')" title="${escaparTextoHTML(t('borrarRegistroTitle'))}">🗑️</button>`
-                    : '';
 
                 const esMio = !!(usuarioActual && usuarioActual.nombre && String(item.nombre || '').trim().toLowerCase() === usuarioActual.nombre.trim().toLowerCase());
                 const claseUsuario = esMio ? 'es-usuario-actual' : '';
@@ -3818,7 +3056,6 @@
                             <div class="ranking-meta">${escaparTextoHTML(modoTxt + difTxt)}</div>
                         </div>
                         <div class="ranking-puntaje">${escaparTextoHTML(t('nivelRank', Number(item.record)))}</div>
-                        ${btnBorrar}
                     </div>
                 `;
             }).join('');
@@ -3938,47 +3175,6 @@
             if (document.getElementById('modal-global').classList.contains('activo')) {
                 renderizarClasificacionGlobal();
             }
-        }
-
-        function sincronizarSelectTituloAdmin() {
-            const sel = document.getElementById('admin-select-titulo');
-            if (!sel) return;
-            const dict = TRADUCCIONES[idiomaActual] || TRADUCCIONES.es;
-            const escala = Array.isArray(dict.titulos) ? dict.titulos : TRADUCCIONES.es.titulos;
-            const optAuto = [...sel.options].find(o => o.value === 'auto');
-            if (optAuto) {
-                optAuto.textContent = idiomaActual === 'en' ? '✨ Auto by Achievements' : '✨ Automático por Logros';
-            }
-            escala.forEach((item, idx) => {
-                const opt = [...sel.options].find(o => o.value === String(idx));
-                if (opt) opt.textContent = item.texto;
-            });
-            sel.value = tituloForzadoIndice !== null ? String(tituloForzadoIndice) : 'auto';
-        }
-
-        function adminCambiarTitulo() {
-            if (!esAdminActivo) return;
-            const sel = document.getElementById('admin-select-titulo');
-            if (!sel) return;
-            if (sel.value === 'auto') {
-                adminResetTituloAuto();
-                return;
-            }
-            const idx = Number(sel.value);
-            if ([0, 1, 2, 3, 4].includes(idx)) {
-                tituloForzadoIndice = idx;
-                localStorage.setItem('memoria_titulo_forzado_v1', String(idx));
-                actualizarBadgeTituloJugador();
-            }
-        }
-
-        function adminResetTituloAuto() {
-            if (!esAdminActivo) return;
-            tituloForzadoIndice = null;
-            localStorage.removeItem('memoria_titulo_forzado_v1');
-            ultimoIndiceTituloLogros = obtenerIndiceTituloPorLogros();
-            sincronizarSelectTituloAdmin();
-            actualizarBadgeTituloJugador();
         }
 
         const PREFS_DEFAULT = {
@@ -4433,7 +3629,6 @@
             try { iniciarAtmosfera(); } catch (e) { console.error(e); }
             try { verificarProgresoEstetico(); } catch (e) { console.error(e); }
             aplicarIdioma(idiomaActual);
-            actualizarVisibilidadControlesAdmin();
             actualizarBotonComodin();
             actualizarBotonesPartida();
 
