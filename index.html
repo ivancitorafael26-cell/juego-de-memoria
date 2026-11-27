@@ -1474,10 +1474,215 @@
             .barra-superior .perfil-usuario-bloque { width: 100%; max-width: 360px; }
             .barra-superior .perfil-usuario-fila { justify-content: center; flex-wrap: nowrap; }
         }
+
+        /* ===== Cuenta regresiva 3-2-1 ===== */
+        #cuenta-regresiva {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1150;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.18) 75%);
+        }
+        #cuenta-regresiva.activa { opacity: 1; }
+        #cuenta-numero {
+            font-size: min(34vw, 190px);
+            font-weight: 900;
+            line-height: 1;
+            color: #ffffff;
+            text-shadow: 0 0 26px rgba(5, 217, 232, 0.95), 0 6px 0 rgba(0, 0, 0, 0.35);
+            animation: cuentaPop 0.68s ease-out;
+        }
+        #cuenta-numero.ya {
+            font-size: min(24vw, 130px);
+            color: #2ed573;
+            text-shadow: 0 0 26px rgba(46, 213, 115, 0.95), 0 6px 0 rgba(0, 0, 0, 0.35);
+        }
+        @keyframes cuentaPop {
+            0% { transform: scale(2.3); opacity: 0; }
+            28% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.82); opacity: 0.8; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #cuenta-numero { animation: none; }
+        }
+        /* ===== Navidad ===== */
+        body.fondo-navidad:not(.modo-hacker) {
+            --subtext-color: #ffe7a3;
+            --control-bg: rgba(96, 8, 20, 0.78);
+            --control-hover: rgba(138, 18, 32, 0.92);
+            --modal-bg: rgba(86, 8, 18, 0.92);
+            --badge-bg: rgba(255, 255, 255, 0.14);
+            --btn-bg: #ffd60a;
+            --btn-text: #6b0a14;
+            padding-bottom: 66px;
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .barra-superior {
+            background: rgba(92, 8, 18, 0.88);
+            border-bottom: 2px solid rgba(255, 214, 10, 0.65);
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .grupo-opcion-config {
+            background-color: rgba(96, 8, 20, 0.55);
+            border-color: rgba(255, 214, 10, 0.25);
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .grupo-opcion-config select,
+        body.fondo-navidad:not(.modo-hacker) .grupo-opcion-config button {
+            background-color: rgba(96, 8, 20, 0.8);
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .fondo-onda-inclinada {
+            background:
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.085) 0 26px, rgba(255, 255, 255, 0) 26px 52px),
+                linear-gradient(
+                    -30deg,
+                    var(--onda-oscuro, #5e0b16) 0%,
+                    var(--onda-onda, #c0283a) 45%,
+                    rgba(255, 232, 130, 0.22) 52%,
+                    var(--onda-onda, #c0283a) 60%,
+                    var(--onda-oscuro, #5e0b16) 100%
+                );
+            background-size: auto, 250% 250%;
+            opacity: 0.85;
+        }
+
+        .decor-navidad,
+        .navidad-suelo {
+            display: none;
+            pointer-events: none;
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .decor-navidad {
+            display: block;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: calc(var(--alto-barra, 60px) - 2px);
+            height: 30px;
+            z-index: 1;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='30' viewBox='0 0 120 30'%3E%3Cpath d='M0 3 Q15 13 30 3 Q45 13 60 3 Q75 13 90 3 Q105 13 120 3' fill='none' stroke='%231f8a46' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x left top / 120px 30px;
+        }
+
+        .decor-navidad::before,
+        .decor-navidad::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-repeat: repeat-x;
+            background-position: left top;
+            background-size: 120px 30px;
+            animation: parpadeoLucesNavidad 2s ease-in-out infinite;
+        }
+
+        .decor-navidad::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='30' viewBox='0 0 120 30'%3E%3Cdefs%3E%3CradialGradient id='g0'%3E%3Cstop offset='0' stop-color='%23ffd60a' stop-opacity='.75'/%3E%3Cstop offset='1' stop-color='%23ffd60a' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g1'%3E%3Cstop offset='0' stop-color='%23fff6d8' stop-opacity='.75'/%3E%3Cstop offset='1' stop-color='%23fff6d8' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='15' cy='17' r='11' fill='url(%23g0)'/%3E%3Crect x='12.8' y='7.6' width='4.4' height='4.6' rx='1' fill='%230f4a25'/%3E%3Cellipse cx='15' cy='17' rx='4' ry='5.6' fill='%23ffd60a'/%3E%3Cellipse cx='13.7' cy='15' rx='1.2' ry='2' fill='%23ffffff' fill-opacity='.75'/%3E%3Ccircle cx='75' cy='17' r='11' fill='url(%23g1)'/%3E%3Crect x='72.8' y='7.6' width='4.4' height='4.6' rx='1' fill='%230f4a25'/%3E%3Cellipse cx='75' cy='17' rx='4' ry='5.6' fill='%23fff6d8'/%3E%3Cellipse cx='73.7' cy='15' rx='1.2' ry='2' fill='%23ffffff' fill-opacity='.75'/%3E%3C/svg%3E");
+        }
+
+        .decor-navidad::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='30' viewBox='0 0 120 30'%3E%3Cdefs%3E%3CradialGradient id='g0'%3E%3Cstop offset='0' stop-color='%23ff3b4a' stop-opacity='.75'/%3E%3Cstop offset='1' stop-color='%23ff3b4a' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='g1'%3E%3Cstop offset='0' stop-color='%23ffe45c' stop-opacity='.75'/%3E%3Cstop offset='1' stop-color='%23ffe45c' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='45' cy='17' r='11' fill='url(%23g0)'/%3E%3Crect x='42.8' y='7.6' width='4.4' height='4.6' rx='1' fill='%230f4a25'/%3E%3Cellipse cx='45' cy='17' rx='4' ry='5.6' fill='%23ff3b4a'/%3E%3Cellipse cx='43.7' cy='15' rx='1.2' ry='2' fill='%23ffffff' fill-opacity='.75'/%3E%3Ccircle cx='105' cy='17' r='11' fill='url(%23g1)'/%3E%3Crect x='102.8' y='7.6' width='4.4' height='4.6' rx='1' fill='%230f4a25'/%3E%3Cellipse cx='105' cy='17' rx='4' ry='5.6' fill='%23ffe45c'/%3E%3Cellipse cx='103.7' cy='15' rx='1.2' ry='2' fill='%23ffffff' fill-opacity='.75'/%3E%3C/svg%3E");
+            animation-delay: 1s;
+        }
+
+        @keyframes parpadeoLucesNavidad {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.28; }
+        }
+
+        body.fondo-navidad:not(.modo-hacker) .navidad-suelo {
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 84px;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .navidad-suelo::before,
+        .navidad-suelo::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-repeat: repeat-x;
+            background-position: left bottom;
+        }
+
+        .navidad-suelo::before {
+            height: 56px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='56' viewBox='0 0 320 56'%3E%3Cpath d='M0 30 C40 4 80 4 120 26 C150 42 190 42 220 22 C250 4 290 10 320 30 L320 56 L0 56Z' fill='%23ffe9ec'/%3E%3C/svg%3E");
+            background-size: 320px 56px;
+            opacity: 0.55;
+        }
+
+        .navidad-suelo::after {
+            height: 40px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='40' viewBox='0 0 240 40'%3E%3Cpath d='M0 26 C30 6 70 6 100 22 C130 36 170 36 200 20 C215 12 230 14 240 26 L240 40 L0 40Z' fill='%23ffffff'/%3E%3C/svg%3E");
+            background-size: 240px 40px;
+            filter: drop-shadow(0 -2px 3px rgba(60, 0, 8, 0.28));
+        }
+
+        .navidad-adorno {
+            position: absolute;
+            z-index: 2;
+            line-height: 1;
+            filter: drop-shadow(0 2px 2px rgba(60, 0, 8, 0.35));
+        }
+
+        .nav-arbol-1 { left: 3%; bottom: 25px; font-size: 34px; }
+        .nav-regalo { left: 17%; bottom: 23px; font-size: 24px; }
+        .nav-arbol-2 { right: 19%; bottom: 24px; font-size: 26px; }
+        .nav-muneco { right: 4%; bottom: 24px; font-size: 32px; }
+
+        .navidad-saludo {
+            position: absolute;
+            z-index: 2;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 9px;
+            white-space: nowrap;
+            font-weight: 800;
+            font-size: 0.92rem;
+            letter-spacing: 0.3px;
+            color: #b3121f;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        @media (max-width: 420px) {
+            .nav-arbol-1 { font-size: 30px; }
+            .nav-muneco { font-size: 28px; }
+            .navidad-saludo { font-size: 0.82rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .decor-navidad::before,
+            .decor-navidad::after {
+                animation: none;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="fondo-onda-inclinada" id="fondo-onda-inclinada" aria-hidden="true"></div>
+    <div class="decor-navidad" id="decor-navidad" aria-hidden="true"></div>
+    <div class="navidad-suelo" id="navidad-suelo" aria-hidden="true">
+        <span class="navidad-adorno nav-arbol-1">🎄</span>
+        <span class="navidad-adorno nav-regalo">🎁</span>
+        <span class="navidad-saludo" id="navidad-saludo">¡Feliz Navidad!</span>
+        <span class="navidad-adorno nav-arbol-2">🎄</span>
+        <span class="navidad-adorno nav-muneco">⛄</span>
+    </div>
 
     <canvas id="matrix-canvas"></canvas>
     <canvas id="atmosfera-canvas"></canvas>
@@ -1545,6 +1750,8 @@
             </div>
         </div>
     </div>
+
+    <div id="cuenta-regresiva" aria-hidden="true"><div id="cuenta-numero"></div></div>
 
     <div class="modal-overlay" id="modal-global">
         <div class="modal-contenido">
@@ -1617,6 +1824,14 @@
             </div>
 
             <div class="grupo-opcion-config">
+                <label id="label-cuenta">⏳ Cuenta regresiva</label>
+                <select id="selector-cuenta" class="btn-mini" onchange="cambiarCuentaRegresiva(this)">
+                    <option value="1" selected>✅ Activada (3-2-1)</option>
+                    <option value="0">❌ Desactivada</option>
+                </select>
+            </div>
+
+            <div class="grupo-opcion-config">
                 <label id="label-atmosfera">🍃 Efectos Atmosféricos</label>
                 <select id="selector-atmosfera" class="btn-mini" onchange="cambiarAtmosfera()">
                     <option value="0">❌ Ninguno</option>
@@ -1659,6 +1874,7 @@
                 <button class="btn-mini" id="btn-toggle-fondo" type="button" onclick="toggleListaFondo()">🖼️ Cambiar Color de Fondo</button>
                 <select id="selector-fondo-oscuro" class="btn-mini selector-fondo-oscuro" onchange="aplicarFondoOscuro(this)">
                     <option value="#1a1a2e">🌌 Azul Noche (Por defecto)</option>
+                    <option value="#8a1220">🎄 Navidad (Rojo, Blanco y Amarillo)</option>
                     <option value="#450a0a">🟥 Rojo Oscuro</option>
                     <option value="#431407">🟧 Naranja Oscuro</option>
                     <option value="#422006">🟨 Amarillo Oscuro</option>
@@ -1947,6 +2163,11 @@
                 modoAutomatico: '🤖 Automático',
                 badgeModo: (m) => `Modo = ${m}`,
                 labelAtmosfera: '🍃 Efectos Atmosféricos',
+                labelCuenta: '⏳ Cuenta regresiva',
+                cuentaOn: '✅ Activada (3-2-1)',
+                cuentaOff: '❌ Desactivada',
+                cuentaPreparate: '🎯 ¡Prepárate!',
+                cuentaYa: '¡YA!',
                 atmos0: '❌ Ninguno',
                 atmos1: '🍃 Hojas',
                 atmos2: '❄️ Nieve',
@@ -1972,6 +2193,8 @@
                 labelFondo: '🖼️ Fondo de Pantalla',
                 btnFondo: '🖼️ Cambiar Color de Fondo',
                 fondoDefault: '🌌 Azul Noche (Por defecto)',
+                fondoNavidad: '🎄 Navidad (Rojo, Blanco y Amarillo)',
+                navidadSaludo: '¡Feliz Navidad!',
                 fondoRojo: '🟥 Rojo Oscuro',
                 fondoNaranja: '🟧 Naranja Oscuro',
                 fondoAmarillo: '🟨 Amarillo Oscuro',
@@ -2180,6 +2403,11 @@
                 modoAutomatico: '🤖 Automatic',
                 badgeModo: (m) => `Mode = ${m}`,
                 labelAtmosfera: '🍃 Atmospheric Effects',
+                labelCuenta: '⏳ Countdown',
+                cuentaOn: '✅ On (3-2-1)',
+                cuentaOff: '❌ Off',
+                cuentaPreparate: '🎯 Get ready!',
+                cuentaYa: 'GO!',
                 atmos0: '❌ None',
                 atmos1: '🍃 Leaves',
                 atmos2: '❄️ Snow',
@@ -2205,6 +2433,8 @@
                 labelFondo: '🖼️ Background',
                 btnFondo: '🖼️ Change Background Color',
                 fondoDefault: '🌌 Midnight Blue (Default)',
+                fondoNavidad: '🎄 Christmas (Red, White & Yellow)',
+                navidadSaludo: 'Merry Christmas!',
                 fondoRojo: '🟥 Dark Red',
                 fondoNaranja: '🟧 Dark Orange',
                 fondoAmarillo: '🟨 Dark Yellow',
@@ -2595,6 +2825,8 @@
             }
 
             try { aplicarIdiomaTutorial(); } catch (e) { console.error(e); }
+            try { aplicarIdiomaCuenta(); } catch (e) { console.error(e); }
+            try { aplicarIdiomaNavidad(); } catch (e) { console.error(e); }
             try { compactarBotonesBarra(); ajustarEspacioBarra(); } catch (e) { console.error(e); }
         }
 
@@ -2967,6 +3199,8 @@
 
         let timerPartidaInterval = null;
         let segundosPartida = 0;
+        const CLAVE_CUENTA_REGRESIVA = 'memoria_cuenta_regresiva_v1';
+        let cuentaRegresivaEnCurso = false;
         let haJugadoPartida = false;
 
         let tamanoCuadricula = 2;
@@ -3858,6 +4092,7 @@
         }
 
         function aplicarPreferenciasVisualesAlCargar() {
+            limpiarOpcionesNavidenasViejas();
             const prefs = obtenerPreferenciasVisuales();
             const selAtmos = document.getElementById('selector-atmosfera');
             const selSonido = document.getElementById('selector-sonido');
@@ -4262,8 +4497,44 @@
             '#422006': { oscuro: '#2e1603', onda: '#6e380a' },
             '#052e16': { oscuro: '#031f0e', onda: '#0a5227' },
             '#172554': { oscuro: '#0f1838', onda: '#233982' },
-            '#2e1065': { oscuro: '#1e0945', onda: '#4919a3' }
+            '#2e1065': { oscuro: '#1e0945', onda: '#4919a3' },
+            '#8a1220': { oscuro: '#5e0b16', onda: '#c0283a' }
         };
+
+        const FONDO_NAVIDAD = '#8a1220';
+
+        function aplicarIdiomaNavidad() {
+            const saludo = document.getElementById('navidad-saludo');
+            if (saludo) saludo.textContent = t('navidadSaludo');
+            setSelectOptionText('selector-fondo-oscuro', FONDO_NAVIDAD, t('fondoNavidad'));
+        }
+
+        // Si el navegador guardo opciones de una version anterior (atmosfera, tema o sonido navidenos),
+        // se quitan: atmosfera -> Ninguno; tema y sonido -> lo que tenia antes. El fondo de Navidad se conserva.
+        function limpiarOpcionesNavidenasViejas() {
+            try {
+                const p = obtenerPreferenciasVisuales();
+                let previo = null;
+                try { previo = JSON.parse(localStorage.getItem('memoria_navidad_previo_v1')); } catch (e) { previo = null; }
+                const validas = {
+                    atmosfera: ['0', '1', '2', '3'],
+                    temaColor: ['0', '2', '3', '4', '5', '6', '7'],
+                    sonido: ['12', '1', '3', '5', '7', '8', '9', '10', '11']
+                };
+                Object.keys(validas).forEach((clave) => {
+                    if (!validas[clave].includes(String(p[clave]))) {
+                        const antes = previo && previo[clave] !== undefined ? String(previo[clave]) : null;
+                        let nuevo = (antes && validas[clave].includes(antes)) ? antes : PREFS_DEFAULT[clave];
+                        if (clave === 'atmosfera') nuevo = '0'; // el fondo de Navidad va sin efecto atmosferico
+                        guardarPreferenciaVisual(clave, nuevo);
+                    }
+                });
+                localStorage.removeItem('memoria_navidad_previo_v1');
+                localStorage.removeItem('memoria_navidad_v1');
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
         function hexARgb(hex) {
             const limpio = String(hex || '').replace('#', '').trim();
@@ -4286,6 +4557,7 @@
         }
 
         function actualizarOndaFondo(colorHex) {
+            document.body.classList.toggle('fondo-navidad', colorHex === FONDO_NAVIDAD);
             const onda = document.getElementById('fondo-onda-inclinada');
             if (!onda) return;
             const paleta = PALETAS_ONDA_FONDO[colorHex] || {
@@ -4988,6 +5260,90 @@
             }
         }
 
+        // ===== Cuenta regresiva 3-2-1 antes de empezar =====
+        function cuentaRegresivaActivada() {
+            try { return localStorage.getItem(CLAVE_CUENTA_REGRESIVA) !== '0'; } catch (e) { return true; }
+        }
+
+        function cambiarCuentaRegresiva(select) {
+            try { localStorage.setItem(CLAVE_CUENTA_REGRESIVA, select.value === '0' ? '0' : '1'); } catch (e) {}
+        }
+
+        function inicializarCuentaRegresiva() {
+            const sel = document.getElementById('selector-cuenta');
+            if (sel) sel.value = cuentaRegresivaActivada() ? '1' : '0';
+        }
+
+        function sonarTickCuenta(esFinal) {
+            if (estaSilenciado) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const ahora = audioCtx.currentTime;
+                const duracion = esFinal ? 0.28 : 0.12;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(esFinal ? 1046.5 : 523.25, ahora);
+                gain.gain.setValueAtTime(0.001, ahora);
+                gain.gain.linearRampToValueAtTime(esFinal ? 0.3 : 0.22, ahora + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, ahora + duracion);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(ahora);
+                osc.stop(ahora + duracion + 0.02);
+            } catch (e) {}
+        }
+
+        function mostrarNumeroCuenta(texto, esFinal) {
+            const cont = document.getElementById('cuenta-regresiva');
+            const num = document.getElementById('cuenta-numero');
+            if (!cont || !num) return;
+            num.textContent = texto;
+            num.classList.toggle('ya', !!esFinal);
+            num.style.animation = 'none';
+            void num.offsetWidth;
+            num.style.animation = '';
+            cont.classList.add('activa');
+            cont.setAttribute('aria-hidden', 'false');
+            sonarTickCuenta(!!esFinal);
+        }
+
+        function ocultarCuentaRegresiva() {
+            cuentaRegresivaEnCurso = false;
+            const cont = document.getElementById('cuenta-regresiva');
+            if (cont) {
+                cont.classList.remove('activa');
+                cont.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        function iniciarCuentaRegresiva(alTerminar) {
+            if (modoJuego === 'automatico' || !cuentaRegresivaActivada()) {
+                alTerminar();
+                return;
+            }
+            cuentaRegresivaEnCurso = true;
+            document.getElementById('mensaje').textContent = t('cuentaPreparate');
+            mostrarNumeroCuenta('3', false);
+            timeouts.push(setTimeout(() => { if (partidaEnCurso) mostrarNumeroCuenta('2', false); }, 700));
+            timeouts.push(setTimeout(() => { if (partidaEnCurso) mostrarNumeroCuenta('1', false); }, 1400));
+            timeouts.push(setTimeout(() => { if (partidaEnCurso) mostrarNumeroCuenta(t('cuentaYa'), true); }, 2100));
+            timeouts.push(setTimeout(() => {
+                ocultarCuentaRegresiva();
+                if (partidaEnCurso) alTerminar();
+            }, 2650));
+        }
+
+        function aplicarIdiomaCuenta() {
+            const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+            set('label-cuenta', t('labelCuenta'));
+            setSelectOptionText('selector-cuenta', '1', t('cuentaOn'));
+            setSelectOptionText('selector-cuenta', '0', t('cuentaOff'));
+        }
+
+        inicializarCuentaRegresiva();
+
         function iniciarJuego() {
             if (modoJuego === 'libre') {
                 document.getElementById('mensaje').textContent = t('mensajeLibre');
@@ -5022,14 +5378,17 @@
             const crono = document.getElementById('cronometro-juego');
             crono.style.display = 'inline-block';
             crono.textContent = '⏱️ 00:00';
-            timerPartidaInterval = setInterval(() => {
-                segundosPartida++;
-                const min = String(Math.floor(segundosPartida / 60)).padStart(2, '0');
-                const seg = String(segundosPartida % 60).padStart(2, '0');
-                crono.textContent = `⏱️ ${min}:${seg}`;
-            }, 1000);
 
-            siguienteNivel();
+            iniciarCuentaRegresiva(() => {
+                timerPartidaInterval = setInterval(() => {
+                    segundosPartida++;
+                    const min = String(Math.floor(segundosPartida / 60)).padStart(2, '0');
+                    const seg = String(segundosPartida % 60).padStart(2, '0');
+                    crono.textContent = `⏱️ ${min}:${seg}`;
+                }, 1000);
+
+                siguienteNivel();
+            });
         }
 
         function siguienteNivel() {
@@ -5298,6 +5657,7 @@
         }
 
         function limpiarTimers() {
+            ocultarCuentaRegresiva();
             if (timerPartidaInterval) {
                 clearInterval(timerPartidaInterval);
                 timerPartidaInterval = null;
